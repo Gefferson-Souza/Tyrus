@@ -9,3 +9,4 @@ ox_analyzer = { path = "../ox_analyzer" }
 ox_codegen = { path = "../ox_codegen" }
 ox_diagnostics = { path = "../ox_diagnostics" }
 swc_ecma_ast = "18.0.0"
+miette = { version = "7.6.0", features = ["fancy"] }

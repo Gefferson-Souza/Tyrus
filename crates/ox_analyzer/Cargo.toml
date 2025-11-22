@@ -5,5 +5,9 @@ edition = "2021"
 
 [dependencies]
 petgraph = "0.6"
+swc_ecma_visit = "18.0.0"
+swc_ecma_ast = "18.0.0"
+swc_common = "17.0.1"
 ox_ast = { path = "../ox_ast" }
 ox_diagnostics = { path = "../ox_diagnostics" }
+miette = { version = "7.6.0", features = ["fancy"] }

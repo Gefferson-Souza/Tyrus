@@ -640,9 +640,13 @@ checksum = "9c6901729fa79e91a0913333229e9ca5dc725089d1c363b2f4b4760709dc4a52"
 name = "ox_analyzer"
 version = "0.1.0"
 dependencies = [
+ "miette",
  "ox_ast",
  "ox_diagnostics",
  "petgraph",
+ "swc_common",
+ "swc_ecma_ast",
+ "swc_ecma_visit",
 ]
 
 [[package]]
@@ -692,6 +696,7 @@ dependencies = [
 name = "ox_orchestrator"
 version = "0.1.0"
 dependencies = [
+ "miette",
  "ox_analyzer",
  "ox_codegen",
  "ox_diagnostics",
@@ -1143,6 +1148,21 @@ dependencies = [
  "swc_atoms",
  "swc_common",
  "swc_ecma_ast",
+ "tracing",
+]
+
+[[package]]
+name = "swc_ecma_visit"
+version = "18.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9611a72a4008d62608547a394e5d72a5245413104db096d95a52368a8cc1d63"
+dependencies = [
+ "new_debug_unreachable",
+ "num-bigint",
+ "swc_atoms",
+ "swc_common",
+ "swc_ecma_ast",
+ "swc_visit",
  "tracing",
 ]
 

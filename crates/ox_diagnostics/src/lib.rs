@@ -16,7 +16,34 @@ pub enum OxidizerError {
         #[label("{message}")]
         span: SourceSpan,
     },
-    
+
+    #[error("Lint Error: Rust does not support 'var'. Use 'let' or 'const'.")]
+    #[diagnostic(code(oxidizer::lint::no_var))]
+    UseOfVar {
+        #[source_code]
+        src: NamedSource<String>,
+        #[label("replace 'var' with 'let' or 'const'")]
+        span: SourceSpan,
+    },
+
+    #[error("Lint Error: Rust requires strict typing. 'any' is not allowed.")]
+    #[diagnostic(code(oxidizer::lint::no_any))]
+    UseOfAny {
+        #[source_code]
+        src: NamedSource<String>,
+        #[label("specify a concrete type")]
+        span: SourceSpan,
+    },
+
+    #[error("Lint Error: Code injection via 'eval' is unsafe and not supported in Rust.")]
+    #[diagnostic(code(oxidizer::lint::no_eval))]
+    UseOfEval {
+        #[source_code]
+        src: NamedSource<String>,
+        #[label("remove 'eval' usage")]
+        span: SourceSpan,
+    },
+
     #[error("Unknown Error")]
     #[diagnostic(code(oxidizer::unknown))]
     Unknown,

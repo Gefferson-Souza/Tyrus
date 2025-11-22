@@ -3,7 +3,7 @@
 ## 🏁 Milestone 0: The Foundation (Current)
 - [x] Project Scaffolding (Cargo Workspace)
 - [x] CLI Basic Structure (`clap`)
-- [ ] **Tracer Bullet:** Connect CLI to Parser (Read a file and print "Success")
+- [x] **Tracer Bullet:** Connect CLI to Parser (Read a file and print "Success")
 - [ ] CI/CD Pipeline Setup (GitHub Actions)
 
 ## 🏗️ Milestone 1: The Analyzer (Focus: "oxidizer check")
