@@ -44,6 +44,10 @@ pub enum OxidizerError {
         span: SourceSpan,
     },
 
+    #[error("Formatting Error: {0}")]
+    #[diagnostic(code(oxidizer::fmt_error))]
+    FormattingError(String),
+
     #[error("Unknown Error")]
     #[diagnostic(code(oxidizer::unknown))]
     Unknown,

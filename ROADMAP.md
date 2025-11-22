@@ -6,20 +6,20 @@
 - [x] **Tracer Bullet:** Connect CLI to Parser (Read a file and print "Success")
 - [ ] CI/CD Pipeline Setup (GitHub Actions)
 
-## 🏗️ Milestone 1: The Analyzer (Focus: "oxidizer check")
+## � Milestone 1: The Analyzer (Complete)
 - [x] **Analyzer Core:** Implement `ox_analyzer` crate
 - [x] **Linter Rules:**
     - [x] Block `any`
     - [x] Block `eval`
     - [x] Block `var`
-- [x] **Refactoring:** Compliance with Guidelines (Newtype, Tracing, Tests)aph (Resolve `import` statements)
-- [ ] Implement basic Lints:
-    - [ ] Ban `any` type
-    - [ ] Ban `eval`
-    - [ ] Check for `var` usage
+- [x] **Refactoring:** Compliance with Guidelines (Newtype, Tracing, Tests)
+- [x] Implement basic Lints:
+    - [x] Ban `any` type
+    - [x] Ban `eval`
+    - [x] Check for `var` usage
 - [ ] Error Reporting with `miette` (Visual spans)
 
-## ⚙️ Milestone 2: The Type Transpiler (Focus: DTOs)
+## 🏗️ Milestone 2: The Type Transpiler (Current)
 - [ ] Convert TS `interface` -> Rust `struct`
 - [ ] Map primitive types (`string` -> `String`, `number` -> `f64`)
 - [ ] Auto-derive `Serialize, Deserialize` (Serde)

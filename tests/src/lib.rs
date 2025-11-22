@@ -4,6 +4,8 @@ use assert_cmd::prelude::*;
 #[cfg(test)]
 use std::process::Command;
 
+mod test_build;
+
 #[test]
 fn test_cli_check_pass() {
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("ox_cli"));

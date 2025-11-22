@@ -21,7 +21,7 @@ enum Commands {
     /// Build the output Rust code
     Build {
         /// Input file path
-        path: String,
+        path: PathBuf,
     },
 }
 
@@ -41,8 +41,8 @@ async fn main() -> Result<()> {
             ox_orchestrator::check(FilePath::from(path))?;
         }
         Commands::Build { path } => {
-            println!("Building file: {}", path);
-            // Call orchestrator build here
+            let output = ox_orchestrator::build(FilePath::from(path))?;
+            println!("{}", output);
         }
     }
 

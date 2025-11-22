@@ -8,6 +8,7 @@ publish = false
 ox_common = { path = "../crates/ox_common" }
 assert_cmd = "2.0"
 predicates = "3.0"
+insta = "1.34"
 
 [dev-dependencies]
 

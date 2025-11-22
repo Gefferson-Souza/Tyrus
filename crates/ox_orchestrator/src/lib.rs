@@ -30,3 +30,36 @@ pub fn pipeline() -> Result<(), OxidizerError> {
     // Stub implementation
     Ok(())
 }
+
+pub fn build(path: FilePath) -> Result<String, OxidizerError> {
+    let program = ox_parser::parse(path.as_ref())?;
+    let generated_code = ox_codegen::generate(&program);
+    format_code(generated_code)
+}
+
+fn format_code(code: String) -> Result<String, OxidizerError> {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
+    let mut child = Command::new("rustfmt")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .map_err(OxidizerError::IoError)?;
+
+    if let Some(mut stdin) = child.stdin.take() {
+        stdin
+            .write_all(code.as_bytes())
+            .map_err(OxidizerError::IoError)?;
+    }
+
+    let output = child.wait_with_output().map_err(OxidizerError::IoError)?;
+
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).to_string())
+    } else {
+        Err(OxidizerError::FormattingError(
+            String::from_utf8_lossy(&output.stderr).to_string(),
+        ))
+    }
+}
