@@ -49,4 +49,8 @@ impl Visit for RustGenerator {
         self.code.push_str(&struct_def.to_string());
         self.code.push('\n');
     }
+
+    fn visit_fn_decl(&mut self, n: &swc_ecma_ast::FnDecl) {
+        self.visit_fn_decl(n);
+    }
 }

@@ -1,6 +1,6 @@
-mod convert_struct;
+mod convert;
 
-use convert_struct::RustGenerator;
+use convert::interface::RustGenerator;
 use swc_ecma_ast::Program;
 use swc_ecma_visit::VisitWith;
 

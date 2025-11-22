@@ -25,10 +25,10 @@
 - [x] Auto-derive `Serialize, Deserialize` (Serde)
 - [x] Output `.rs` files using `quote!`
 
-## 🏗️ Milestone 3: Logic & Functions (Current)
-- [ ] Convert simple `fn` declarations
-- [ ] Basic control flow (`if`, `return`)
-- [ ] Binary expressions (Math)
+## 🏁 Milestone 3: Logic & Functions (Complete)
+- [x] Convert simple `fn` declarations
+- [x] Basic control flow (`if`, `return`)
+- [x] Binary expressions (Math)
 
 ## 🚀 Milestone 4: Advanced Features (The "Viral" Stuff)
 - [ ] Async/Await support (`tokio`)

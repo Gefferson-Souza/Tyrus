@@ -3,7 +3,7 @@ use quote::quote;
 use swc_ecma_ast::{TsType, TsTypeAnn};
 
 /// Maps TypeScript types to Rust types
-pub fn map_ts_type(type_ann: Option<&TsTypeAnn>) -> TokenStream {
+pub fn map_ts_type(type_ann: Option<&Box<TsTypeAnn>>) -> TokenStream {
     if let Some(type_ann) = type_ann {
         match &*type_ann.type_ann {
             TsType::TsKeywordType(k) => match k.kind {

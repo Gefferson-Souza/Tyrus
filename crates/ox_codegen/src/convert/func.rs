@@ -1,11 +1,10 @@
 use quote::{format_ident, quote};
-use swc_ecma_ast::{BinExpr, BinaryOp, Expr, FnDecl, Ident, Pat, ReturnStmt, Stmt};
-use swc_ecma_visit::Visit;
+use swc_ecma_ast::{BinExpr, BinaryOp, Expr, FnDecl, Lit, Pat, ReturnStmt, Stmt};
 
 use super::type_mapper::map_ts_type;
 
 impl super::interface::RustGenerator {
-    fn visit_fn_decl(&mut self, n: &FnDecl) {
+    pub fn visit_fn_decl(&mut self, n: &FnDecl) {
         let fn_name = to_snake_case(&n.ident.sym);
         let fn_ident = format_ident!("{}", fn_name);
 
@@ -65,8 +64,14 @@ fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
             quote! { #ident_name }
         }
         Expr::Lit(lit) => {
-            // Handle literals (numbers, strings, etc.)
-            quote! { #lit }
+            // Handle numeric literals
+            match lit {
+                Lit::Num(num) => {
+                    let value = num.value;
+                    quote! { #value }
+                }
+                _ => quote! { todo!("non-numeric literal") },
+            }
         }
         _ => quote! { todo!() },
     }
