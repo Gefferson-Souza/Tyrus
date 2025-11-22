@@ -5,6 +5,7 @@ use assert_cmd::prelude::*;
 use std::process::Command;
 
 mod test_build;
+mod test_compilation;
 
 #[test]
 fn test_cli_check_pass() {

@@ -74,3 +74,58 @@ fn map_inner_type(ts_type: &swc_ecma_ast::TsType) -> TokenStream {
         _ => quote! { serde_json::Value },
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use swc_common::DUMMY_SP;
+    use swc_ecma_ast::{TsKeywordType, TsKeywordTypeKind};
+
+    #[test]
+    fn test_map_ts_type_string() {
+        let ts_type = TsType::TsKeywordType(TsKeywordType {
+            span: DUMMY_SP,
+            kind: TsKeywordTypeKind::TsStringKeyword,
+        });
+        let type_ann = Box::new(TsTypeAnn {
+            span: DUMMY_SP,
+            type_ann: Box::new(ts_type),
+        });
+        let result = map_ts_type(Some(&type_ann));
+        assert_eq!(result.to_string(), "String");
+    }
+
+    #[test]
+    fn test_map_ts_type_number() {
+        let ts_type = TsType::TsKeywordType(TsKeywordType {
+            span: DUMMY_SP,
+            kind: TsKeywordTypeKind::TsNumberKeyword,
+        });
+        let type_ann = Box::new(TsTypeAnn {
+            span: DUMMY_SP,
+            type_ann: Box::new(ts_type),
+        });
+        let result = map_ts_type(Some(&type_ann));
+        assert_eq!(result.to_string(), "f64");
+    }
+
+    #[test]
+    fn test_map_ts_type_boolean() {
+        let ts_type = TsType::TsKeywordType(TsKeywordType {
+            span: DUMMY_SP,
+            kind: TsKeywordTypeKind::TsBooleanKeyword,
+        });
+        let type_ann = Box::new(TsTypeAnn {
+            span: DUMMY_SP,
+            type_ann: Box::new(ts_type),
+        });
+        let result = map_ts_type(Some(&type_ann));
+        assert_eq!(result.to_string(), "bool");
+    }
+
+    #[test]
+    fn test_map_ts_type_none() {
+        let result = map_ts_type(None);
+        assert_eq!(result.to_string(), "serde_json :: Value");
+    }
+}

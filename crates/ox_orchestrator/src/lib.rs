@@ -38,6 +38,14 @@ pub fn build(path: FilePath) -> Result<String, OxidizerError> {
 }
 
 fn format_code(code: String) -> Result<String, OxidizerError> {
+    // Skip formatting for code containing async (edition compatibility)
+    if code.contains("async fn") {
+        return Ok(format!(
+            "// Note: async/await code - formatting skipped for edition compatibility\n{}",
+            code
+        ));
+    }
+
     use std::io::Write;
     use std::process::{Command, Stdio};
 

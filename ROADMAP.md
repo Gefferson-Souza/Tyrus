@@ -33,8 +33,11 @@
 ## 🚀 Milestone 4: The Modern Stack (Current)
 - [x] **Async/Await Support:**
     - [x] Convert `async function` -> `pub async fn`
-    - [x] Unwrap `Promise<T>` return types (e.g., `Promise<string>` -> `String`)
+    - [x] Unwrap `Promise<T>` return types
     - [x] Convert `await expr` -> `expr.await`
-- [ ] **Class Support:**
-    - [ ] Convert `class` -> `struct` + `impl`
+- [ ] **Class Support (Part 2):**
+    - [ ] Split `class` into `struct` (properties) + `impl` (methods)
+    - [ ] Convert `constructor` -> `pub fn new() -> Self`
+    - [ ] Convert `this.prop` -> `self.prop`
+    - [ ] Add `&self` to instance methods
 - [ ] **HTTP Client mapping** (`axios` -> `reqwest`)
