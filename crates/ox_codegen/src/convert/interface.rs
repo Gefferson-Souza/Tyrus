@@ -53,4 +53,8 @@ impl Visit for RustGenerator {
     fn visit_fn_decl(&mut self, n: &swc_ecma_ast::FnDecl) {
         self.visit_fn_decl(n);
     }
+
+    fn visit_class_decl(&mut self, n: &swc_ecma_ast::ClassDecl) {
+        self.visit_class_decl(n);
+    }
 }

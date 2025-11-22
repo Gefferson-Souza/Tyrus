@@ -1,7 +1,7 @@
 use quote::{format_ident, quote};
 use swc_ecma_ast::{
-    AwaitExpr, BinExpr, BinaryOp, CallExpr, Callee, Expr, ExprOrSpread, FnDecl, Lit, Pat,
-    ReturnStmt, Stmt,
+    AwaitExpr, BinExpr, BinaryOp, CallExpr, Callee, Expr, ExprOrSpread, FnDecl, Lit, MemberExpr,
+    Pat, ReturnStmt, Stmt,
 };
 
 use super::type_mapper::{map_ts_type, unwrap_promise_type};
@@ -58,9 +58,21 @@ impl super::interface::RustGenerator {
     }
 }
 
+pub fn convert_stmt_pub(stmt: &Stmt) -> proc_macro2::TokenStream {
+    convert_stmt(stmt)
+}
+
+pub fn convert_expr_pub(expr: &Expr) -> proc_macro2::TokenStream {
+    convert_expr(expr)
+}
+
 fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
     match stmt {
         Stmt::Return(ret) => convert_return_stmt(ret),
+        Stmt::Expr(expr_stmt) => {
+            let expr = convert_expr(&expr_stmt.expr);
+            quote! { #expr; }
+        }
         _ => quote! {}, // Skip other statements for now
     }
 }
@@ -91,9 +103,28 @@ fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
                 _ => quote! { todo!("non-numeric literal") },
             }
         }
+        Expr::Member(member) => convert_member_expr(member),
         Expr::Await(await_expr) => convert_await_expr(await_expr),
         Expr::Call(call_expr) => convert_call_expr(call_expr),
         _ => quote! { todo!() },
+    }
+}
+
+fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
+    // Handle this.prop -> self.prop
+    if member.obj.is_this() {
+        if let Some(prop_ident) = member.prop.as_ident() {
+            let field = format_ident!("{}", prop_ident.sym.to_string());
+            return quote! { self.#field };
+        }
+    }
+    // Handle other.prop
+    let obj = convert_expr(&member.obj);
+    if let Some(prop_ident) = member.prop.as_ident() {
+        let prop = format_ident!("{}", prop_ident.sym.to_string());
+        quote! { #obj.#prop }
+    } else {
+        quote! { todo!("complex member access") }
     }
 }
 
