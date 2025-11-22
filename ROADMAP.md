@@ -30,14 +30,33 @@
 - [x] Basic control flow (`if`, `return`)
 - [x] Binary expressions (Math)
 
-## 🚀 Milestone 4: The Modern Stack (Current)
+## 🚀 Milestone 4: The Modern Stack (Complete)
 - [x] **Async/Await Support:**
     - [x] Convert `async function` -> `pub async fn`
     - [x] Unwrap `Promise<T>` return types
     - [x] Convert `await expr` -> `expr.await`
-- [ ] **Class Support (Part 2):**
-    - [ ] Split `class` into `struct` (properties) + `impl` (methods)
-    - [ ] Convert `constructor` -> `pub fn new() -> Self`
-    - [ ] Convert `this.prop` -> `self.prop`
-    - [ ] Add `&self` to instance methods
+- [x] **Class Support:**
+    - [x] Split `class` into `struct` (properties) + `impl` (methods)
+    - [x] Convert `constructor` -> `pub fn new() -> Self`
+    - [x] Convert `this.prop` -> `self.prop`
+    - [x] Add `&self` to instance methods
 - [ ] **HTTP Client mapping** (`axios` -> `reqwest`)
+
+## ✅ QA & Compliance (Complete)
+- [x] **Code Quality:**
+    - [x] Fix all compiler warnings
+    - [x] Clippy compliance
+- [x] **Guidelines.md Compliance:**
+    - [x] Newtype Pattern (`FilePath`)
+    - [x] Visitor Pattern (AST traversal)
+    - [x] Rich error handling (miette)
+- [x] **Testing Infrastructure:**
+    - [x] Unit tests (8 passing)
+    - [x] Snapshot tests (insta)
+    - [x] Compilation tests (rustc validation)
+    - [x] Complex E2E fixtures
+
+## 🎯 Next Steps
+- [ ] HTTP Client mapping (`axios` -> `reqwest`)
+- [ ] Module system support
+- [ ] Advanced type features (Generics, Union types)
