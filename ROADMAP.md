@@ -31,10 +31,10 @@
 - [x] Binary expressions (Math)
 
 ## 🚀 Milestone 4: The Modern Stack (Current)
-- [ ] **Async/Await Support:**
-    - [ ] Convert `async function` -> `pub async fn`
-    - [ ] Unwrap `Promise<T>` return types (e.g., `Promise<string>` -> `String`)
-    - [ ] Convert `await expr` -> `expr.await`
+- [x] **Async/Await Support:**
+    - [x] Convert `async function` -> `pub async fn`
+    - [x] Unwrap `Promise<T>` return types (e.g., `Promise<string>` -> `String`)
+    - [x] Convert `await expr` -> `expr.await`
 - [ ] **Class Support:**
     - [ ] Convert `class` -> `struct` + `impl`
 - [ ] **HTTP Client mapping** (`axios` -> `reqwest`)

@@ -1,12 +1,18 @@
 use quote::{format_ident, quote};
-use swc_ecma_ast::{BinExpr, BinaryOp, Expr, FnDecl, Lit, Pat, ReturnStmt, Stmt};
+use swc_ecma_ast::{
+    AwaitExpr, BinExpr, BinaryOp, CallExpr, Callee, Expr, ExprOrSpread, FnDecl, Lit, Pat,
+    ReturnStmt, Stmt,
+};
 
-use super::type_mapper::map_ts_type;
+use super::type_mapper::{map_ts_type, unwrap_promise_type};
 
 impl super::interface::RustGenerator {
     pub fn visit_fn_decl(&mut self, n: &FnDecl) {
         let fn_name = to_snake_case(&n.ident.sym);
         let fn_ident = format_ident!("{}", fn_name);
+
+        // Check if async
+        let is_async = n.function.is_async;
 
         // Extract parameters
         let mut params = Vec::new();
@@ -18,8 +24,12 @@ impl super::interface::RustGenerator {
             }
         }
 
-        // Extract return type
-        let return_type = map_ts_type(n.function.return_type.as_ref());
+        // Extract return type - unwrap Promise<T> for async functions
+        let return_type = if is_async {
+            unwrap_promise_type(n.function.return_type.as_ref())
+        } else {
+            map_ts_type(n.function.return_type.as_ref())
+        };
 
         // Convert body
         let mut body_stmts = Vec::new();
@@ -29,9 +39,17 @@ impl super::interface::RustGenerator {
             }
         }
 
-        let fn_def = quote! {
-            pub fn #fn_ident(#(#params),*) -> #return_type {
-                #(#body_stmts)*
+        let fn_def = if is_async {
+            quote! {
+                pub async fn #fn_ident(#(#params),*) -> #return_type {
+                    #(#body_stmts)*
+                }
+            }
+        } else {
+            quote! {
+                pub fn #fn_ident(#(#params),*) -> #return_type {
+                    #(#body_stmts)*
+                }
             }
         };
 
@@ -73,6 +91,8 @@ fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
                 _ => quote! { todo!("non-numeric literal") },
             }
         }
+        Expr::Await(await_expr) => convert_await_expr(await_expr),
+        Expr::Call(call_expr) => convert_call_expr(call_expr),
         _ => quote! { todo!() },
     }
 }
@@ -90,6 +110,26 @@ fn convert_bin_expr(bin: &BinExpr) -> proc_macro2::TokenStream {
     };
 
     quote! { #left #op #right }
+}
+
+fn convert_await_expr(await_expr: &AwaitExpr) -> proc_macro2::TokenStream {
+    let inner = convert_expr(&await_expr.arg);
+    quote! { #inner.await }
+}
+
+fn convert_call_expr(call: &CallExpr) -> proc_macro2::TokenStream {
+    let callee = match &call.callee {
+        Callee::Expr(expr) => convert_expr(expr),
+        _ => quote! { unknown_callee },
+    };
+
+    let args: Vec<_> = call.args.iter().map(convert_expr_or_spread).collect();
+
+    quote! { #callee(#(#args),*) }
+}
+
+fn convert_expr_or_spread(arg: &ExprOrSpread) -> proc_macro2::TokenStream {
+    convert_expr(&arg.expr)
 }
 
 fn to_snake_case(s: &str) -> String {
