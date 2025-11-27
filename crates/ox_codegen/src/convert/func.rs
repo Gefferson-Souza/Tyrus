@@ -341,7 +341,7 @@ pub fn convert_expr_or_spread(arg: &ExprOrSpread) -> proc_macro2::TokenStream {
     convert_expr(&arg.expr)
 }
 
-fn to_snake_case(s: &str) -> String {
+pub fn to_snake_case(s: &str) -> String {
     let mut result = String::new();
     for (i, ch) in s.chars().enumerate() {
         if ch.is_uppercase() && i > 0 {

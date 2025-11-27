@@ -8,13 +8,15 @@ use super::type_mapper::map_ts_type;
 pub struct RustGenerator {
     pub code: String,
     pub is_exporting: bool,
+    pub is_index: bool,
 }
 
 impl RustGenerator {
-    pub fn new() -> Self {
+    pub fn new(is_index: bool) -> Self {
         Self {
             code: String::new(),
             is_exporting: false,
+            is_index,
         }
     }
 }

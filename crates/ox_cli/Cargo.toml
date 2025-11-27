@@ -11,3 +11,4 @@ ox_orchestrator = { path = "../ox_orchestrator" }
 ox_common = { path = "../ox_common" }
 tracing = "0.1.41"
 tracing-subscriber = "0.3.20"
+walkdir = "2.5.0"

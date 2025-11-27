@@ -19,8 +19,11 @@ enum Commands {
     },
     /// Build the output Rust code
     Build {
-        /// Input file path
+        /// Input file or directory path
         path: PathBuf,
+        /// Output directory path (default: ./typerust_output)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
     },
 }
 
@@ -35,9 +38,15 @@ async fn main() -> Result<()> {
         Commands::Check { path } => {
             ox_orchestrator::check(FilePath::from(path))?;
         }
-        Commands::Build { path } => {
-            let output = ox_orchestrator::build(FilePath::from(path))?;
-            println!("{}", output);
+        Commands::Build { path, output } => {
+            if path.is_dir() {
+                let output_dir = output.unwrap_or_else(|| PathBuf::from("./typerust_output"));
+                ox_orchestrator::build_project(path, output_dir)?;
+                println!("✅ Project built successfully!");
+            } else {
+                let output_code = ox_orchestrator::build(FilePath::from(path))?;
+                println!("{}", output_code);
+            }
         }
     }
 
