@@ -37,7 +37,11 @@ impl Visit for RustGenerator {
                 };
                 let field_name = format_ident!("{}", field_name_str);
 
-                let field_type = map_ts_type(prop.type_ann.as_ref());
+                let mut field_type = map_ts_type(prop.type_ann.as_ref());
+
+                if prop.optional {
+                    field_type = quote! { Option<#field_type> };
+                }
 
                 fields.push(quote! {
                     pub #field_name: #field_type
@@ -62,6 +66,27 @@ impl Visit for RustGenerator {
 
     fn visit_class_decl(&mut self, n: &swc_ecma_ast::ClassDecl) {
         self.process_class_decl(n);
+    }
+
+    fn visit_ts_type_alias_decl(&mut self, n: &swc_ecma_ast::TsTypeAliasDecl) {
+        let alias_name = format_ident!("{}", n.id.sym.to_string());
+        let alias_type = map_ts_type(Some(&Box::new(swc_ecma_ast::TsTypeAnn {
+            span: swc_common::DUMMY_SP,
+            type_ann: n.type_ann.clone(),
+        })));
+
+        let vis = if self.is_exporting {
+            quote! { pub }
+        } else {
+            quote! {}
+        };
+
+        let type_def = quote! {
+            #vis type #alias_name = #alias_type;
+        };
+
+        self.code.push_str(&type_def.to_string());
+        self.code.push('\n');
     }
 
     fn visit_module_item(&mut self, n: &swc_ecma_ast::ModuleItem) {

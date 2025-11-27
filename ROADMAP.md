@@ -117,6 +117,24 @@ _Goal: Support multi-file projects with imports and exports._
   - [x] `import { Foo } from './bar'` -> `use crate::bar::Foo;`
   - [x] `export class Bar {}` -> `pub struct Bar ...`
   - [ ] `export default` handling
-- [ ] **File System Mapping:**
-  - [ ] Map TS file structure to Rust module structure (`mod.rs`)
-  - [ ] Handle `index.ts` resolution
+- [x] **File System Mapping:**
+  - [x] Map TS file structure to Rust module structure (`mod.rs`)
+  - [x] Handle `index.ts` resolution
+
+## 🧬 Phase 3: Advanced Type System (Complete)
+
+_Goal: Support complex TypeScript types and generics._
+
+- [x] **Arrays:** `number[]` -> `Vec<f64>`
+- [x] **Optionals:** `string | undefined` -> `Option<String>`
+- [x] **Type References:** `User` -> `User` (Struct linkage)
+- [x] **Type Aliases:** `type ID = string` -> `type ID = String;`
+
+## 🧩 Phase 4: Generics (Next)
+
+_Goal: Support user-defined generics in classes, interfaces, and functions._
+
+- [ ] **Generic Interfaces:** `interface Box<T> { value: T; }`
+- [ ] **Generic Classes:** `class Wrapper<T> { ... }`
+- [ ] **Generic Functions:** `function identity<T>(arg: T): T { ... }`
+- [ ] **Trait Implementation:** `class User implements IPrintable` (Future/Stretch)

@@ -122,7 +122,7 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
         }
         Stmt::If(if_stmt) => {
             let test = convert_expr(&if_stmt.test);
-            let cons = convert_stmt(&*if_stmt.cons);
+            let cons = convert_stmt(&if_stmt.cons);
 
             let cons_block = if matches!(*if_stmt.cons, Stmt::Block(_)) {
                 quote! { #cons }
@@ -131,7 +131,7 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
             };
 
             let alt = if let Some(alt) = &if_stmt.alt {
-                let alt_stmt = convert_stmt(&*alt);
+                let alt_stmt = convert_stmt(alt);
                 let alt_block = if matches!(&**alt, Stmt::Block(_) | Stmt::If(_)) {
                     quote! { #alt_stmt }
                 } else {
@@ -157,7 +157,7 @@ pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
             let name = ident.sym.as_str();
             // If starts with uppercase, assume Class/Type and keep as is
             // If starts with lowercase, convert to snake_case (variable/function)
-            if name.chars().next().map_or(false, |c| c.is_uppercase()) {
+            if name.chars().next().is_some_and(|c| c.is_uppercase()) {
                 let ident_token = format_ident!("{}", name);
                 quote! { #ident_token }
             } else {

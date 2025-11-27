@@ -119,7 +119,7 @@ impl RustGenerator {
                     let imported_rust_name = if imported_name
                         .chars()
                         .next()
-                        .map_or(false, |c| c.is_uppercase())
+                        .is_some_and(|c| c.is_uppercase())
                     {
                         imported_name.clone()
                     } else {
@@ -130,7 +130,7 @@ impl RustGenerator {
                     let local_rust_name = if local_name
                         .chars()
                         .next()
-                        .map_or(false, |c| c.is_uppercase())
+                        .is_some_and(|c| c.is_uppercase())
                     {
                         local_name.clone()
                     } else {
@@ -154,7 +154,7 @@ impl RustGenerator {
                     let local_rust_name = if local_name
                         .chars()
                         .next()
-                        .map_or(false, |c| c.is_uppercase())
+                        .is_some_and(|c| c.is_uppercase())
                     {
                         local_name.clone()
                     } else {
@@ -177,7 +177,7 @@ impl RustGenerator {
                     let local_rust_name = if local_name
                         .chars()
                         .next()
-                        .map_or(false, |c| c.is_uppercase())
+                        .is_some_and(|c| c.is_uppercase())
                     {
                         local_name.clone()
                     } else {

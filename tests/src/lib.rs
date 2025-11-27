@@ -11,6 +11,8 @@ mod test_execute;
 mod test_snapshots;
 #[cfg(test)]
 mod test_stdlib_exec;
+#[cfg(test)]
+mod test_types;
 
 #[test]
 fn test_cli_check_pass() {
