@@ -49,9 +49,24 @@ impl Visit for RustGenerator {
             }
         }
 
+        let generics = if let Some(type_params) = &n.type_params {
+            let params: Vec<_> = type_params
+                .params
+                .iter()
+                .map(|p| {
+                    let name = p.name.sym.to_string();
+                    let ident = format_ident!("{}", name);
+                    quote! { #ident: Clone }
+                })
+                .collect();
+            quote! { <#(#params),*> }
+        } else {
+            quote! {}
+        };
+
         let struct_def = quote! {
             #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-            pub struct #struct_name {
+            pub struct #struct_name #generics {
                 #(#fields),*
             }
         };

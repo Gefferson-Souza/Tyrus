@@ -1,7 +1,7 @@
 use quote::{format_ident, quote};
 use swc_ecma_ast::{AssignTarget, ClassDecl, ClassMember, Constructor, Expr, ExprStmt, Pat, Stmt};
 
-use super::func::{convert_expr_pub, convert_stmt_pub};
+use super::func::{convert_expr_pub, convert_stmt_pub, to_snake_case};
 use super::interface::RustGenerator;
 use super::type_mapper::{is_optional_type, map_ts_type};
 
@@ -40,9 +40,32 @@ impl RustGenerator {
             quote! {}
         };
 
+        let (generics_decl, generics_use) = if let Some(type_params) = &n.class.type_params {
+            let params_decl: Vec<_> = type_params
+                .params
+                .iter()
+                .map(|p| {
+                    let name = p.name.sym.to_string();
+                    let ident = format_ident!("{}", name);
+                    quote! { #ident: Clone }
+                })
+                .collect();
+            let params_use: Vec<_> = type_params
+                .params
+                .iter()
+                .map(|p| format_ident!("{}", p.name.sym.to_string()))
+                .collect();
+            (
+                quote! { <#(#params_decl),*> },
+                quote! { <#(#params_use),*> },
+            )
+        } else {
+            (quote! {}, quote! {})
+        };
+
         let struct_def = quote! {
             #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-            #vis struct #struct_name {
+            #vis struct #struct_name #generics_decl {
                 #(#fields),*
             }
         };
@@ -71,7 +94,7 @@ impl RustGenerator {
         }
 
         let impl_block = quote! {
-            impl #struct_name {
+            impl #generics_decl #struct_name #generics_use {
                 #(#impl_items)*
             }
         };
@@ -207,7 +230,7 @@ impl RustGenerator {
         } else {
             return quote! { /* unsupported method key */ };
         };
-        let method_name = format_ident!("{}", method_name_str);
+        let method_name = format_ident!("{}", to_snake_case(&method_name_str));
 
         // Build parameters - always add &self for instance methods
         let mut params = vec![quote! { &self }];

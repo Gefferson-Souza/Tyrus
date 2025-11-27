@@ -7,6 +7,7 @@ use std::process::Command;
 mod test_build;
 mod test_compilation;
 mod test_execute;
+mod test_generics;
 #[cfg(test)]
 mod test_snapshots;
 #[cfg(test)]

@@ -45,15 +45,30 @@ impl super::interface::RustGenerator {
             quote! {}
         };
 
+        let generics = if let Some(type_params) = &n.function.type_params {
+            let params: Vec<_> = type_params
+                .params
+                .iter()
+                .map(|p| {
+                    let name = p.name.sym.to_string();
+                    let ident = format_ident!("{}", name);
+                    quote! { #ident: Clone }
+                })
+                .collect();
+            quote! { <#(#params),*> }
+        } else {
+            quote! {}
+        };
+
         let fn_def = if is_async {
             quote! {
-                #vis async fn #fn_ident(#(#params),*) -> #return_type {
+                #vis async fn #fn_ident #generics (#(#params),*) -> #return_type {
                     #(#body_stmts)*
                 }
             }
         } else {
             quote! {
-                #vis fn #fn_ident(#(#params),*) -> #return_type {
+                #vis fn #fn_ident #generics (#(#params),*) -> #return_type {
                     #(#body_stmts)*
                 }
             }
@@ -205,7 +220,7 @@ fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
     if member.obj.is_this() {
         if let Some(prop_ident) = member.prop.as_ident() {
             let field = format_ident!("{}", prop_ident.sym.to_string());
-            return quote! { self.#field };
+            return quote! { self.#field.clone() };
         }
     }
     // Handle other.prop
@@ -312,18 +327,18 @@ fn convert_axios_call(method: &str, args: &[ExprOrSpread]) -> proc_macro2::Token
         let data = convert_expr_or_spread(&args[1]);
         quote! {
             reqwest::Client::new()
-                .#method_ident(#url)
-                .json(&#data)
-                .send()
-                .await?
+            .#method_ident(#url)
+            .json(&#data)
+            .send()
+            .await?
         }
     } else {
         // GET/DELETE or POST/PUT without body
         quote! {
             reqwest::Client::new()
-                .#method_ident(#url)
-                .send()
-                .await?
+            .#method_ident(#url)
+            .send()
+            .await?
         }
     }
 }

@@ -130,11 +130,11 @@ _Goal: Support complex TypeScript types and generics._
 - [x] **Type References:** `User` -> `User` (Struct linkage)
 - [x] **Type Aliases:** `type ID = string` -> `type ID = String;`
 
-## 🧩 Phase 4: Generics (Next)
+## 🧩 Phase 4: Generics (Complete)
 
 _Goal: Support user-defined generics in classes, interfaces, and functions._
 
-- [ ] **Generic Interfaces:** `interface Box<T> { value: T; }`
-- [ ] **Generic Classes:** `class Wrapper<T> { ... }`
-- [ ] **Generic Functions:** `function identity<T>(arg: T): T { ... }`
+- [x] **Generic Interfaces:** `interface Box<T> { value: T; }`
+- [x] **Generic Classes:** `class Wrapper<T> { ... }`
+- [x] **Generic Functions:** `function identity<T>(arg: T): T { ... }`
 - [ ] **Trait Implementation:** `class User implements IPrintable` (Future/Stretch)

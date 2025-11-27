@@ -15,9 +15,9 @@ impl Dog {
         }
     }
     pub fn bark(&self) -> () {
-        println!("{}", self.name);
+        println!("{}", self.name.clone());
     }
-    pub fn getAge(&self) -> f64 {
-        return self.age;
+    pub fn get_age(&self) -> f64 {
+        return self.age.clone();
     }
 }

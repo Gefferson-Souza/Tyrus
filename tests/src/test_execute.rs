@@ -101,9 +101,9 @@ fn main() {{
     println!("calc.multiply(3.0) = {{}}", result2);
     assert_eq!(result2, 30.0, "Expected multiply to return 30.0");
     
-    let value = calc.getValue();
-    println!("calc.getValue() = {{}}", value);
-    assert_eq!(value, 10.0, "Expected getValue to return 10.0");
+    let value = calc.get_value();
+    println!("calc.get_value() = {{}}", value);
+    assert_eq!(value, 10.0, "Expected get_value to return 10.0");
     
     println!("✅ Class execution test passed!");
 }}
