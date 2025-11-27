@@ -8,6 +8,7 @@ mod test_build;
 mod test_compilation;
 mod test_execute;
 mod test_generics;
+mod test_nestjs;
 #[cfg(test)]
 mod test_snapshots;
 #[cfg(test)]

@@ -19,6 +19,7 @@ pub fn parse(path: &Path) -> Result<Program, OxidizerError> {
     let lexer = Lexer::new(
         Syntax::Typescript(TsSyntax {
             tsx: path.to_string_lossy().ends_with(".tsx"),
+            decorators: true,
             ..Default::default()
         }),
         Default::default(),

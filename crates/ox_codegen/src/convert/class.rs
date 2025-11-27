@@ -1,5 +1,7 @@
 use quote::{format_ident, quote};
-use swc_ecma_ast::{AssignTarget, ClassDecl, ClassMember, Constructor, Expr, ExprStmt, Pat, Stmt};
+use swc_ecma_ast::{
+    AssignTarget, ClassDecl, ClassMember, Constructor, Expr, ExprStmt, Lit, Pat, Stmt,
+};
 
 use super::func::{convert_expr_pub, convert_stmt_pub, to_snake_case};
 use super::interface::RustGenerator;
@@ -232,32 +234,137 @@ impl RustGenerator {
         };
         let method_name = format_ident!("{}", to_snake_case(&method_name_str));
 
-        // Build parameters - always add &self for instance methods
-        let mut params = vec![quote! { &self }];
-        for param in &method.function.params {
-            if let Pat::Ident(ident) = &param.pat {
-                let param_name = format_ident!("{}", ident.sym.to_string());
-                let param_type = map_ts_type(ident.type_ann.as_ref());
-                params.push(quote! { #param_name: #param_type });
+        // Check for NestJS decorators (@Get, @Post, etc.)
+        let mut http_method = None;
+        let mut route_path = String::new();
+
+        for decorator in &method.function.decorators {
+            if let Expr::Call(call) = &*decorator.expr {
+                if let swc_ecma_ast::Callee::Expr(expr) = &call.callee {
+                    if let Expr::Ident(ident) = &**expr {
+                        let name = ident.sym.as_str();
+                        if matches!(name, "Get" | "Post" | "Put" | "Delete" | "Patch") {
+                            http_method = Some(name.to_string());
+                            // Extract route path if present
+                            if let Some(arg) = call.args.first() {
+                                if let Expr::Lit(Lit::Str(s)) = &*arg.expr {
+                                    route_path = s.value.as_str().unwrap_or_default().to_string();
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        let return_type = if method.function.is_async {
+        let is_handler = http_method.is_some();
+
+        // Build parameters
+        let mut params = vec![quote! { &self }];
+        for param in &method.function.params {
+            if let Pat::Ident(ident) = &param.pat {
+                let param_name = format_ident!("{}", to_snake_case(ident.sym.as_ref()));
+                let param_type = map_ts_type(ident.type_ann.as_ref());
+
+                // Check for @Body decorator on parameters
+                let mut is_body = false;
+
+                // Correctly check decorators on the Param node
+                for decorator in &param.decorators {
+                    if let Expr::Call(call) = &*decorator.expr {
+                        if let swc_ecma_ast::Callee::Expr(expr) = &call.callee {
+                            if let Expr::Ident(ident) = &**expr {
+                                if ident.sym == "Body" {
+                                    is_body = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if is_body {
+                    // Wrap in axum::Json
+                    // Argument name needs to be destructured: axum::Json(name): axum::Json<Type>
+                    // But we can't easily change the param name pattern here in the loop to a destructuring pattern
+                    // without changing how we generate the function signature.
+                    // For now, let's change the type to `axum::Json<T>` and keep the name.
+                    // Inside the function, `name` will be `axum::Json<T>`, so we might need `name.0` to access it.
+                    // OR, we use `axum::Json(param_name)` pattern in the argument list.
+                    // Let's try to use the pattern matching in argument: `axum::Json(param_name): axum::Json<Type>`
+
+                    // We need to change how we push to `params`.
+                    // This requires a bit of a hack in how we construct the `quote!`.
+                    // We'll construct the whole argument token stream.
+
+                    params.push(quote! { axum::Json(#param_name): axum::Json<#param_type> });
+                } else {
+                    params.push(quote! { #param_name: #param_type });
+                }
+            }
+        }
+
+        let mut return_type = if method.function.is_async {
             super::type_mapper::unwrap_promise_type(method.function.return_type.as_ref())
         } else {
             map_ts_type(method.function.return_type.as_ref())
         };
 
+        // If it's a handler, wrap return type in Json unless it's String
+        if is_handler {
+            let return_type_str = return_type.to_string();
+            if return_type_str != "String" {
+                return_type = quote! { axum::Json<#return_type> };
+            }
+        }
+
         // Convert body
         let mut body_stmts = Vec::new();
         if let Some(body) = &method.function.body {
             for stmt in &body.stmts {
+                // We need to intercept the return statement if it's a handler
+                if is_handler {
+                    if let Stmt::Return(ret) = stmt {
+                        if let Some(arg) = &ret.arg {
+                            let expr = convert_expr_pub(arg);
+                            // Check if we wrapped the return type
+                            let is_wrapped = return_type.to_string().starts_with("axum :: Json");
+
+                            if is_wrapped {
+                                body_stmts.push(quote! { return axum::Json(#expr); });
+                            } else {
+                                body_stmts.push(quote! { return #expr; });
+                            }
+                            continue;
+                        }
+                    }
+                }
                 body_stmts.push(convert_stmt_pub(stmt));
             }
         }
 
+        let fn_keyword = if is_handler || method.function.is_async {
+            quote! { async fn }
+        } else {
+            quote! { fn }
+        };
+
+        let doc_comment = if is_handler {
+            let method_str = http_method.unwrap().to_uppercase();
+            let route = if route_path.is_empty() {
+                "/".to_string()
+            } else {
+                route_path
+            };
+            quote! {
+                #[doc = concat!("Route: ", #method_str, " ", #route)]
+            }
+        } else {
+            quote! {}
+        };
+
         quote! {
-            pub fn #method_name(#(#params),*) -> #return_type {
+            #doc_comment
+            pub #fn_keyword #method_name(#(#params),*) -> #return_type {
                 #(#body_stmts)*
             }
         }

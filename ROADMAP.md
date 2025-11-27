@@ -138,3 +138,14 @@ _Goal: Support user-defined generics in classes, interfaces, and functions._
 - [x] **Generic Classes:** `class Wrapper<T> { ... }`
 - [x] **Generic Functions:** `function identity<T>(arg: T): T { ... }`
 - [ ] **Trait Implementation:** `class User implements IPrintable` (Future/Stretch)
+
+## 🏗️ Phase 5: NestJS Foundation (Complete)
+
+_Goal: Transform NestJS Controllers into Axum-compatible handlers and generate a runnable Rust project._
+
+- [x] **Decorator Support:** Enable `decorators: true` in parser.
+- [x] **Axum Handler Generation:**
+  - [x] `@Get`, `@Post` -> `pub async fn`
+  - [x] `Promise<T>` -> `axum::Json<T>`
+  - [x] `@Body()` -> `axum::Json<T>` extractor
+- [x] **Manifest Generation:** Generate `Cargo.toml` with `axum`, `tokio`, `serde`.

@@ -88,6 +88,30 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
         }
     }
 
+    // 3. Generate Cargo.toml
+    generate_cargo_toml(&output_dir)?;
+
+    Ok(())
+}
+
+fn generate_cargo_toml(output_dir: &Path) -> Result<(), OxidizerError> {
+    let cargo_toml_content = r#"[package]
+name = "typerust_app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+axum = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.11", features = ["json"] }
+tower = { version = "0.4" }
+tower-http = { version = "0.5", features = ["trace"] }
+"#;
+
+    let cargo_toml_path = output_dir.join("Cargo.toml");
+    fs::write(cargo_toml_path, cargo_toml_content).map_err(OxidizerError::IoError)?;
     Ok(())
 }
 
