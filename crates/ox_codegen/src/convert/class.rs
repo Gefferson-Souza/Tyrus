@@ -91,8 +91,128 @@ impl RustGenerator {
         }
 
         // Methods
+        let mut routes: Vec<(String, String, String)> = Vec::new();
         for method in methods {
-            impl_items.push(self.convert_method(method));
+            let (method_tokens, route_info) = self.convert_method(method);
+            impl_items.push(method_tokens);
+            if let Some(info) = route_info {
+                routes.push(info);
+            }
+        }
+
+        // Generate router() if it's a controller
+        // Check for @Controller decorator
+        let mut is_controller = false;
+        let mut controller_path = String::new();
+
+        for decorator in &n.class.decorators {
+            if let Expr::Call(call) = &*decorator.expr {
+                if let swc_ecma_ast::Callee::Expr(expr) = &call.callee {
+                    if let Expr::Ident(ident) = &**expr {
+                        if ident.sym == "Controller" {
+                            is_controller = true;
+                            if let Some(arg) = call.args.first() {
+                                if let Expr::Lit(Lit::Str(s)) = &*arg.expr {
+                                    controller_path =
+                                        s.value.as_str().unwrap_or_default().to_string();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if is_controller {
+            // Generate FromRequestParts implementation to allow `self` injection
+            // impl<S> axum::extract::FromRequestParts<S> for CatsController
+            // where S: Send + Sync
+            // {
+            //     type Rejection = std::convert::Infallible;
+            //     async fn from_request_parts(_parts: &mut axum::http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
+            //         let axum::Extension(controller) = axum::Extension::<std::sync::Arc<Self>>::from_request_parts(_parts, state).await.unwrap_or_default();
+            //         Ok(controller.as_ref().clone())
+            //     }
+            // }
+
+            let from_request_impl = quote! {
+                #[axum::async_trait]
+                impl<S> axum::extract::FromRequestParts<S> for #struct_name
+                where S: Send + Sync
+                {
+                    type Rejection = std::convert::Infallible;
+                    async fn from_request_parts(parts: &mut axum::http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
+                        let axum::Extension(controller) = axum::Extension::<std::sync::Arc<Self>>::from_request_parts(parts, state)
+                            .await
+                            .expect("Controller extension missing");
+                        Ok(controller.as_ref().clone())
+                    }
+                }
+            };
+
+            self.code.push_str(&from_request_impl.to_string());
+            self.code.push('\n');
+
+            // Generate router function
+            // pub fn router() -> axum::Router {
+            //     axum::Router::new()
+            //         .route("/path", get(handler))
+            //         .route("/path2", post(handler2))
+            // }
+
+            let mut route_calls = Vec::new();
+            for (method_name, http_method, path) in &routes {
+                let method_ident = format_ident!("{}", method_name);
+                let axum_method = match http_method.as_str() {
+                    "Get" => quote! { get },
+                    "Post" => quote! { post },
+                    "Put" => quote! { put },
+                    "Delete" => quote! { delete },
+                    "Patch" => quote! { patch },
+                    _ => quote! { get },
+                };
+
+                // Combine controller path and method path
+                // Controller: "cats", Method: "/" -> "/cats"
+                // Controller: "cats", Method: "/:id" -> "/cats/:id"
+
+                let full_path = if controller_path.is_empty() {
+                    path.clone()
+                } else {
+                    let c_path = controller_path.trim_matches('/');
+                    let m_path = path.trim_matches('/');
+                    if m_path.is_empty() {
+                        format!("/{}", c_path)
+                    } else {
+                        format!("/{}/{}", c_path, m_path)
+                    }
+                };
+
+                // Ensure starts with /
+                let full_path = if full_path.starts_with('/') {
+                    full_path
+                } else {
+                    format!("/{}", full_path)
+                };
+
+                route_calls.push(quote! {
+                    .route(#full_path, axum::routing::#axum_method(Self::#method_ident))
+                });
+            }
+
+            impl_items.push(quote! {
+                pub fn router() -> axum::Router {
+                    axum::Router::new()
+                        #(#route_calls)*
+                        .layer(axum::Extension(std::sync::Arc::new(Self::default())))
+                }
+            });
+
+            // Add to metadata
+            self.controllers.push(crate::ControllerMetadata {
+                struct_name: class_name.clone(),
+                route_path: controller_path.clone(),
+            });
         }
 
         let impl_block = quote! {
@@ -226,11 +346,14 @@ impl RustGenerator {
         }
     }
 
-    fn convert_method(&self, method: &swc_ecma_ast::ClassMethod) -> proc_macro2::TokenStream {
+    fn convert_method(
+        &self,
+        method: &swc_ecma_ast::ClassMethod,
+    ) -> (proc_macro2::TokenStream, Option<(String, String, String)>) {
         let method_name_str = if let Some(ident) = method.key.as_ident() {
             ident.sym.to_string()
         } else {
-            return quote! { /* unsupported method key */ };
+            return (quote! { /* unsupported method key */ }, None);
         };
         let method_name = format_ident!("{}", to_snake_case(&method_name_str));
 
@@ -260,7 +383,17 @@ impl RustGenerator {
         let is_handler = http_method.is_some();
 
         // Build parameters
-        let mut params = vec![quote! { &self }];
+        let mut params = Vec::new();
+
+        // Handle self parameter
+        if is_handler {
+            // For handlers, we consume self (injected via FromRequest)
+            params.push(quote! { self });
+        } else {
+            // For regular methods, use &self
+            params.push(quote! { &self });
+        }
+
         for param in &method.function.params {
             if let Pat::Ident(ident) = &param.pat {
                 let param_name = format_ident!("{}", to_snake_case(ident.sym.as_ref()));
@@ -283,19 +416,6 @@ impl RustGenerator {
                 }
 
                 if is_body {
-                    // Wrap in axum::Json
-                    // Argument name needs to be destructured: axum::Json(name): axum::Json<Type>
-                    // But we can't easily change the param name pattern here in the loop to a destructuring pattern
-                    // without changing how we generate the function signature.
-                    // For now, let's change the type to `axum::Json<T>` and keep the name.
-                    // Inside the function, `name` will be `axum::Json<T>`, so we might need `name.0` to access it.
-                    // OR, we use `axum::Json(param_name)` pattern in the argument list.
-                    // Let's try to use the pattern matching in argument: `axum::Json(param_name): axum::Json<Type>`
-
-                    // We need to change how we push to `params`.
-                    // This requires a bit of a hack in how we construct the `quote!`.
-                    // We'll construct the whole argument token stream.
-
                     params.push(quote! { axum::Json(#param_name): axum::Json<#param_type> });
                 } else {
                     params.push(quote! { #param_name: #param_type });
@@ -349,11 +469,11 @@ impl RustGenerator {
         };
 
         let doc_comment = if is_handler {
-            let method_str = http_method.unwrap().to_uppercase();
+            let method_str = http_method.as_ref().unwrap().to_uppercase();
             let route = if route_path.is_empty() {
                 "/".to_string()
             } else {
-                route_path
+                route_path.clone()
             };
             quote! {
                 #[doc = concat!("Route: ", #method_str, " ", #route)]
@@ -362,11 +482,19 @@ impl RustGenerator {
             quote! {}
         };
 
-        quote! {
+        let tokens = quote! {
             #doc_comment
             pub #fn_keyword #method_name(#(#params),*) -> #return_type {
                 #(#body_stmts)*
             }
-        }
+        };
+
+        let route_info = if let Some(method) = http_method {
+            Some((method_name.to_string(), method, route_path))
+        } else {
+            None
+        };
+
+        (tokens, route_info)
     }
 }

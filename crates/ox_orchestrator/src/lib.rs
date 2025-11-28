@@ -38,10 +38,12 @@ pub fn build(path: FilePath) -> Result<String, OxidizerError> {
     let program = ox_parser::parse(path.as_ref())?;
     // Default to false for single file build
     let generated_code = ox_codegen::generate(&program, false);
-    format_code(generated_code)
+    format_code(generated_code.code)
 }
 
 pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), OxidizerError> {
+    let mut controllers: Vec<(String, String)> = Vec::new();
+
     // 1. Walk and Transpile
     for entry in WalkDir::new(&input_dir) {
         let entry = entry.map_err(|e| OxidizerError::IoError(e.into()))?;
@@ -61,8 +63,8 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
                 // Check if it's index.ts
                 let is_index = path.file_stem().and_then(|s| s.to_str()) == Some("index");
 
-                let generated_code = ox_codegen::generate(&program, is_index);
-                let formatted_code = format_code(generated_code)?;
+                let generated = ox_codegen::generate(&program, is_index);
+                let formatted_code = format_code(generated.code)?;
 
                 // Change extension to .rs and sanitize filename
                 // e.g. cats.controller.ts -> cats_controller.rs
@@ -77,6 +79,33 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
                 }
 
                 fs::write(output_file, formatted_code).map_err(OxidizerError::IoError)?;
+
+                // Collect controllers
+                if !generated.controllers.is_empty() {
+                    // Construct module path
+                    // e.g. relative_path = "cats/cats.controller.ts"
+                    // parent = "cats"
+                    // stem = "cats_controller"
+                    // module = "crate::cats::cats_controller"
+
+                    let mut module_parts = Vec::new();
+                    module_parts.push("crate".to_string());
+
+                    if let Some(parent) = relative_path.parent() {
+                        for part in parent.components() {
+                            if let std::path::Component::Normal(s) = part {
+                                module_parts.push(s.to_string_lossy().to_string());
+                            }
+                        }
+                    }
+                    module_parts.push(sanitized_stem);
+
+                    let module_path = module_parts.join("::");
+
+                    for controller in generated.controllers {
+                        controllers.push((module_path.clone(), controller.struct_name));
+                    }
+                }
             }
         }
     }
@@ -95,6 +124,71 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
     // 3. Generate Cargo.toml
     generate_cargo_toml(&output_dir)?;
 
+    // 4. Generate main.rs
+    generate_main_rs(&output_dir, &controllers)?;
+
+    Ok(())
+}
+
+fn generate_main_rs(
+    output_dir: &Path,
+    controllers: &[(String, String)],
+) -> Result<(), OxidizerError> {
+    let mut main_content = String::new();
+    main_content.push_str("use axum::Router;\n");
+    main_content.push_str("use tokio::net::TcpListener;\n\n");
+
+    // We need to declare the modules here if main.rs is the crate root.
+    // But usually lib.rs is the library root and main.rs is the binary root.
+    // If we have both, main.rs can use the library.
+    // But here we are generating a single crate that is both lib and bin?
+    // Or main.rs includes mod.rs?
+    // If we generate `lib.rs` (which we do by renaming mod.rs in the test), then `main.rs` can use `typerust_app::...`.
+    // But `build_project` generates `mod.rs` in the root.
+    // If we want `main.rs` to work, it should probably be `mod.rs` -> `lib.rs` and `main.rs` uses the lib.
+    // OR `main.rs` declares `mod ...;`.
+
+    // Let's assume `lib.rs` exists (created from `mod.rs` by the caller or we should do it here).
+    // In `test_nestjs.rs`, we rename `mod.rs` to `lib.rs`.
+    // So `main.rs` should use the crate name.
+    // The crate name is defined in `Cargo.toml` as `typerust_app`.
+    // So we should use `typerust_app::path::to::Controller`.
+    // BUT, my module path construction used `crate::...`.
+    // `crate::` refers to the current crate. If `main.rs` is in the same crate as `lib.rs`, it's tricky.
+    // Usually `main.rs` and `lib.rs` are separate crate roots.
+    // If `main.rs` uses `typerust_app`, it treats `lib.rs` as an external crate.
+
+    // Let's change `crate::` to `typerust_app::` in the module path construction?
+    // Or just use `typerust_app` prefix in `main.rs`.
+
+    // Wait, if I use `crate::` in `main.rs`, it refers to `main.rs`'s module tree.
+    // If `main.rs` does NOT declare modules, it can't see them via `crate::`.
+    // So `main.rs` must use the library crate.
+
+    // So I should replace `crate::` with `typerust_app::` when generating `main.rs`.
+
+    main_content.push_str("#[tokio::main]\n");
+    main_content.push_str("async fn main() {\n");
+    main_content.push_str("    let app = Router::new()");
+
+    for (module_path, struct_name) in controllers {
+        // Replace crate:: with typerust_app::
+        let lib_path = module_path.replacen("crate", "typerust_app", 1);
+        main_content.push_str(&format!(
+            "\n        .merge({}::{}::router())",
+            lib_path, struct_name
+        ));
+    }
+    main_content.push_str(";\n\n");
+
+    main_content
+        .push_str("    let listener = TcpListener::bind(\"0.0.0.0:3000\").await.unwrap();\n");
+    main_content.push_str("    println!(\"Server running on http://0.0.0.0:3000\");\n");
+    main_content.push_str("    axum::serve(listener, app).await.unwrap();\n");
+    main_content.push_str("}\n");
+
+    let main_path = output_dir.join("main.rs");
+    fs::write(main_path, main_content).map_err(OxidizerError::IoError)?;
     Ok(())
 }
 
@@ -112,6 +206,14 @@ serde_json = "1.0"
 reqwest = { version = "0.11", features = ["json"] }
 tower = { version = "0.4" }
 tower-http = { version = "0.5", features = ["trace"] }
+
+[[bin]]
+name = "server"
+path = "src/main.rs"
+
+[lib]
+name = "typerust_app"
+path = "src/lib.rs"
 "#;
 
     let cargo_toml_path = output_dir.join("Cargo.toml");

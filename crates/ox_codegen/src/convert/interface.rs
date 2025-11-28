@@ -4,11 +4,14 @@ use swc_ecma_visit::Visit;
 
 use super::type_mapper::map_ts_type;
 
+use crate::ControllerMetadata;
+
 #[derive(Default)]
 pub struct RustGenerator {
     pub code: String,
     pub is_exporting: bool,
     pub is_index: bool,
+    pub controllers: Vec<ControllerMetadata>,
 }
 
 impl RustGenerator {
@@ -17,6 +20,7 @@ impl RustGenerator {
             code: String::new(),
             is_exporting: false,
             is_index,
+            controllers: Vec::new(),
         }
     }
 }
