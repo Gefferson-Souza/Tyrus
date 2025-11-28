@@ -1,0 +1,36 @@
+   Compiling integration_tests v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/tests)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.23s
+     Running unittests src/lib.rs (target/debug/deps/integration_tests-48cacc1c99420a89)
+
+running 31 tests
+test test_cli_check_pass ... ok
+test test_build::test_build_async_fn ... ok
+test test_build::test_e2e_complex_scenario ... ok
+test test_nestjs::nestjs_tests::test_nestjs_controller_generation ... ok
+test test_nestjs::nestjs_tests::test_cargo_toml_generation ... ok
+test test_build::test_build_simple_fn ... ok
+test test_build::test_build_dto ... ok
+    Updating crates.io index
+test test_compilation::tests::test_execute_simple_function ... ok
+test test_smoke_error ... ok
+test test_compilation::tests::test_execute_class_with_main ... FAILED
+test test_smoke_lint ... ok
+test test_smoke_valid ... ok
+test test_execute::executable_tests::test_compile_and_execute_class ... FAILED
+    Blocking waiting for file lock on package cache
+test test_compilation::tests::test_execute_interface ... ok
+stored new snapshot /home/gefferson-souza/Desktop/personal-projects/TypeRust/tests/src/snapshots/integration_tests__test_snapshots__snapshot_e2e_full_stack.snap.new
+test test_snapshots::test_snapshot_e2e_full_stack ... FAILED
+test test_snapshots::test_snapshot_interface_simple ... ok
+test test_snapshots::test_snapshot_smoke_valid ... ok
+test test_execute::executable_tests::test_compile_and_execute_simple_functions ... ok
+    Blocking waiting for file lock on package cache
+test test_execute::executable_tests::test_compile_and_execute_integration ... ok
+test test_stdlib_exec::stdlib_tests::test_stdlib_console ... ok
+stored new snapshot /home/gefferson-souza/Desktop/personal-projects/TypeRust/tests/src/snapshots/integration_tests__test_snapshots__snapshot_class_simple.snap.new
+test test_snapshots::test_snapshot_class_simple ... FAILED
+    Blocking waiting for file lock on package cache
+test test_execute::executable_tests::test_compile_and_execute_multi_file_project ... ok
+test test_stdlib_exec::stdlib_tests::test_stdlib_math_execution ... ok
+test test_stdlib_exec::stdlib_tests::test_stdlib_string_execution ... ok
+    Blocking waiting for file lock on package cache

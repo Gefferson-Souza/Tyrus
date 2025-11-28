@@ -1,7 +1,7 @@
 use quote::{format_ident, quote};
 use swc_ecma_ast::{
     AwaitExpr, BinExpr, BinaryOp, CallExpr, Callee, Decl, Expr, ExprOrSpread, FnDecl, Lit,
-    MemberExpr, Pat, Stmt,
+    MemberExpr, Pat, Stmt, UpdateExpr, UpdateOp,
 };
 
 use super::type_mapper::{map_ts_type, unwrap_promise_type};
@@ -164,13 +164,13 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
                     if let Some(init) = &decl.init {
                         let init_expr = convert_expr(init);
                         declarations.push(quote! {
-                            let #var_ident = #init_expr;
+                            let mut #var_ident = #init_expr;
                         });
                     } else {
                         // Uninitialized variable - maybe let x; -> let mut x; (but we need type)
                         // For now, skip or generate todo
                         declarations.push(quote! {
-                            let #var_ident; // This might fail in Rust if type not inferred
+                            let mut #var_ident; // This might fail in Rust if type not inferred
                         });
                     }
                 }
@@ -220,6 +220,7 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
 pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
     match expr {
         Expr::Bin(bin) => convert_bin_expr(bin),
+        Expr::This(_) => quote! { self },
         Expr::Ident(ident) => {
             let name = ident.sym.as_str();
             // If starts with uppercase, assume Class/Type and keep as is
@@ -253,8 +254,108 @@ pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
         Expr::New(new_expr) => convert_new_expr(new_expr),
         Expr::Tpl(tpl) => convert_tpl_expr(tpl),
         Expr::Arrow(arrow) => convert_arrow_expr(arrow),
+        Expr::Object(obj) => convert_object_lit(obj),
+        Expr::Array(arr) => convert_array_lit(arr),
+        Expr::Update(update) => convert_update_expr(update),
+        Expr::Assign(assign) => convert_assign_expr(assign),
         _ => quote! { todo!() },
     }
+}
+
+fn convert_assign_expr(assign: &swc_ecma_ast::AssignExpr) -> proc_macro2::TokenStream {
+    let right = convert_expr(&assign.right);
+    let left = match &assign.left {
+        swc_ecma_ast::AssignTarget::Simple(simple) => match simple {
+            swc_ecma_ast::SimpleAssignTarget::Ident(ident) => {
+                let name = format_ident!("{}", to_snake_case(ident.sym.as_ref()));
+                quote! { #name }
+            }
+            swc_ecma_ast::SimpleAssignTarget::Member(member) => {
+                // Handle LHS member access (no clone)
+                let obj = convert_expr(&member.obj);
+                match &member.prop {
+                    swc_ecma_ast::MemberProp::Ident(ident) => {
+                        let prop = format_ident!("{}", ident.sym.as_ref().to_string());
+                        quote! { #obj.#prop }
+                    }
+                    swc_ecma_ast::MemberProp::Computed(computed) => {
+                        if let swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Num(num)) =
+                            &*computed.expr
+                        {
+                            let idx = num.value as usize;
+                            quote! { #obj[#idx] }
+                        } else {
+                            let prop = convert_expr(&computed.expr);
+                            quote! { #obj[#prop] }
+                        }
+                    }
+                    _ => quote! { todo!("complex member assignment") },
+                }
+            }
+            _ => quote! { todo!("unsupported assign target") },
+        },
+        _ => quote! { todo!("unsupported assign target") },
+    };
+
+    match assign.op {
+        swc_ecma_ast::AssignOp::Assign => quote! { #left = #right },
+        swc_ecma_ast::AssignOp::AddAssign => quote! { #left += #right },
+        swc_ecma_ast::AssignOp::SubAssign => quote! { #left -= #right },
+        _ => quote! { todo!("unsupported assign op") },
+    }
+}
+
+fn convert_update_expr(update: &UpdateExpr) -> proc_macro2::TokenStream {
+    let arg = convert_expr(&update.arg);
+    match update.op {
+        UpdateOp::PlusPlus => quote! { #arg += 1.0 },
+        UpdateOp::MinusMinus => quote! { #arg -= 1.0 },
+    }
+}
+
+fn convert_object_lit(obj: &swc_ecma_ast::ObjectLit) -> proc_macro2::TokenStream {
+    let mut fields = Vec::new();
+    for prop in &obj.props {
+        if let swc_ecma_ast::PropOrSpread::Prop(prop) = prop {
+            match &**prop {
+                swc_ecma_ast::Prop::KeyValue(kv) => {
+                    let key = match &kv.key {
+                        swc_ecma_ast::PropName::Ident(ident) => {
+                            format!("{:?}", ident.sym).trim_matches('"').to_string()
+                        }
+                        swc_ecma_ast::PropName::Str(s) => {
+                            format!("{:?}", s.value).trim_matches('"').to_string()
+                        }
+                        _ => "unknown".to_string(),
+                    };
+                    let value = convert_expr(&kv.value);
+                    fields.push(quote! { #key: #value });
+                }
+                swc_ecma_ast::Prop::Shorthand(ident) => {
+                    let key = format!("{:?}", ident.sym).trim_matches('"').to_string();
+                    let value = format_ident!("{}", to_snake_case(&key));
+                    fields.push(quote! { #key: #value });
+                }
+                _ => {}
+            }
+        }
+    }
+    quote! { serde_json::json!({ #(#fields),* }) }
+}
+
+fn convert_array_lit(arr: &swc_ecma_ast::ArrayLit) -> proc_macro2::TokenStream {
+    let elems: Vec<_> = arr
+        .elems
+        .iter()
+        .map(|elem| {
+            if let Some(elem) = elem {
+                convert_expr_or_spread(elem)
+            } else {
+                quote! { serde_json::Value::Null }
+            }
+        })
+        .collect();
+    quote! { vec![#(#elems),*] }
 }
 
 fn convert_tpl_expr(tpl: &swc_ecma_ast::Tpl) -> proc_macro2::TokenStream {
@@ -296,13 +397,25 @@ fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
             return quote! { self.#field.clone() };
         }
     }
-    // Handle other.prop
+    // Handle other.prop or other[prop]
     let obj = convert_expr(&member.obj);
-    if let Some(prop_ident) = member.prop.as_ident() {
-        let prop = format_ident!("{}", prop_ident.sym.to_string());
-        quote! { #obj.#prop }
-    } else {
-        quote! { todo!("complex member access") }
+
+    match &member.prop {
+        swc_ecma_ast::MemberProp::Ident(ident) => {
+            let prop = format_ident!("{}", ident.sym.as_ref().to_string());
+            quote! { #obj.#prop }
+        }
+        swc_ecma_ast::MemberProp::Computed(computed) => {
+            // Check if expr is number literal
+            if let swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Num(num)) = &*computed.expr {
+                let idx = num.value as usize;
+                quote! { #obj[#idx] }
+            } else {
+                let prop = convert_expr(&computed.expr);
+                quote! { #obj[#prop] }
+            }
+        }
+        _ => quote! { todo!("complex member access") },
     }
 }
 
@@ -388,8 +501,8 @@ pub fn convert_bin_expr(bin: &BinExpr) -> proc_macro2::TokenStream {
         BinaryOp::Sub => quote! { - },
         BinaryOp::Mul => quote! { * },
         BinaryOp::Div => quote! { / },
-        BinaryOp::EqEq => quote! { == },
-        BinaryOp::NotEq => quote! { != },
+        BinaryOp::EqEq | BinaryOp::EqEqEq => quote! { == },
+        BinaryOp::NotEq | BinaryOp::NotEqEq => quote! { != },
         BinaryOp::Lt => quote! { < },
         BinaryOp::LtEq => quote! { <= },
         BinaryOp::Gt => quote! { > },
@@ -461,6 +574,29 @@ fn convert_await_expr(await_expr: &AwaitExpr) -> proc_macro2::TokenStream {
 fn convert_call_expr(call: &CallExpr) -> proc_macro2::TokenStream {
     let callee = &call.callee;
     let args = &call.args;
+
+    // Handle JSON.stringify
+    if let Callee::Expr(expr) = callee {
+        if let Expr::Member(member) = &**expr {
+            if let Expr::Ident(obj) = &*member.obj {
+                if obj.sym == "JSON" {
+                    if let Some(prop) = member.prop.as_ident() {
+                        if prop.sym == "stringify" {
+                            if let Some(arg) = args.first() {
+                                let val = convert_expr_or_spread(arg);
+                                return quote! { serde_json::to_string(&#val).unwrap() };
+                            }
+                        } else if prop.sym == "parse" {
+                            if let Some(arg) = args.first() {
+                                let val = convert_expr_or_spread(arg);
+                                return quote! { serde_json::from_str::<serde_json::Value>(&#val).unwrap() };
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Handle axios.get<T>(...)
     if let Callee::Expr(expr) = callee {

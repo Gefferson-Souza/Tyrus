@@ -19,6 +19,13 @@ pub struct GeneratedCode {
 pub fn generate(program: &Program, is_index: bool) -> GeneratedCode {
     let mut generator = RustGenerator::new(is_index);
     program.visit_with(&mut generator);
+
+    if !generator.main_body.is_empty() && is_index {
+        generator.code.push_str("\npub fn main() {\n");
+        generator.code.push_str(&generator.main_body);
+        generator.code.push_str("}\n");
+    }
+
     GeneratedCode {
         code: generator.code,
         controllers: generator.controllers,

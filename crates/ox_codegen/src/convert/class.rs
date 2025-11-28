@@ -779,8 +779,8 @@ impl RustGenerator {
             // For handlers, we consume self (injected via FromRequest)
             params.push(quote! { self });
         } else {
-            // For regular methods, use &self
-            params.push(quote! { &self });
+            // For regular methods, use &mut self to allow mutation (TS default)
+            params.push(quote! { &mut self });
         }
 
         for param in &method.function.params {

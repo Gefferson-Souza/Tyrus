@@ -1,0 +1,5 @@
+    Checking ox_codegen v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_codegen)
+    Checking ox_orchestrator v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_orchestrator)
+    Checking ox_cli v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_cli)
+    Checking integration_tests v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/tests)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.54s

@@ -1,0 +1,56 @@
+    Checking ox_codegen v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_codegen)
+warning: unused imports: `ArrowExpr`, `NewExpr`, and `Tpl`
+ --> crates/ox_codegen/src/convert/func.rs:3:5
+  |
+3 |     ArrowExpr, AwaitExpr, BinExpr, BinaryOp, CallExpr, Callee, Decl, Expr, ExprOrSpread, FnDecl,
+  |     ^^^^^^^^^
+4 |     Lit, MemberExpr, NewExpr, Pat, Stmt, Tpl, UpdateExpr, UpdateOp,
+  |                      ^^^^^^^             ^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: you seem to be trying to use `match` for destructuring a single pattern. Consider using `if let`
+   --> crates/ox_codegen/src/convert/func.rs:319:9
+    |
+319 | /         match prop {
+320 | |             swc_ecma_ast::PropOrSpread::Prop(prop) => match &**prop {
+321 | |                 swc_ecma_ast::Prop::KeyValue(kv) => {
+322 | |                     let key = match &kv.key {
+...   |
+341 | |             _ => {}
+342 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#single_match
+    = note: `#[warn(clippy::single_match)]` on by default
+help: try
+    |
+319 ~         if let swc_ecma_ast::PropOrSpread::Prop(prop) = prop { match &**prop {
+320 +             swc_ecma_ast::Prop::KeyValue(kv) => {
+321 +                 let key = match &kv.key {
+322 +                     swc_ecma_ast::PropName::Ident(ident) => {
+323 +                         format!("{:?}", ident.sym).trim_matches('"').to_string()
+324 +                     }
+325 +                     swc_ecma_ast::PropName::Str(s) => {
+326 +                         format!("{:?}", s.value).trim_matches('"').to_string()
+327 +                     }
+328 +                     _ => "unknown".to_string(),
+329 +                 };
+330 +                 let value = convert_expr(&kv.value);
+331 +                 fields.push(quote! { #key: #value });
+332 +             }
+333 +             swc_ecma_ast::Prop::Shorthand(ident) => {
+334 +                 let key = format!("{:?}", ident.sym).trim_matches('"').to_string();
+335 +                 let value = format_ident!("{}", to_snake_case(&key));
+336 +                 fields.push(quote! { #key: #value });
+337 +             }
+338 +             _ => {}
+339 +         } }
+    |
+
+warning: `ox_codegen` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p ox_codegen` to apply 2 suggestions)
+    Checking ox_orchestrator v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_orchestrator)
+warning: `ox_codegen` (lib test) generated 2 warnings (2 duplicates)
+    Checking ox_cli v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_cli)
+    Checking integration_tests v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/tests)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.14s

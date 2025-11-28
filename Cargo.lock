@@ -558,6 +558,7 @@ dependencies = [
  "ox_common",
  "ox_orchestrator",
  "predicates",
+ "serde_json",
  "tempfile",
 ]
 

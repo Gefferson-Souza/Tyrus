@@ -7,7 +7,7 @@ impl FraudService {
     pub fn new_di() -> Self {
         Self::default()
     }
-    pub fn check(&self, account: String) -> bool {
+    pub fn check(&mut self, account: String) -> bool {
         return account.contains(&String::from("SAFE"));
     }
 }

@@ -40,10 +40,8 @@ pub fn handle_method(obj: &Expr, method: &str, args: &[ExprOrSpread]) -> Option<
         "filter" => {
             if args.len() == 1 {
                 let callback = convert_expr_or_spread(&args[0]);
-                // filter yields &T, but callback expects T. We must clone.
-                Some(
-                    quote! { #obj_tokens.iter().cloned().filter(|x| (#callback)(x.clone())).collect::<Vec<_>>() },
-                )
+                // filter yields &T. Pass directly to callback (which will infer &T argument).
+                Some(quote! { #obj_tokens.iter().cloned().filter(#callback).collect::<Vec<_>>() })
             } else {
                 None
             }

@@ -3,12 +3,12 @@ class Counter {
     count: number;
     constructor(start: number) { this.count = start; }
 
-    increment(amount: number) {
+    increment(amount: number): void {
         this.count = this.count + amount;
     }
 
     report(): string {
-        return "Final: " + this.count;
+        return `Final: ${this.count}`;
     }
 }
 

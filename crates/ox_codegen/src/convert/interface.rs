@@ -1,6 +1,6 @@
 use quote::{format_ident, quote};
 use swc_ecma_ast::{TsInterfaceDecl, TsTypeElement};
-use swc_ecma_visit::Visit;
+use swc_ecma_visit::{Visit, VisitWith};
 
 use super::type_mapper::map_ts_type;
 
@@ -12,6 +12,7 @@ pub struct RustGenerator {
     pub is_exporting: bool,
     pub is_index: bool,
     pub controllers: Vec<ControllerMetadata>,
+    pub main_body: String,
 }
 
 impl RustGenerator {
@@ -21,6 +22,7 @@ impl RustGenerator {
             is_exporting: false,
             is_index,
             controllers: Vec::new(),
+            main_body: String::new(),
         }
     }
 }
@@ -110,5 +112,25 @@ impl Visit for RustGenerator {
 
     fn visit_module_item(&mut self, n: &swc_ecma_ast::ModuleItem) {
         self.process_module_item(n);
+    }
+
+    fn visit_stmt(&mut self, n: &swc_ecma_ast::Stmt) {
+        // This is called for top-level statements via process_module_item -> visit_with(self)
+        match n {
+            swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::Fn(_))
+            | swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::Class(_))
+            | swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::TsInterface(_))
+            | swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::TsTypeAlias(_))
+            | swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::TsEnum(_)) => {
+                // Top-level declarations: let visitor handle them (writes to self.code)
+                n.visit_children_with(self);
+            }
+            _ => {
+                // Script statements (ExprStmt, VarDecl, If, Loop, etc.): write to self.main_body
+                let stmt_code = super::func::convert_stmt(n);
+                self.main_body.push_str(&stmt_code.to_string());
+                self.main_body.push('\n');
+            }
+        }
     }
 }

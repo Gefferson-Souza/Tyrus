@@ -1,0 +1,30 @@
+---
+source: tests/src/test_snapshots.rs
+assertion_line: 17
+expression: result
+---
+#[derive(Default, Debug, Clone, PartialEq, serde :: Serialize, serde :: Deserialize)]
+struct Dog {
+    pub name: String,
+    pub age: f64,
+}
+impl Dog {
+    pub fn new(name: String, age: f64) -> Self {
+        Self {
+            name: name,
+            age: age,
+        }
+    }
+    pub fn new_di() -> Self {
+        Self {
+            name: Default::default(),
+            age: Default::default(),
+        }
+    }
+    pub fn bark(&mut self) -> () {
+        println!("{}", self.name.clone());
+    }
+    pub fn get_age(&mut self) -> f64 {
+        return self.age.clone();
+    }
+}
