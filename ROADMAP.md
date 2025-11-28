@@ -69,6 +69,11 @@
 - [x] **Guidelines.md Compliance:**
   - [x] Newtype Pattern (`FilePath`)
   - [x] Visitor Pattern (AST traversal)
+- [x] **Phase 4: Generics Support**
+  - [x] Identify generic type parameters in classes/functions.
+  - [x] Map TypeScript generics to Rust generics.
+  - [x] Add trait bounds (Clone, Debug, Default, Serialize, Deserialize).
+  - [x] Handle PhantomData for unused generic parameters.
 - [x] **Testing Infrastructure:**
   - [x] Unit tests (8 passing)
   - [x] Snapshot tests (insta)

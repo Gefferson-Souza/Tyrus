@@ -33,12 +33,6 @@ mod generic_tests {
 
         let rust_code = ox_orchestrator::build(FilePath::from(ts_file)).unwrap();
 
-        // Remove serde for standalone test (since we don't link against serde in this simple rustc invocation)
-        let rust_code = rust_code
-            .replace(", serde :: Serialize, serde :: Deserialize", "")
-            .replace("serde :: Serialize, serde :: Deserialize, ", "")
-            .replace("serde :: Serialize, serde :: Deserialize", "");
-
         let program = format!(
             r#"
             {}
@@ -68,15 +62,30 @@ mod generic_tests {
             rust_code
         );
 
-        let src_file = temp_dir.path().join("main.rs");
+        // Create Cargo.toml
+        let cargo_toml = r#"
+[package]
+name = "test_generics"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive", "rc"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+axum = "0.7"
+"#;
+        fs::write(temp_dir.path().join("Cargo.toml"), cargo_toml).unwrap();
+
+        // Create src directory
+        let src_dir = temp_dir.path().join("src");
+        fs::create_dir(&src_dir).unwrap();
+        let src_file = src_dir.join("main.rs");
         fs::write(&src_file, program).unwrap();
 
-        let exe_path = temp_dir.path().join("test_exec");
-        let compile = Command::new("rustc")
-            .arg("--edition=2021")
-            .arg(&src_file)
-            .arg("-o")
-            .arg(&exe_path)
+        let compile = Command::new("cargo")
+            .arg("build")
+            .current_dir(temp_dir.path())
             .output()
             .expect("Failed to compile");
 
@@ -89,6 +98,7 @@ mod generic_tests {
         }
         assert!(compile.status.success(), "Compilation failed");
 
+        let exe_path = temp_dir.path().join("target/debug/test_generics");
         let exec = Command::new(&exe_path).output().expect("Failed to execute");
         let stdout = String::from_utf8_lossy(&exec.stdout);
         println!("Output:\n{}", stdout);

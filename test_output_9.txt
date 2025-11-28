@@ -1,0 +1,38 @@
+   Compiling ox_codegen v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_codegen)
+warning: unused variable: `type_str`
+   --> crates/ox_codegen/src/convert/class.rs:537:33
+    |
+537 | ...                   let type_str = param_type.to_string();
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_type_str`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+   Compiling ox_orchestrator v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_orchestrator)
+   Compiling integration_tests v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/tests)
+warning: `ox_codegen` (lib) generated 1 warning
+error: invalid format string: expected `}`, found `p`
+  --> tests/src/test_types.rs:84:21
+   |
+83 |                 if let Some(opt) = container.optional {
+   |                                                       - because of this opening brace
+84 |                     println!("Optional: {}", opt);
+   |                     ^ expected `}` in format string
+   |
+   = note: if you intended to print `{`, you can escape it using `{{`
+
+warning: unused variable: `temp_dir`
+  --> tests/src/test_nestjs.rs:55:13
+   |
+55 |         let temp_dir = TempDir::new().unwrap();
+   |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temp_dir`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `input_dir`
+  --> tests/src/test_nestjs.rs:56:13
+   |
+56 |         let input_dir = PathBuf::from("fixtures/nestjs_controller/src");
+   |             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_input_dir`
+
+warning: `integration_tests` (lib test) generated 2 warnings
+error: could not compile `integration_tests` (lib test) due to 1 previous error; 2 warnings emitted

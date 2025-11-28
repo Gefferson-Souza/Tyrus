@@ -1,0 +1,47 @@
+warning: unused variable: `type_str`
+   --> crates/ox_codegen/src/convert/class.rs:537:33
+    |
+537 | ...                   let type_str = param_type.to_string();
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_type_str`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: `ox_codegen` (lib) generated 1 warning
+   Compiling integration_tests v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/tests)
+warning: unused variable: `temp_dir`
+  --> tests/src/test_nestjs.rs:55:13
+   |
+55 |         let temp_dir = TempDir::new().unwrap();
+   |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temp_dir`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `input_dir`
+  --> tests/src/test_nestjs.rs:56:13
+   |
+56 |         let input_dir = PathBuf::from("fixtures/nestjs_controller/src");
+   |             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_input_dir`
+
+warning: `integration_tests` (lib test) generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.23s
+     Running unittests src/lib.rs (target/debug/deps/integration_tests-726d51bf8feaca74)
+
+running 1 test
+DEBUG convert_prop: Field id, Type ID, is_dependency: true
+Output:
+Result: 42
+Container ID: 123
+Optional: present
+Maybe is None
+✅ Advanced Types Test Passed!
+
+test test_types::type_tests::test_compile_and_execute_advanced_types ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 9.99s
+
+   Doc-tests integration_tests
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

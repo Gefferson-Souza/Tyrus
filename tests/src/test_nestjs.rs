@@ -52,8 +52,8 @@ mod nestjs_tests {
         // It requires internet access to fetch dependencies (axum, tokio, etc.)
         // If this fails due to network, we might need to mock or skip it in CI.
 
-        let temp_dir = TempDir::new().unwrap();
-        let input_dir = PathBuf::from("fixtures/nestjs_controller/src");
+        let _temp_dir = TempDir::new().unwrap();
+        let _input_dir = PathBuf::from("fixtures/nestjs_controller/src");
         let temp_dir = TempDir::new().unwrap();
         let input_dir = PathBuf::from("fixtures/nestjs_controller/src");
         let output_dir = temp_dir.path().to_path_buf(); // Project root

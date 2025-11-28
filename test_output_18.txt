@@ -1,0 +1,14 @@
+   Compiling ox_codegen v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_codegen)
+error[E0282]: type annotations needed for `HashSet<_>`
+   --> crates/ox_codegen/src/convert/class.rs:412:13
+    |
+412 |         let mut dependency_params = std::collections::HashSet::new();
+    |             ^^^^^^^^^^^^^^^^^^^^^   -------------------------------- type must be known at this point
+    |
+help: consider giving `dependency_params` an explicit type, where the type for type parameter `T` is specified
+    |
+412 |         let mut dependency_params: HashSet<T> = std::collections::HashSet::new();
+    |                                  ++++++++++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `ox_codegen` (lib) due to 1 previous error

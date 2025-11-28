@@ -6,7 +6,7 @@ expression: result
 # [derive (Default , Debug , Clone , PartialEq , serde :: Serialize , serde :: Deserialize)] pub struct User { pub id : f64 , pub name : String , pub email : String , pub isActive : bool }
 # [derive (Default , Debug , Clone , PartialEq , serde :: Serialize , serde :: Deserialize)] pub struct ApiResponse { pub success : bool , pub data : String , pub timestamp : f64 }
 # [derive (Default , Debug , Clone , PartialEq , serde :: Serialize , serde :: Deserialize)] struct UserService { pub baseUrl : String }
-impl UserService { pub fn new (baseUrl : String) -> Self { Self { baseUrl : base_url } } pub async fn fetch_user (& self , id : f64) -> User { return get_from_database (id) . await ; } pub async fn save_user (& self , user : User) -> ApiResponse { return post_to_database (user) . await ; } pub fn get_base_url (& self) -> String { return self . baseUrl . clone () ; } }
-async fn get_from_database (id : f64) -> User { return todo ! () ; }
-async fn post_to_database (user : User) -> ApiResponse { return todo ! () ; }
-fn calculate_total (a : f64 , b : f64 , c : f64) -> f64 { return a + b + c ; }
+impl UserService { pub fn new (baseUrl : String) -> Self { Self { baseUrl : base_url } } pub fn new_di () -> Self { Self { baseUrl : Default :: default () } } pub async fn fetch_user (& self , id : f64) -> Result < User , crate :: AppError > { return Ok (get_from_database (id) . await ?) ; } pub async fn save_user (& self , user : User) -> Result < ApiResponse , crate :: AppError > { return Ok (post_to_database (user) . await ?) ; } pub fn get_base_url (& self) -> String { return self . base_url . clone () ; } }
+async fn get_from_database (id : f64) -> Result < User , crate :: AppError > { return Ok (todo ! ()) ; }
+async fn post_to_database (user : User) -> Result < ApiResponse , crate :: AppError > { return Ok (todo ! ()) ; }
+fn calculate_total (a : f64 , b : f64 , c : f64) -> f64 { return a + & b + & c ; }

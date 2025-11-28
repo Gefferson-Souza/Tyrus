@@ -12,18 +12,33 @@ impl RustGenerator {
         let class_name = n.ident.sym.to_string();
         let struct_name = format_ident!("{}", class_name);
 
+        // Extract generic params early
+        let mut generic_params = std::collections::HashSet::new();
+        if let Some(type_params) = &n.class.type_params {
+            for param in &type_params.params {
+                generic_params.insert(param.name.sym.to_string());
+            }
+        }
+
         // 1. Generate Struct (Properties)
         let mut fields = Vec::new();
         let mut methods = Vec::new();
         let mut constructor: Option<&Constructor> = None;
         let mut class_fields_meta = Vec::new();
 
+        let mut dependency_fields = std::collections::HashSet::new();
+
         for member in &n.class.body {
             match member {
                 ClassMember::ClassProp(prop) => {
-                    if let Some((field_tokens, name, is_opt)) = self.convert_prop(prop) {
+                    if let Some((field_tokens, name, is_opt, is_dep)) =
+                        self.convert_prop(prop, &generic_params)
+                    {
                         fields.push(field_tokens);
-                        class_fields_meta.push((name, is_opt));
+                        class_fields_meta.push((name.clone(), is_opt));
+                        if is_dep {
+                            dependency_fields.insert(name);
+                        }
                     }
                 }
                 ClassMember::Method(method) => {
@@ -49,12 +64,22 @@ impl RustGenerator {
 
                         // Heuristic: If it's a TypeRef (not primitive), wrap in Arc
                         let is_dependency = if let Some(ann) = type_ann {
-                            if let Some(_type_ref) = ann.type_ann.as_ts_type_ref() {
-                                let type_str = field_type.to_string();
-                                !matches!(
-                                    type_str.as_str(),
-                                    "String" | "f64" | "bool" | "i32" | "Vec" | "Option"
-                                )
+                            if let Some(type_ref) = ann.type_ann.as_ts_type_ref() {
+                                if let Some(ident) = type_ref.type_name.as_ident() {
+                                    let name = ident.sym.as_str();
+                                    !matches!(
+                                        name,
+                                        "String"
+                                            | "f64"
+                                            | "bool"
+                                            | "i32"
+                                            | "Vec"
+                                            | "Option"
+                                            | "Array"
+                                    )
+                                } else {
+                                    true
+                                }
                             } else {
                                 false
                             }
@@ -64,6 +89,7 @@ impl RustGenerator {
 
                         if is_dependency {
                             field_type = quote! { std::sync::Arc<#field_type> };
+                            dependency_fields.insert(field_name_str.clone());
                         }
 
                         fields.push(quote! { pub #field_name: #field_type });
@@ -78,16 +104,28 @@ impl RustGenerator {
             quote! {}
         };
 
-        let (generics_decl, generics_use) = if let Some(type_params) = &n.class.type_params {
-            let params_decl: Vec<_> = type_params
+        let (generics_struct_decl, generics_impl_decl, generics_use) = if let Some(type_params) =
+            &n.class.type_params
+        {
+            let params_struct: Vec<_> = type_params
+                .params
+                .iter()
+                .map(|p| {
+                    let name = p.name.sym.to_string();
+                    format_ident!("{}", name)
+                })
+                .collect();
+
+            let params_impl: Vec<_> = type_params
                 .params
                 .iter()
                 .map(|p| {
                     let name = p.name.sym.to_string();
                     let ident = format_ident!("{}", name);
-                    quote! { #ident: serde::de::DeserializeOwned + serde::Serialize }
+                    quote! { #ident: serde::de::DeserializeOwned + serde::Serialize + Clone + Default + std::fmt::Debug }
                 })
                 .collect();
+
             let params_use: Vec<_> = type_params
                 .params
                 .iter()
@@ -96,23 +134,29 @@ impl RustGenerator {
 
             // Add PhantomData to usage to avoid unused type parameter error
             if !params_use.is_empty() {
+                let phantom_type = if params_use.len() == 1 {
+                    quote! { #(#params_use)* }
+                } else {
+                    quote! { (#(#params_use),*) }
+                };
                 fields.push(quote! {
                     #[serde(skip)]
-                    pub _marker: std::marker::PhantomData<(#(#params_use),*)>
+                    pub _marker: std::marker::PhantomData<#phantom_type>
                 });
             }
 
             (
-                quote! { <#(#params_decl),*> },
+                quote! { <#(#params_struct),*> },
+                quote! { <#(#params_impl),*> },
                 quote! { <#(#params_use),*> },
             )
         } else {
-            (quote! {}, quote! {})
+            (quote! {}, quote! {}, quote! {})
         };
 
         let struct_def = quote! {
             #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-            #vis struct #struct_name #generics_decl {
+            #vis struct #struct_name #generics_struct_decl {
                 #(#fields),*
             }
         };
@@ -125,18 +169,15 @@ impl RustGenerator {
 
         // Constructor
         if let Some(cons) = constructor {
-            let has_generics = n
-                .class
-                .type_params
-                .as_ref()
-                .map(|tp| !tp.params.is_empty())
-                .unwrap_or(false);
-            impl_items.push(self.convert_constructor(
+            let constructor_tokens = self.convert_constructor(
                 &struct_name,
                 cons,
                 &class_fields_meta,
-                has_generics,
-            ));
+                n.class.type_params.is_some(),
+                &generic_params,
+                &dependency_fields,
+            );
+            impl_items.push(constructor_tokens);
         } else {
             // Default constructor if none exists
             impl_items.push(quote! {
@@ -287,7 +328,7 @@ impl RustGenerator {
         }
 
         let impl_block = quote! {
-            impl #generics_decl #struct_name #generics_use {
+            impl #generics_impl_decl #struct_name #generics_use {
                 #(#impl_items)*
             }
         };
@@ -299,7 +340,8 @@ impl RustGenerator {
     fn convert_prop(
         &self,
         prop: &swc_ecma_ast::ClassProp,
-    ) -> Option<(proc_macro2::TokenStream, String, bool)> {
+        generic_params: &std::collections::HashSet<String>,
+    ) -> Option<(proc_macro2::TokenStream, String, bool, bool)> {
         let field_name_str = if let Some(ident) = prop.key.as_ident() {
             ident.sym.to_string()
         } else {
@@ -308,12 +350,40 @@ impl RustGenerator {
         let field_name = format_ident!("{}", field_name_str);
         let mut field_type = map_ts_type(prop.type_ann.as_ref());
 
+        // Check dependency
+        let is_dependency = if let Some(ann) = prop.type_ann.as_ref() {
+            if let Some(type_ref) = ann.type_ann.as_ts_type_ref() {
+                if let Some(ident) = type_ref.type_name.as_ident() {
+                    let name = ident.sym.as_str();
+                    if generic_params.contains(name) {
+                        false
+                    } else {
+                        !matches!(
+                            name,
+                            "String" | "f64" | "bool" | "i32" | "Vec" | "Option" | "Array"
+                        )
+                    }
+                } else {
+                    true
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+
+        if is_dependency {
+            field_type = quote! { std::sync::Arc<#field_type> };
+        }
+
         let is_optional_union = is_optional_type(prop.type_ann.as_deref());
         let is_effectively_optional = prop.is_optional || is_optional_union;
 
         if prop.is_optional {
             // If it's optional via `?`, we wrap in Option.
             // If it's optional via union `| undefined`, map_ts_type already wraps it in Option.
+            // But if it was already wrapped in Arc, we wrap Arc in Option? Option<Arc<T>>.
             field_type = quote! { Option<#field_type> };
         }
 
@@ -323,6 +393,7 @@ impl RustGenerator {
             },
             field_name_str,
             is_effectively_optional,
+            is_dependency,
         ))
     }
 
@@ -332,10 +403,14 @@ impl RustGenerator {
         constructor: &Constructor,
         class_fields: &[(String, bool)],
         has_generics: bool,
+        generic_params: &std::collections::HashSet<String>,
+        dependency_fields: &std::collections::HashSet<String>,
     ) -> proc_macro2::TokenStream {
         let mut params = Vec::new();
         let mut field_inits = Vec::new();
         let mut initialized_fields = std::collections::HashSet::new();
+        let mut dependency_params: std::collections::HashSet<String> =
+            std::collections::HashSet::new();
 
         for param in &constructor.params {
             match param {
@@ -349,12 +424,26 @@ impl RustGenerator {
 
                         // Heuristic: If it's a TypeRef (not primitive), wrap in Arc
                         let is_dependency = if let Some(ann) = type_ann {
-                            if let Some(_type_ref) = ann.type_ann.as_ts_type_ref() {
-                                let type_str = param_type.to_string();
-                                !matches!(
-                                    type_str.as_str(),
-                                    "String" | "f64" | "bool" | "i32" | "Vec" | "Option"
-                                )
+                            if let Some(type_ref) = ann.type_ann.as_ts_type_ref() {
+                                if let Some(ident) = type_ref.type_name.as_ident() {
+                                    let name = ident.sym.as_str();
+                                    if generic_params.contains(name) {
+                                        false
+                                    } else {
+                                        !matches!(
+                                            name,
+                                            "String"
+                                                | "f64"
+                                                | "bool"
+                                                | "i32"
+                                                | "Vec"
+                                                | "Option"
+                                                | "Array"
+                                        )
+                                    }
+                                } else {
+                                    true
+                                }
                             } else {
                                 false
                             }
@@ -364,6 +453,7 @@ impl RustGenerator {
 
                         if is_dependency {
                             param_type = quote! { std::sync::Arc<#param_type> };
+                            dependency_params.insert(param_name_str.clone());
                         }
 
                         params.push(quote! { #param_name: #param_type });
@@ -374,7 +464,42 @@ impl RustGenerator {
                 swc_ecma_ast::ParamOrTsParamProp::Param(pat_param) => {
                     if let Pat::Ident(ident) = &pat_param.pat {
                         let param_name = format_ident!("{}", ident.sym.to_string());
-                        let param_type = map_ts_type(ident.type_ann.as_ref());
+                        let mut param_type = map_ts_type(ident.type_ann.as_ref());
+
+                        // Check dependency
+                        let is_dependency = if let Some(ann) = ident.type_ann.as_ref() {
+                            if let Some(type_ref) = ann.type_ann.as_ts_type_ref() {
+                                if let Some(ident) = type_ref.type_name.as_ident() {
+                                    let name = ident.sym.as_str();
+                                    if generic_params.contains(name) {
+                                        false
+                                    } else {
+                                        !matches!(
+                                            name,
+                                            "String"
+                                                | "f64"
+                                                | "bool"
+                                                | "i32"
+                                                | "Vec"
+                                                | "Option"
+                                                | "Array"
+                                        )
+                                    }
+                                } else {
+                                    true
+                                }
+                            } else {
+                                false
+                            }
+                        } else {
+                            false
+                        };
+
+                        if is_dependency {
+                            param_type = quote! { std::sync::Arc<#param_type> };
+                            dependency_params.insert(ident.sym.to_string());
+                        }
+
                         params.push(quote! { #param_name: #param_type });
                     }
                 }
@@ -415,6 +540,25 @@ impl RustGenerator {
                                             value
                                         };
 
+                                        let value = if dependency_fields.contains(&field_name_str) {
+                                            // Check if the assigned value is a parameter that is already a dependency
+                                            let is_already_wrapped = if let Expr::Ident(ident) =
+                                                &*assign.right
+                                            {
+                                                dependency_params.contains(&ident.sym.to_string())
+                                            } else {
+                                                false
+                                            };
+
+                                            if is_already_wrapped {
+                                                value
+                                            } else {
+                                                quote! { std::sync::Arc::new(#value) }
+                                            }
+                                        } else {
+                                            value
+                                        };
+
                                         field_inits.push(quote! { #field_name: #value });
                                         initialized_fields.insert(field_name_str);
                                     }
@@ -444,6 +588,7 @@ impl RustGenerator {
             // It takes only dependencies and defaults primitives
             let mut di_params = Vec::new();
             let mut di_field_inits = Vec::new();
+            let mut di_initialized_fields = std::collections::HashSet::new();
 
             for param in &constructor.params {
                 match param {
@@ -454,13 +599,31 @@ impl RustGenerator {
                             let type_ann = ident.type_ann.as_ref();
                             let mut param_type = map_ts_type(type_ann);
 
-                            let type_str = param_type.to_string();
+                            let _type_str = param_type.to_string();
+                            // Check if it's a dependency (not primitive/std type)
+                            // We check if it starts with Vec, Option, or matches primitives
                             let is_dependency = if let Some(ann) = type_ann {
-                                if let Some(_type_ref) = ann.type_ann.as_ts_type_ref() {
-                                    !matches!(
-                                        type_str.as_str(),
-                                        "String" | "f64" | "bool" | "i32" | "Vec" | "Option"
-                                    )
+                                if let Some(type_ref) = ann.type_ann.as_ts_type_ref() {
+                                    if let Some(ident) = type_ref.type_name.as_ident() {
+                                        let name = ident.sym.as_str();
+                                        if generic_params.contains(name) {
+                                            false
+                                        } else {
+                                            !matches!(
+                                                name,
+                                                "String"
+                                                    | "f64"
+                                                    | "bool"
+                                                    | "i32"
+                                                    | "Vec"
+                                                    | "Option"
+                                                    | "Array"
+                                            )
+                                        }
+                                    } else {
+                                        // Complex type ref (e.g. qualified name), assume dependency
+                                        true
+                                    }
                                 } else {
                                     false
                                 }
@@ -473,27 +636,60 @@ impl RustGenerator {
                                 di_params.push(quote! { #param_name: #param_type });
                                 di_field_inits.push(quote! { #param_name: #param_name });
                             } else {
-                                di_field_inits.push(quote! { #param_name: Default::default() });
+                                di_params.push(quote! { #param_name: #param_type });
+                                di_field_inits.push(quote! { #param_name: #param_name });
                             }
+                            // Always mark as initialized for TsParamProp as it creates a field
+                            di_initialized_fields.insert(ident.sym.to_string());
                         }
                     }
                     swc_ecma_ast::ParamOrTsParamProp::Param(pat_param) => {
                         if let Pat::Ident(ident) = &pat_param.pat {
-                            let param_name = format_ident!("{}", ident.sym.to_string());
+                            let param_name_str = ident.sym.to_string();
+                            let param_name = format_ident!("{}", param_name_str);
                             let param_type = map_ts_type(ident.type_ann.as_ref());
 
-                            let type_str = param_type.to_string();
-                            let is_dependency = !matches!(
-                                type_str.as_str(),
-                                "String" | "f64" | "bool" | "i32" | "Vec" | "Option"
-                            );
+                            // Check dependency using same logic
+                            let is_dependency = if let Some(ann) = ident.type_ann.as_ref() {
+                                if let Some(type_ref) = ann.type_ann.as_ts_type_ref() {
+                                    if let Some(ident) = type_ref.type_name.as_ident() {
+                                        let name = ident.sym.as_str();
+                                        if generic_params.contains(name) {
+                                            false
+                                        } else {
+                                            !matches!(
+                                                name,
+                                                "String"
+                                                    | "f64"
+                                                    | "bool"
+                                                    | "i32"
+                                                    | "Vec"
+                                                    | "Option"
+                                                    | "Array"
+                                            )
+                                        }
+                                    } else {
+                                        true
+                                    }
+                                } else {
+                                    false
+                                }
+                            } else {
+                                false
+                            };
 
                             if is_dependency {
-                                di_params.push(quote! { #param_name: #param_type });
-                                // For plain params, we assume they are used in body or handled elsewhere.
-                                // But for DI, we can't easily map body assignments.
-                                // We'll skip adding to field_inits if not a property.
+                                let arc_type = quote! { std::sync::Arc<#param_type> };
+                                di_params.push(quote! { #param_name: #arc_type });
+
+                                // If this param matches a class field, initialize it
+                                if class_fields.iter().any(|(n, _)| n == &param_name_str) {
+                                    di_field_inits.push(quote! { #param_name: #param_name });
+                                    di_initialized_fields.insert(param_name_str);
+                                }
                             }
+                            // If not dependency, we don't add to params, and we don't add to inits.
+                            // We also do NOT add to di_initialized_fields, so it gets Default::default() later.
                         }
                     }
                 }
@@ -501,29 +697,6 @@ impl RustGenerator {
 
             if has_generics {
                 di_field_inits.push(quote! { _marker: std::marker::PhantomData });
-            }
-
-            // Fill in missing fields for new_di with Default::default()
-            // We need to track which fields are initialized in di_field_inits
-            // But di_field_inits is a list of TokenStreams.
-            // We can track names separately.
-            let mut di_initialized_fields = std::collections::HashSet::new();
-            for param in &constructor.params {
-                match param {
-                    swc_ecma_ast::ParamOrTsParamProp::TsParamProp(prop) => {
-                        if let swc_ecma_ast::TsParamPropParam::Ident(ident) = &prop.param {
-                            di_initialized_fields.insert(ident.sym.to_string());
-                        }
-                    }
-                    swc_ecma_ast::ParamOrTsParamProp::Param(pat_param) => {
-                        if let Pat::Ident(ident) = &pat_param.pat {
-                            // Only if it was added to params
-                            // But we don't know easily here.
-                            // Let's just assume if it's in class_fields, we check it.
-                            di_initialized_fields.insert(ident.sym.to_string());
-                        }
-                    }
-                }
             }
 
             for (name, _) in class_fields {

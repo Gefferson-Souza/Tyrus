@@ -1,0 +1,18 @@
+   Compiling ox_codegen v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_codegen)
+error[E0425]: cannot find value `is_dep` in this scope
+  --> crates/ox_codegen/src/convert/class.rs:65:37
+   |
+65 | ...                   is_dep
+   |                       ^^^^^^ not found in this scope
+
+warning: unused variable: `type_str`
+   --> crates/ox_codegen/src/convert/class.rs:498:33
+    |
+498 | ...                   let type_str = param_type.to_string();
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_type_str`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+For more information about this error, try `rustc --explain E0425`.
+warning: `ox_codegen` (lib) generated 1 warning
+error: could not compile `ox_codegen` (lib) due to 1 previous error; 1 warning emitted

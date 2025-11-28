@@ -1,31 +1,41 @@
-warning: unused variable: `type_str`
-   --> crates/ox_codegen/src/convert/class.rs:473:33
+   Compiling ox_codegen v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_codegen)
+warning: unused variable: `is_dependency`
+   --> crates/ox_codegen/src/convert/class.rs:429:29
     |
-473 | ...   let type_str = param_ty...
-    |           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_type_str`
+429 |                         let is_dependency = if let Some(ann) = ident.type_ann.as_ref() {
+    |                             ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_is_dependency`
     |
     = note: `#[warn(unused_variables)]` on by default
 
-warning: `ox_codegen` (lib) generated 1 warning
+warning: unused variable: `type_str`
+   --> crates/ox_codegen/src/convert/class.rs:538:33
+    |
+538 | ...                   let type_str = param_type.to_string();
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_type_str`
+
+   Compiling ox_orchestrator v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/crates/ox_orchestrator)
+   Compiling integration_tests v0.1.0 (/home/gefferson-souza/Desktop/personal-projects/TypeRust/tests)
+warning: `ox_codegen` (lib) generated 2 warnings
 warning: unused variable: `temp_dir`
   --> tests/src/test_nestjs.rs:55:13
    |
-55 | ...   let temp_dir = TempDir::...
-   |           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temp_dir`
+55 |         let temp_dir = TempDir::new().unwrap();
+   |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temp_dir`
    |
    = note: `#[warn(unused_variables)]` on by default
 
 warning: unused variable: `input_dir`
   --> tests/src/test_nestjs.rs:56:13
    |
-56 | ...   let input_dir = PathBuf:...
-   |           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_input_dir`
+56 |         let input_dir = PathBuf::from("fixtures/nestjs_controller/src");
+   |             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_input_dir`
 
 warning: `integration_tests` (lib test) generated 2 warnings
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.39s
      Running unittests src/lib.rs (target/debug/deps/integration_tests-726d51bf8feaca74)
 
 running 1 test
+DEBUG convert_prop: Field id, Type ID, is_dependency: true
 Compilation failed:
 Stderr:
     Updating crates.io index
@@ -36,43 +46,43 @@ Stderr:
    Compiling quote v1.0.42
    Compiling libc v0.2.177
    Compiling itoa v1.0.15
-   Compiling pin-project-lite v0.2.16
    Compiling bytes v1.11.0
+   Compiling pin-project-lite v0.2.16
    Compiling parking_lot_core v0.9.12
    Compiling futures-core v0.3.31
-   Compiling serde_core v1.0.228
-   Compiling smallvec v1.15.1
-   Compiling cfg-if v1.0.4
    Compiling scopeguard v1.2.0
+   Compiling serde_core v1.0.228
+   Compiling cfg-if v1.0.4
+   Compiling smallvec v1.15.1
+   Compiling lock_api v0.4.14
    Compiling pin-utils v0.1.0
    Compiling httparse v1.10.1
    Compiling once_cell v1.21.3
    Compiling serde v1.0.228
-   Compiling lock_api v0.4.14
-   Compiling tower-service v0.3.3
    Compiling futures-task v0.3.31
+   Compiling tower-service v0.3.3
    Compiling log v0.4.28
-   Compiling rustversion v1.0.22
    Compiling tracing-core v0.1.35
+   Compiling rustversion v1.0.22
    Compiling futures-util v0.3.31
    Compiling futures-channel v0.3.31
-   Compiling httpdate v1.0.3
-   Compiling sync_wrapper v1.0.2
-   Compiling percent-encoding v2.3.2
-   Compiling serde_json v1.0.145
-   Compiling atomic-waker v1.1.2
    Compiling ryu v1.0.20
+   Compiling atomic-waker v1.1.2
+   Compiling httpdate v1.0.3
+   Compiling serde_json v1.0.145
    Compiling tower-layer v0.3.3
-   Compiling form_urlencoded v1.2.2
+   Compiling percent-encoding v2.3.2
+   Compiling sync_wrapper v1.0.2
    Compiling http v1.4.0
+   Compiling form_urlencoded v1.2.2
    Compiling mime v0.3.17
-   Compiling memchr v2.7.6
    Compiling tracing v0.1.41
+   Compiling memchr v2.7.6
    Compiling matchit v0.7.3
    Compiling syn v2.0.111
+   Compiling mio v1.1.0
    Compiling socket2 v0.6.1
    Compiling signal-hook-registry v1.4.7
-   Compiling mio v1.1.0
    Compiling http-body v1.0.1
    Compiling parking_lot v0.12.5
    Compiling http-body-util v0.1.3
@@ -87,7 +97,13 @@ Stderr:
    Compiling tower v0.5.2
    Compiling hyper-util v0.1.18
    Compiling axum v0.7.9
-   Compiling test_types v0.1.0 (/tmp/.tmpKGSgS8)
+   Compiling test_types v0.1.0 (/tmp/.tmpunL7JH)
+error[E0425]: cannot find value `container` in this scope
+  --> src/main.rs:49:20
+   |
+49 |                 if container.maybe.is_none() {
+   |                    ^^^^^^^^^ not found in this scope
+
 warning: unreachable expression
   --> src/main.rs:12:5
    |
@@ -100,15 +116,15 @@ warning: unreachable expression
    = note: `#[warn(unreachable_code)]` on by default
 
 error[E0308]: mismatched types
-  --> src/main.rs:32:17
+  --> src/main.rs:25:21
    |
-32 |             id: id,
-   |                 ^^- help: try using a conversion method: `.to_string()`
-   |                 |
-   |                 expected `String`, found `Arc<String>`
+25 |             values: values,
+   |                     ^^^^^^- help: try using a conversion method: `.to_vec()`
+   |                     |
+   |                     expected `Vec<f64>`, found `Arc<Vec<f64>>`
    |
-   = note: expected struct `String`
-              found struct `Arc<String>`
+   = note: expected struct `Vec<_>`
+              found struct `Arc<Vec<_>>`
 
 warning: unused variable: `id`
   --> src/main.rs:11:25
@@ -130,9 +146,10 @@ warning: unused variable: `list`
 39 | pub fn process_list(list: Vec<f64>) -> f64 {
    |                     ^^^^ help: if this is intentional, prefix it with an underscore: `_list`
 
-For more information about this error, try `rustc --explain E0308`.
+Some errors have detailed explanations: E0308, E0425.
+For more information about an error, try `rustc --explain E0308`.
 warning: `test_types` (bin "test_types") generated 4 warnings
-error: could not compile `test_types` (bin "test_types") due to 1 previous error; 4 warnings emitted
+error: could not compile `test_types` (bin "test_types") due to 2 previous errors; 4 warnings emitted
 
 Stdout:
 
@@ -151,13 +168,13 @@ pub fn create_container(id: ID, values: NumberList) -> Container {
 }
 #[derive(Default, Debug, Clone, PartialEq)]
 pub struct ContainerClass {
-    pub id: ID,
+    pub id: std::sync::Arc<ID>,
     pub values: Vec<f64>,
     pub optional: Option<String>,
     pub maybe: Option<f64>,
 }
 impl ContainerClass {
-    pub fn new(id: ID, values: Vec<f64>) -> Self {
+    pub fn new(id: std::sync::Arc<ID>, values: std::sync::Arc<Vec<f64>>) -> Self {
         Self {
             id: id,
             values: values,
@@ -179,7 +196,7 @@ pub fn process_list(list: Vec<f64>) -> f64 {
 }
 
 
-thread 'test_types::type_tests::test_compile_and_execute_advanced_types' panicked at tests/src/test_types.rs:137:9:
+thread 'test_types::type_tests::test_compile_and_execute_advanced_types' panicked at tests/src/test_types.rs:123:9:
 Compilation failed
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 test test_types::type_tests::test_compile_and_execute_advanced_types ... FAILED
@@ -189,6 +206,6 @@ failures:
 failures:
     test_types::type_tests::test_compile_and_execute_advanced_types
 
-test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 29 filtered out; finished in 9.39s
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 29 filtered out; finished in 8.24s
 
 error: test failed, to rerun pass `-p integration_tests --lib`
