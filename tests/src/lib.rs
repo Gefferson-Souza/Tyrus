@@ -17,6 +17,22 @@ mod test_stdlib_exec;
 #[cfg(test)]
 mod test_types;
 
+#[cfg(test)]
+mod infrastructure;
+
+#[test]
+fn verify_equivalence() {
+    let scenarios = vec![
+        "fixtures/equivalence/recursion.ts",
+        "fixtures/equivalence/data_processing.ts",
+        "fixtures/equivalence/class_state.ts",
+    ];
+
+    for scenario in scenarios {
+        infrastructure::equivalence::assert_behavior(scenario);
+    }
+}
+
 #[test]
 fn test_cli_check_pass() {
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("ox_cli"));

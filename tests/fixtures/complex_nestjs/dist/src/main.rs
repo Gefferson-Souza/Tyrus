@@ -13,9 +13,9 @@ async fn main() {
     // Build router
     let app = axum::Router::new()
         .merge(typerust_app::controllers::payment_controller::PaymentController::router())
-        .layer(Extension(create_payment_dto.clone()))
-        .layer(Extension(payment_controller.clone()))
         .layer(Extension(payment_service.clone()))
+        .layer(Extension(payment_controller.clone()))
+        .layer(Extension(create_payment_dto.clone()))
         .layer(Extension(fraud_service.clone()));
 
     let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
