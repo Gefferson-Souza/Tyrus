@@ -199,8 +199,28 @@ pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
         Expr::Await(await_expr) => convert_await_expr(await_expr),
         Expr::Call(call_expr) => convert_call_expr(call_expr),
         Expr::New(new_expr) => convert_new_expr(new_expr),
+        Expr::Tpl(tpl) => convert_tpl_expr(tpl),
+        Expr::Arrow(arrow) => convert_arrow_expr(arrow),
         _ => quote! { todo!() },
     }
+}
+
+fn convert_tpl_expr(tpl: &swc_ecma_ast::Tpl) -> proc_macro2::TokenStream {
+    let mut format_str = String::new();
+    let mut args = Vec::new();
+
+    let quasis = &tpl.quasis;
+    let exprs = &tpl.exprs;
+
+    for (i, quasi) in quasis.iter().enumerate() {
+        format_str.push_str(&quasi.raw);
+        if i < exprs.len() {
+            format_str.push_str("{}");
+            args.push(convert_expr(&exprs[i]));
+        }
+    }
+
+    quote! { format!(#format_str, #(#args),*) }
 }
 
 fn convert_new_expr(new_expr: &swc_ecma_ast::NewExpr) -> proc_macro2::TokenStream {
@@ -219,7 +239,8 @@ fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
     // Handle this.prop -> self.prop
     if member.obj.is_this() {
         if let Some(prop_ident) = member.prop.as_ident() {
-            let field = format_ident!("{}", prop_ident.sym.to_string());
+            let field_name = to_snake_case(&prop_ident.sym.to_string());
+            let field = format_ident!("{}", field_name);
             return quote! { self.#field.clone() };
         }
     }
@@ -235,7 +256,27 @@ fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
 
 fn convert_bin_expr(bin: &BinExpr) -> proc_macro2::TokenStream {
     let left = convert_expr(&bin.left);
-    let right = convert_expr(&bin.right);
+    let mut right = convert_expr(&bin.right);
+
+    if bin.op == BinaryOp::Add {
+        // Heuristic: If right side is a string method call, borrow it to allow String + &String
+        if let Expr::Call(call) = &*bin.right {
+            if let Callee::Expr(callee_expr) = &call.callee {
+                if let Expr::Member(member) = &**callee_expr {
+                    if let Some(ident) = member.prop.as_ident() {
+                        let method_name = ident.sym.as_ref();
+                        match method_name {
+                            "toString" | "toUpperCase" | "toLowerCase" | "trim" | "replace"
+                            | "join" | "repeat" | "slice" | "substring" | "substr" => {
+                                right = quote! { &#right };
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     let op = match bin.op {
         BinaryOp::Add => quote! { + },
@@ -345,11 +386,50 @@ fn convert_axios_call(method: &str, args: &[ExprOrSpread]) -> proc_macro2::Token
 
 fn convert_fetch_call(args: &[ExprOrSpread]) -> proc_macro2::TokenStream {
     if args.is_empty() {
-        return quote! { reqwest::get("").await? };
+        return quote! { reqwest::get("") };
     }
 
     let url = convert_expr_or_spread(&args[0]);
-    quote! { reqwest::get(#url).await? }
+    quote! { reqwest::get(#url) }
+}
+
+fn convert_arrow_expr(arrow: &swc_ecma_ast::ArrowExpr) -> proc_macro2::TokenStream {
+    let params = &arrow.params;
+    let body = &arrow.body;
+
+    let param_idents: Vec<_> = params
+        .iter()
+        .map(|p| {
+            if let Pat::Ident(ident) = p {
+                let name = format_ident!("{}", to_snake_case(&ident.sym));
+                quote! { #name }
+            } else {
+                quote! { _ }
+            }
+        })
+        .collect();
+
+    let body_code = match &**body {
+        swc_ecma_ast::BlockStmtOrExpr::BlockStmt(block) => {
+            let stmts: Vec<_> = block.stmts.iter().map(convert_stmt).collect();
+            quote! { { #(#stmts)* } }
+        }
+        swc_ecma_ast::BlockStmtOrExpr::Expr(expr) => {
+            let expr_code = convert_expr(expr);
+            quote! { #expr_code }
+        }
+    };
+
+    let is_async = arrow.is_async;
+    let _async_kw = if is_async {
+        quote! { async }
+    } else {
+        quote! {}
+    };
+    // Rust closures don't support async easily without blocks, but for map/filter they are usually sync.
+    // If async, we might need `async move`.
+
+    quote! { |#(#param_idents),*| #body_code }
 }
 
 pub fn convert_expr_or_spread(arg: &ExprOrSpread) -> proc_macro2::TokenStream {

@@ -36,6 +36,42 @@ impl RustGenerator {
             }
         }
 
+        // Collect fields from constructor (private/public params)
+        if let Some(cons) = constructor {
+            for param in &cons.params {
+                if let swc_ecma_ast::ParamOrTsParamProp::TsParamProp(prop) = param {
+                    if let swc_ecma_ast::TsParamPropParam::Ident(ident) = &prop.param {
+                        let field_name_str = ident.sym.to_string();
+                        let field_name = format_ident!("{}", to_snake_case(&field_name_str));
+
+                        let type_ann = ident.type_ann.as_ref();
+                        let mut field_type = map_ts_type(type_ann);
+
+                        // Heuristic: If it's a TypeRef (not primitive), wrap in Arc
+                        let is_dependency = if let Some(ann) = type_ann {
+                            if let Some(_type_ref) = ann.type_ann.as_ts_type_ref() {
+                                let type_str = field_type.to_string();
+                                !matches!(
+                                    type_str.as_str(),
+                                    "String" | "f64" | "bool" | "i32" | "Vec" | "Option"
+                                )
+                            } else {
+                                false
+                            }
+                        } else {
+                            false
+                        };
+
+                        if is_dependency {
+                            field_type = quote! { std::sync::Arc<#field_type> };
+                        }
+
+                        fields.push(quote! { pub #field_name: #field_type });
+                    }
+                }
+            }
+        }
+
         let vis = if self.is_exporting {
             quote! { pub }
         } else {
@@ -200,11 +236,23 @@ impl RustGenerator {
                 });
             }
 
+            // Note: We don't add .layer(Extension(Self::default())) here anymore because
+            // we expect the controller to be fully constructed with dependencies in main.rs
+            // and passed as an extension there.
+            // Actually, if we use Self::default(), we bypass DI.
+            // So we should REMOVE Self::default() from here if we want DI.
+            // But for now, let's keep it but assume it will be overridden or unused if we inject properly in main.
+            // Wait, if we add .layer(...) here, it overrides outer layers?
+            // Axum layers are applied outside-in.
+            // If main.rs does .merge(router).layer(Extension(controller)), that Extension is available to the router.
+            // If router() does .layer(Extension(default)), that might shadow the one from main.
+            // So we should REMOVE .layer(Extension(Self::default())) from here!
+            // The controller instance should be provided by the caller (main.rs).
+
             impl_items.push(quote! {
                 pub fn router() -> axum::Router {
                     axum::Router::new()
                         #(#route_calls)*
-                        .layer(axum::Extension(std::sync::Arc::new(Self::default())))
                 }
             });
 
@@ -262,20 +310,54 @@ impl RustGenerator {
         class_fields: &[(String, bool)],
     ) -> proc_macro2::TokenStream {
         let mut params = Vec::new();
+        let mut field_inits = Vec::new();
+        let mut initialized_fields = std::collections::HashSet::new();
+
         for param in &constructor.params {
-            if let Some(pat_param) = param.as_param() {
-                if let Pat::Ident(ident) = &pat_param.pat {
-                    let param_name = format_ident!("{}", ident.sym.to_string());
-                    let param_type = map_ts_type(ident.type_ann.as_ref());
-                    params.push(quote! { #param_name: #param_type });
+            match param {
+                swc_ecma_ast::ParamOrTsParamProp::TsParamProp(prop) => {
+                    if let swc_ecma_ast::TsParamPropParam::Ident(ident) = &prop.param {
+                        let param_name_str = ident.sym.to_string();
+                        let param_name = format_ident!("{}", to_snake_case(&param_name_str));
+
+                        let type_ann = ident.type_ann.as_ref();
+                        let mut param_type = map_ts_type(type_ann);
+
+                        // Heuristic: If it's a TypeRef (not primitive), wrap in Arc
+                        let is_dependency = if let Some(ann) = type_ann {
+                            if let Some(_type_ref) = ann.type_ann.as_ts_type_ref() {
+                                let type_str = param_type.to_string();
+                                !matches!(
+                                    type_str.as_str(),
+                                    "String" | "f64" | "bool" | "i32" | "Vec" | "Option"
+                                )
+                            } else {
+                                false
+                            }
+                        } else {
+                            false
+                        };
+
+                        if is_dependency {
+                            param_type = quote! { std::sync::Arc<#param_type> };
+                        }
+
+                        params.push(quote! { #param_name: #param_type });
+                        field_inits.push(quote! { #param_name: #param_name });
+                        initialized_fields.insert(param_name_str);
+                    }
+                }
+                swc_ecma_ast::ParamOrTsParamProp::Param(pat_param) => {
+                    if let Pat::Ident(ident) = &pat_param.pat {
+                        let param_name = format_ident!("{}", ident.sym.to_string());
+                        let param_type = map_ts_type(ident.type_ann.as_ref());
+                        params.push(quote! { #param_name: #param_type });
+                    }
                 }
             }
         }
 
         // Try to extract field assignments from constructor body
-        let mut field_inits = Vec::new();
-        let mut initialized_fields = std::collections::HashSet::new();
-
         if let Some(body) = &constructor.body {
             for stmt in &body.stmts {
                 if let Stmt::Expr(ExprStmt { expr, .. }) = stmt {
@@ -450,7 +532,7 @@ impl RustGenerator {
                             let is_wrapped = return_type.to_string().starts_with("axum :: Json");
 
                             if is_wrapped {
-                                body_stmts.push(quote! { return axum::Json(#expr); });
+                                body_stmts.push(quote! { return axum::Json(#expr.into()); });
                             } else {
                                 body_stmts.push(quote! { return #expr; });
                             }
@@ -469,7 +551,11 @@ impl RustGenerator {
         };
 
         let doc_comment = if is_handler {
-            let method_str = http_method.as_ref().unwrap().to_uppercase();
+            let method_str = if let Some(m) = http_method.as_ref() {
+                m.to_uppercase()
+            } else {
+                "GET".to_string() // Default or unreachable if guarded
+            };
             let route = if route_path.is_empty() {
                 "/".to_string()
             } else {

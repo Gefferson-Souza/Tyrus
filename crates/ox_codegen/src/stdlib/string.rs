@@ -55,6 +55,13 @@ pub fn handle_method(obj: &Expr, method: &str, args: &[ExprOrSpread]) -> Option<
                 None
             }
         }
+        "toString" => {
+            if args.is_empty() {
+                Some(quote! { #obj_tokens.to_string() })
+            } else {
+                None
+            }
+        }
         _ => None,
     }
 }

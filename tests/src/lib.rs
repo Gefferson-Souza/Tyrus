@@ -9,6 +9,7 @@ mod test_compilation;
 mod test_execute;
 mod test_generics;
 mod test_nestjs;
+mod test_regression;
 #[cfg(test)]
 mod test_snapshots;
 #[cfg(test)]

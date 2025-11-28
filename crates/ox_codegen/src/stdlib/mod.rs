@@ -46,7 +46,7 @@ pub fn try_handle_method_call(
 
     match method {
         // String methods
-        "includes" | "replace" | "split" | "toUpperCase" | "toLowerCase" | "trim" => {
+        "includes" | "replace" | "split" | "toUpperCase" | "toLowerCase" | "trim" | "toString" => {
             string::handle_method(obj, method, args)
         }
         // Array methods

@@ -158,29 +158,28 @@ _Goal: Generate the entry point that wires everything together._
   - [x] Update Codegen to generate a `pub fn router() -> Router` inside each Controller file.
   - [x] Inside this router, map `@Get('/')` to `.route("/", get(self::find_all))`.
 - [x] **Main.rs Generation:**
+
   - [x] Collect all Controllers found during the build.
   - [x] Generate `src/main.rs`.
   - [x] Logic: `Router::new().merge(cats_controller::router()).merge(...)`.
   - [x] Bind to `0.0.0.0:3000`.
 
-## 💉 Phase 7: Dependency Injection (Current Focus)
-
-_Goal: Connect Services to Controllers via Arc pointers and Topological Sort._
-
-- [ ] **Dependency Graph:**
-  - [ ] Detect Constructor Injection (`constructor(private s: Service)`).
-  - [ ] Build a DAG (Directed Acyclic Graph) of dependencies.
-  - [ ] Topological Sort: Determine instantiation order (Leafs first).
-- [ ] **Service Instantiation (Main.rs):**
-  - [ ] Generate `let service = Arc::new(Service::new());`.
-  - [ ] Pass dependencies to constructors: `ServiceB::new(service_a.clone())`.
-- [ ] **State Registration (Axum):**
-  - [ ] Inject services into the Router via `.layer(Extension(service))`.
 - [ ] **Controller Consumption:**
   - [ ] Update Controller struct to hold `Arc<Service>`.
-  - [ ] Update Handlers to access `self.service`.
+  - [x] Verify with `tests/fixtures/nestjs_di`
 
-## 💾 Phase 8: Database & Cleanup (Future)
+## 🧪 Phase 8: The Gauntlet (Regression Testing)
+
+_Goal: Ensure robustness across different project types._
+
+- [x] **Scenario 1: Complex Single File** (Math, String, Async)
+- [x] **Scenario 2: Node.js Logic Project** (Imports, Generics, Axios)
+- [x] **Scenario 3: NestJS Microservice** (Decorators, DI, Controllers)
+- [ ] **Fix & Pass All Scenarios**
+
+## 🧹 Phase 9: Database & Cleanup
+
+(Future)
 
 - [ ] Database Connection (SeaORM/SQLx).
 - [ ] Final Refactoring & CLI Polish.

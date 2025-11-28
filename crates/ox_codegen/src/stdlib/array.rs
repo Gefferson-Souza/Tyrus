@@ -20,7 +20,19 @@ pub fn handle_method(obj: &Expr, method: &str, args: &[ExprOrSpread]) -> Option<
         "map" => {
             if args.len() == 1 {
                 let callback = convert_expr_or_spread(&args[0]);
-                Some(quote! { #obj_tokens.iter().map(#callback).collect::<Vec<_>>() })
+                let param_count = if let Expr::Arrow(arrow) = &*args[0].expr {
+                    arrow.params.len()
+                } else {
+                    1
+                };
+
+                if param_count > 1 {
+                    Some(quote! {
+                        #obj_tokens.iter().cloned().enumerate().map(|(idx, val)| (#callback)(val, idx as f64)).collect::<Vec<_>>()
+                    })
+                } else {
+                    Some(quote! { #obj_tokens.iter().cloned().map(#callback).collect::<Vec<_>>() })
+                }
             } else {
                 None
             }
@@ -28,7 +40,10 @@ pub fn handle_method(obj: &Expr, method: &str, args: &[ExprOrSpread]) -> Option<
         "filter" => {
             if args.len() == 1 {
                 let callback = convert_expr_or_spread(&args[0]);
-                Some(quote! { #obj_tokens.iter().filter(#callback).collect::<Vec<_>>() })
+                // filter yields &T, but callback expects T. We must clone.
+                Some(
+                    quote! { #obj_tokens.iter().cloned().filter(|x| (#callback)(x.clone())).collect::<Vec<_>>() },
+                )
             } else {
                 None
             }

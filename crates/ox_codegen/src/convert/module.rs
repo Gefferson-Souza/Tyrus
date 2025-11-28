@@ -72,32 +72,30 @@ impl RustGenerator {
             src = src.trim_end_matches("/index").to_string();
         }
 
+        // Helper to sanitize path segments
+        let sanitize_path = |p: &str| -> String {
+            p.split('/')
+                .map(|part| part.replace('.', "_"))
+                .collect::<Vec<_>>()
+                .join("::")
+        };
+
         // Path resolution
         let module_path = if src.starts_with("./") {
             let path_str = src.trim_start_matches("./");
+            let sanitized = sanitize_path(path_str);
             if self.is_index {
-                // In mod.rs (index.ts), ./foo refers to a sibling module which is a child of the current directory
-                // So `use self::foo` or just `foo` works if we are inside the module definition.
-                // But usually we want `use crate::path::to::foo`.
-                // If we use relative paths:
-                // `mod.rs` defines the module `utils`.
-                // `foo` is `utils::foo`.
-                // Inside `utils`, `foo` is accessible as `self::foo`.
-                format!("self::{}", path_str.replace("/", "::"))
+                format!("self::{}", sanitized)
             } else {
-                // In normal file (e.g. math.rs), ./foo refers to a sibling.
-                // `math` and `foo` are siblings in `utils`.
-                // To access `foo` from `math`, we use `super::foo`.
-                format!("super::{}", path_str.replace("/", "::"))
+                format!("super::{}", sanitized)
             }
         } else if src.starts_with("../") {
             let path_str = src.trim_start_matches("../");
+            let sanitized = sanitize_path(path_str);
             if self.is_index {
-                // ../foo from mod.rs -> super::foo
-                format!("super::{}", path_str.replace("/", "::"))
+                format!("super::{}", sanitized)
             } else {
-                // ../foo from normal file -> super::super::foo
-                format!("super::super::{}", path_str.replace("/", "::"))
+                format!("super::super::{}", sanitized)
             }
         } else {
             // External crate or absolute path

@@ -42,143 +42,221 @@ pub fn build(path: FilePath) -> Result<String, OxidizerError> {
 }
 
 pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), OxidizerError> {
-    let mut controllers: Vec<(String, String)> = Vec::new();
+    let mut controllers: Vec<String> = Vec::new(); // Just names of controllers
+    let mut class_module_map: std::collections::HashMap<String, String> =
+        std::collections::HashMap::new();
+    let mut programs = Vec::new();
+    let mut file_paths = Vec::new();
 
-    // 1. Walk and Transpile
+    // 1. Walk, Parse, and Collect Info
     for entry in WalkDir::new(&input_dir) {
         let entry = entry.map_err(|e| OxidizerError::IoError(e.into()))?;
         let path = entry.path();
 
-        // Calculate relative path to mirror structure
-        let relative_path = path.strip_prefix(&input_dir).unwrap_or(path);
-        let output_path = output_dir.join(relative_path);
+        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("ts") {
+            let program = ox_parser::parse(path)?;
 
-        if path.is_dir() {
-            fs::create_dir_all(&output_path).map_err(OxidizerError::IoError)?;
-        } else if let Some(ext) = path.extension() {
-            if ext == "ts" {
-                // Transpile .ts file
-                let program = ox_parser::parse(path)?;
+            // Calculate module path
+            let relative_path = path.strip_prefix(&input_dir).unwrap_or(path);
+            let file_stem = path
+                .file_stem()
+                .ok_or_else(|| {
+                    OxidizerError::IoError(std::io::Error::new(
+                        std::io::ErrorKind::InvalidInput,
+                        "Invalid file path",
+                    ))
+                })?
+                .to_string_lossy();
+            let sanitized_stem = file_stem.replace('.', "_");
 
-                // Check if it's index.ts
-                let is_index = path.file_stem().and_then(|s| s.to_str()) == Some("index");
+            let mut module_parts = Vec::new();
+            module_parts.push("typerust_app".to_string()); // Use lib crate name
 
-                let generated = ox_codegen::generate(&program, is_index);
-                let formatted_code = format_code(generated.code)?;
-
-                // Change extension to .rs and sanitize filename
-                // e.g. cats.controller.ts -> cats_controller.rs
-                let file_stem = path.file_stem().unwrap().to_string_lossy();
-                let sanitized_stem = file_stem.replace('.', "_");
-
-                let output_file = output_path.with_file_name(format!("{}.rs", sanitized_stem));
-
-                // Ensure parent dir exists (just in case)
-                if let Some(parent) = output_file.parent() {
-                    fs::create_dir_all(parent).map_err(OxidizerError::IoError)?;
-                }
-
-                fs::write(output_file, formatted_code).map_err(OxidizerError::IoError)?;
-
-                // Collect controllers
-                if !generated.controllers.is_empty() {
-                    // Construct module path
-                    // e.g. relative_path = "cats/cats.controller.ts"
-                    // parent = "cats"
-                    // stem = "cats_controller"
-                    // module = "crate::cats::cats_controller"
-
-                    let mut module_parts = Vec::new();
-                    module_parts.push("crate".to_string());
-
-                    if let Some(parent) = relative_path.parent() {
-                        for part in parent.components() {
-                            if let std::path::Component::Normal(s) = part {
-                                module_parts.push(s.to_string_lossy().to_string());
-                            }
+            if let Some(parent) = relative_path.parent() {
+                for part in parent.components() {
+                    if let std::path::Component::Normal(s) = part {
+                        let s_str = s.to_string_lossy();
+                        if s_str != "src" {
+                            module_parts.push(s_str.to_string());
                         }
-                    }
-                    module_parts.push(sanitized_stem);
-
-                    let module_path = module_parts.join("::");
-
-                    for controller in generated.controllers {
-                        controllers.push((module_path.clone(), controller.struct_name));
                     }
                 }
             }
+            module_parts.push(sanitized_stem);
+            let module_path = module_parts.join("::");
+
+            // Extract classes to map them
+            // We use a simple visitor or just iterate top level statements
+            match &program {
+                swc_ecma_ast::Program::Module(m) => {
+                    for item in &m.body {
+                        if let swc_ecma_ast::ModuleItem::ModuleDecl(
+                            swc_ecma_ast::ModuleDecl::ExportDecl(export),
+                        ) = item
+                        {
+                            if let swc_ecma_ast::Decl::Class(class_decl) = &export.decl {
+                                let class_name = class_decl.ident.sym.to_string();
+                                class_module_map.insert(class_name, module_path.clone());
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+
+            programs.push(program);
+            file_paths.push(path.to_path_buf());
         }
     }
 
-    // 2. Generate mod.rs (The Glue)
-    // We walk the OUTPUT directory now to generate mod.rs based on what we created
+    // 2. Analyze (Build Dependency Graph)
+    let graph = ox_analyzer::graph::build_graph(&programs);
+    let init_order = graph
+        .get_initialization_order()
+        .map_err(|e| OxidizerError::FormattingError(e))?; // Using FormattingError as generic error for now
+
+    // 3. Transpile
+    for (i, program) in programs.iter().enumerate() {
+        let path = &file_paths[i];
+        let relative_path = path.strip_prefix(&input_dir).unwrap_or(path);
+        let output_path = output_dir.join("src").join(relative_path);
+
+        // Check if it's index.ts
+        let is_index = path.file_stem().and_then(|s| s.to_str()) == Some("index");
+
+        let generated = ox_codegen::generate(program, is_index);
+        let formatted_code = format_code(generated.code)?;
+
+        let file_stem = path
+            .file_stem()
+            .ok_or_else(|| {
+                OxidizerError::IoError(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    "Invalid file path",
+                ))
+            })?
+            .to_string_lossy();
+        let sanitized_stem = file_stem.replace('.', "_");
+        let output_file = output_path.with_file_name(format!("{}.rs", sanitized_stem));
+
+        if let Some(parent) = output_file.parent() {
+            fs::create_dir_all(parent).map_err(OxidizerError::IoError)?;
+        }
+
+        fs::write(output_file, formatted_code).map_err(OxidizerError::IoError)?;
+
+        // Collect controllers
+        for controller in generated.controllers {
+            controllers.push(controller.struct_name);
+        }
+    }
+
+    // 4. Generate mod.rs
     for entry in WalkDir::new(&output_dir) {
         let entry = entry.map_err(|e| OxidizerError::IoError(e.into()))?;
         let path = entry.path();
-
         if path.is_dir() {
             generate_mod_rs(path)?;
         }
     }
 
-    // 3. Generate Cargo.toml
+    // Rename src/mod.rs to src/lib.rs for the crate root
+    let src_mod = output_dir.join("src").join("mod.rs");
+    let src_lib = output_dir.join("src").join("lib.rs");
+    if src_mod.exists() {
+        fs::rename(src_mod, src_lib).map_err(OxidizerError::IoError)?;
+    }
+
+    // 5. Generate Cargo.toml
     generate_cargo_toml(&output_dir)?;
 
-    // 4. Generate main.rs
-    generate_main_rs(&output_dir, &controllers)?;
+    // 6. Generate main.rs
+    generate_main_rs(
+        &output_dir,
+        &init_order,
+        &class_module_map,
+        &controllers,
+        &graph,
+    )?;
 
     Ok(())
 }
 
 fn generate_main_rs(
     output_dir: &Path,
-    controllers: &[(String, String)],
+    init_order: &[String],
+    class_module_map: &std::collections::HashMap<String, String>,
+    controllers: &[String],
+    graph: &ox_analyzer::graph::DependencyGraph,
 ) -> Result<(), OxidizerError> {
     let mut main_content = String::new();
     main_content.push_str("use axum::Router;\n");
-    main_content.push_str("use tokio::net::TcpListener;\n\n");
-
-    // We need to declare the modules here if main.rs is the crate root.
-    // But usually lib.rs is the library root and main.rs is the binary root.
-    // If we have both, main.rs can use the library.
-    // But here we are generating a single crate that is both lib and bin?
-    // Or main.rs includes mod.rs?
-    // If we generate `lib.rs` (which we do by renaming mod.rs in the test), then `main.rs` can use `typerust_app::...`.
-    // But `build_project` generates `mod.rs` in the root.
-    // If we want `main.rs` to work, it should probably be `mod.rs` -> `lib.rs` and `main.rs` uses the lib.
-    // OR `main.rs` declares `mod ...;`.
-
-    // Let's assume `lib.rs` exists (created from `mod.rs` by the caller or we should do it here).
-    // In `test_nestjs.rs`, we rename `mod.rs` to `lib.rs`.
-    // So `main.rs` should use the crate name.
-    // The crate name is defined in `Cargo.toml` as `typerust_app`.
-    // So we should use `typerust_app::path::to::Controller`.
-    // BUT, my module path construction used `crate::...`.
-    // `crate::` refers to the current crate. If `main.rs` is in the same crate as `lib.rs`, it's tricky.
-    // Usually `main.rs` and `lib.rs` are separate crate roots.
-    // If `main.rs` uses `typerust_app`, it treats `lib.rs` as an external crate.
-
-    // Let's change `crate::` to `typerust_app::` in the module path construction?
-    // Or just use `typerust_app` prefix in `main.rs`.
-
-    // Wait, if I use `crate::` in `main.rs`, it refers to `main.rs`'s module tree.
-    // If `main.rs` does NOT declare modules, it can't see them via `crate::`.
-    // So `main.rs` must use the library crate.
-
-    // So I should replace `crate::` with `typerust_app::` when generating `main.rs`.
+    main_content.push_str("use tokio::net::TcpListener;\n");
+    main_content.push_str("use std::sync::Arc;\n");
+    main_content.push_str("use axum::Extension;\n\n");
 
     main_content.push_str("#[tokio::main]\n");
     main_content.push_str("async fn main() {\n");
-    main_content.push_str("    let app = Router::new()");
 
-    for (module_path, struct_name) in controllers {
-        // Replace crate:: with typerust_app::
-        let lib_path = module_path.replacen("crate", "typerust_app", 1);
+    // Instantiate components in order
+    let mut instantiated_vars = std::collections::HashMap::new();
+
+    for class_name in init_order {
+        if let Some(module_path) = class_module_map.get(class_name) {
+            let var_name = ox_common::util::to_snake_case(class_name);
+
+            // Get dependencies
+            let deps = graph.get_dependencies(class_name).unwrap_or_default();
+            let mut args = Vec::new();
+            for dep in deps {
+                let dep_var = ox_common::util::to_snake_case(&dep);
+                args.push(format!("{}.clone()", dep_var));
+            }
+            let args_str = args.join(", ");
+
+            main_content.push_str(&format!(
+                "    let {} = Arc::new({}::{}::new({}));\n",
+                var_name, module_path, class_name, args_str
+            ));
+
+            instantiated_vars.insert(class_name, var_name);
+        }
+    }
+
+    main_content.push_str("\n    let app = Router::new()");
+
+    // Merge controller routers
+    // We need to find the instantiated controller variable
+    for controller_name in controllers {
+        if let Some(_var_name) = instantiated_vars.get(controller_name) {
+            if let Some(module_path) = class_module_map.get(controller_name) {
+                // .merge(typerust_app::cats::cats_controller::CatsController::router())
+                // But wait, router() is static and creates a new Router.
+                // It doesn't take the controller instance.
+                // We need to pass the controller instance to the router via Extension.
+                // The router() function we generated adds .layer(Extension(Self::default())).
+                // We removed Self::default() in previous step (or intended to).
+                // Actually, we kept it but we should override it.
+                // If we do .merge(Controller::router()).layer(Extension(controller_instance)),
+                // the Extension(controller_instance) will be available to the routes.
+
+                main_content.push_str(&format!(
+                    "\n        .merge({}::{}::router())",
+                    module_path, controller_name
+                ));
+            }
+        }
+    }
+
+    // 4. Add Extension layers
+    for (_class_name, var_name) in &instantiated_vars {
+        // Assuming instantiated_services is a typo and it should be instantiated_vars
         main_content.push_str(&format!(
-            "\n        .merge({}::{}::router())",
-            lib_path, struct_name
+            "        .layer(Extension({}.clone()))\n",
+            var_name
         ));
     }
+
     main_content.push_str(";\n\n");
 
     main_content
@@ -187,7 +265,10 @@ fn generate_main_rs(
     main_content.push_str("    axum::serve(listener, app).await.unwrap();\n");
     main_content.push_str("}\n");
 
-    let main_path = output_dir.join("main.rs");
+    let main_path = output_dir.join("src").join("main.rs");
+    if let Some(parent) = main_path.parent() {
+        fs::create_dir_all(parent).map_err(OxidizerError::IoError)?;
+    }
     fs::write(main_path, main_content).map_err(OxidizerError::IoError)?;
     Ok(())
 }
@@ -198,14 +279,17 @@ name = "typerust_app"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
 axum = "0.7"
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 reqwest = { version = "0.11", features = ["json"] }
 tower = { version = "0.4" }
 tower-http = { version = "0.5", features = ["trace"] }
+rand = "0.8"
 
 [[bin]]
 name = "server"
@@ -233,9 +317,11 @@ fn generate_mod_rs(dir: &Path) -> Result<(), OxidizerError> {
         let entry = entry.map_err(OxidizerError::IoError)?;
         let path = entry.path();
 
-        // Skip mod.rs itself if it exists (though we are creating it)
-        if path.file_name().and_then(|n| n.to_str()) == Some("mod.rs") {
-            continue;
+        // Skip mod.rs, lib.rs, and main.rs
+        if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+            if name == "mod.rs" || name == "lib.rs" || name == "main.rs" {
+                continue;
+            }
         }
 
         if path.is_dir() {
