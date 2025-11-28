@@ -34,3 +34,9 @@ test test_execute::executable_tests::test_compile_and_execute_multi_file_project
 test test_stdlib_exec::stdlib_tests::test_stdlib_math_execution ... ok
 test test_stdlib_exec::stdlib_tests::test_stdlib_string_execution ... ok
     Blocking waiting for file lock on package cache
+    Updating crates.io index
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
