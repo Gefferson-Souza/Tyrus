@@ -163,15 +163,24 @@ _Goal: Generate the entry point that wires everything together._
   - [x] Logic: `Router::new().merge(cats_controller::router()).merge(...)`.
   - [x] Bind to `0.0.0.0:3000`.
 
-## 💉 Phase 7: Dependency Injection (The Hardest Part)
+## 💉 Phase 7: Dependency Injection (Current Focus)
 
-_Goal: Connect Services to Controllers._
+_Goal: Connect Services to Controllers via Arc pointers and Topological Sort._
 
-- [ ] Detect `constructor(private service: CatsService)`.
+- [ ] **Dependency Graph:**
+  - [ ] Detect Constructor Injection (`constructor(private s: Service)`).
+  - [ ] Build a DAG (Directed Acyclic Graph) of dependencies.
+  - [ ] Topological Sort: Determine instantiation order (Leafs first).
+- [ ] **Service Instantiation (Main.rs):**
+  - [ ] Generate `let service = Arc::new(Service::new());`.
+  - [ ] Pass dependencies to constructors: `ServiceB::new(service_a.clone())`.
+- [ ] **State Registration (Axum):**
+  - [ ] Inject services into the Router via `.layer(Extension(service))`.
+- [ ] **Controller Consumption:**
+  - [ ] Update Controller struct to hold `Arc<Service>`.
+  - [ ] Update Handlers to access `self.service`.
 
-- [ ] Generate `Extension<Arc<CatsService>>` in the handler arguments.
-- [ ] Register services in `main.rs` via `.layer(Extension(CatsService::new()))`.
+## 💾 Phase 8: Database & Cleanup (Future)
 
-## 💾 Phase 8: Database (Future)
-
-- [ ] Connect TypeORM/Prisma to SeaORM.
+- [ ] Database Connection (SeaORM/SQLx).
+- [ ] Final Refactoring & CLI Polish.
