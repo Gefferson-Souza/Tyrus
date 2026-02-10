@@ -63,4 +63,61 @@ impl Visit for LintVisitor {
         }
         n.visit_children_with(self);
     }
+
+    // While loops are now supported!
+    // fn visit_while_stmt(&mut self, n: &swc_ecma_ast::WhileStmt) { ... }
+
+    fn visit_do_while_stmt(&mut self, n: &swc_ecma_ast::DoWhileStmt) {
+        self.errors.push(OxidizerError::UnsupportedFeature {
+            feature: "do-while loops".to_string(),
+            src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
+            span: self.create_span(n.span),
+        });
+        n.visit_children_with(self);
+    }
+
+    fn visit_for_stmt(&mut self, n: &swc_ecma_ast::ForStmt) {
+        self.errors.push(OxidizerError::UnsupportedFeature {
+            feature: "for loops".to_string(),
+            src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
+            span: self.create_span(n.span),
+        });
+        n.visit_children_with(self);
+    }
+
+    fn visit_for_of_stmt(&mut self, n: &swc_ecma_ast::ForOfStmt) {
+        self.errors.push(OxidizerError::UnsupportedFeature {
+            feature: "for-of loops".to_string(),
+            src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
+            span: self.create_span(n.span),
+        });
+        n.visit_children_with(self);
+    }
+
+    fn visit_for_in_stmt(&mut self, n: &swc_ecma_ast::ForInStmt) {
+        self.errors.push(OxidizerError::UnsupportedFeature {
+            feature: "for-in loops".to_string(),
+            src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
+            span: self.create_span(n.span),
+        });
+        n.visit_children_with(self);
+    }
+
+    fn visit_try_stmt(&mut self, n: &swc_ecma_ast::TryStmt) {
+        self.errors.push(OxidizerError::UnsupportedFeature {
+            feature: "try-catch blocks".to_string(),
+            src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
+            span: self.create_span(n.span),
+        });
+        n.visit_children_with(self);
+    }
+
+    fn visit_switch_stmt(&mut self, n: &swc_ecma_ast::SwitchStmt) {
+        self.errors.push(OxidizerError::UnsupportedFeature {
+            feature: "switch statements".to_string(),
+            src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
+            span: self.create_span(n.span),
+        });
+        n.visit_children_with(self);
+    }
 }

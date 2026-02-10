@@ -214,6 +214,18 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
                 if #test #cons_block #alt
             }
         }
+        Stmt::While(while_stmt) => {
+            let test = convert_expr(&while_stmt.test);
+            let body = convert_stmt(&while_stmt.body);
+            let body_block = if matches!(*while_stmt.body, Stmt::Block(_)) {
+                quote! { #body }
+            } else {
+                quote! { { #body } }
+            };
+            quote! {
+                while #test #body_block
+            }
+        }
         _ => quote! { /* unsupported statement */ },
     }
 }
@@ -249,6 +261,10 @@ pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
                 Lit::Str(str_lit) => {
                     let s = str_lit.value.as_str().unwrap_or("");
                     quote! { String::from(#s) }
+                }
+                Lit::Bool(b) => {
+                    let value = b.value;
+                    quote! { #value }
                 }
                 _ => quote! { todo!("unsupported literal") },
             }

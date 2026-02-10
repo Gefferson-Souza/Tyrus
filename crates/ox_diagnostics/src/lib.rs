@@ -44,6 +44,16 @@ pub enum OxidizerError {
         span: SourceSpan,
     },
 
+    #[error("Unsupported Feature: {feature} is not yet supported in Oxidizer.")]
+    #[diagnostic(code(oxidizer::unsupported))]
+    UnsupportedFeature {
+        feature: String,
+        #[source_code]
+        src: NamedSource<String>,
+        #[label("this feature is pending implementation")]
+        span: SourceSpan,
+    },
+
     #[error("Formatting Error: {0}")]
     #[diagnostic(code(oxidizer::fmt_error))]
     FormattingError(String),

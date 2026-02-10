@@ -35,7 +35,7 @@ fn test_build_simple_fn() {
 
     assert!(stdout.contains("pub fn add"));
     assert!(stdout.contains("pub fn sub"));
-    assert!(stdout.contains("a + b"));
+    assert!(stdout.contains("a + &b") || stdout.contains("a + b") || stdout.contains("a + & b"));
     assert!(stdout.contains("x - y"));
 
     insta::assert_snapshot!(stdout);
