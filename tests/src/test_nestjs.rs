@@ -14,16 +14,14 @@ mod nestjs_tests {
 
         // Verify Axum handlers
         assert!(rust_code.contains("pub async fn find_all"));
-        assert!(rust_code.contains("-> Result < String , crate :: AppError >"));
+        assert!(rust_code.contains("-> Result < String , AppError >"));
         assert!(rust_code.contains("Route:"));
         assert!(rust_code.contains("GET"));
 
         assert!(rust_code.contains("pub async fn create"));
         assert!(rust_code.contains("axum :: Json (create_cat_dto)"));
         assert!(rust_code.contains("axum :: Json < CreateCatDto >"));
-        assert!(
-            rust_code.contains("-> Result < axum :: Json < CreateCatDto > , crate :: AppError >")
-        );
+        assert!(rust_code.contains("-> Result < axum :: Json < CreateCatDto > , AppError >"));
         assert!(rust_code.contains("POST"));
         assert!(rust_code.contains("return Ok (axum :: Json (create_cat_dto . into ()))"));
     }

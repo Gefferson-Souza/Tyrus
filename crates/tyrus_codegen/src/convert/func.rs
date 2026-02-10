@@ -810,7 +810,15 @@ pub fn convert_arrow_expr_with_hint(
         .map(|(i, p)| {
             if let Pat::Ident(ident) = p {
                 let name = format_ident!("{}", to_snake_case(&ident.sym));
-                if let Some(hint) = &type_hint {
+                let ts_type = if let Some(ann) = &ident.type_ann {
+                    Some(super::type_mapper::map_ts_type(Some(ann)))
+                } else {
+                    None
+                };
+
+                if let Some(t) = ts_type {
+                    quote! { #name: #t }
+                } else if let Some(hint) = &type_hint {
                     // Only apply hint to the first parameter for now (common case for map/filter)
                     if i == 0 {
                         quote! { #name: #hint }
