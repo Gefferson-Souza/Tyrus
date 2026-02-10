@@ -1,14 +1,14 @@
 #[cfg(test)]
 mod nestjs_tests {
-    use tyrus_common::fs::FilePath;
     use std::path::PathBuf;
     use tempfile::TempDir;
+    use tyrus_common::fs::FilePath;
 
     #[test]
     fn test_nestjs_controller_generation() {
         let ts_path = PathBuf::from("fixtures/nestjs_controller/src/cats.controller.ts");
-        let rust_code =
-            tyrus_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
+        let rust_code = tyrus_orchestrator::build(FilePath::from(ts_path))
+            .expect("Failed to generate Rust code");
 
         println!("Generated Rust Code:\n{}", rust_code);
 

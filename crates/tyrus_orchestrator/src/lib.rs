@@ -1,6 +1,6 @@
-use tyrus_diagnostics::OxidizerError;
 use std::fs;
 use std::path::{Path, PathBuf};
+use tyrus_diagnostics::OxidizerError;
 
 use walkdir::WalkDir;
 

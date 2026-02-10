@@ -1,7 +1,7 @@
 #[cfg(test)]
 use insta::assert_snapshot;
-use tyrus_common::fs::FilePath;
 use std::path::PathBuf;
+use tyrus_common::fs::FilePath;
 
 #[test]
 fn test_snapshot_interface_simple() {

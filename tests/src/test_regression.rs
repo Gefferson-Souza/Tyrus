@@ -1,6 +1,6 @@
-use tyrus_orchestrator::build_project;
 use std::path::PathBuf;
 use std::process::Command;
+use tyrus_orchestrator::build_project;
 
 #[allow(dead_code)]
 fn run_gauntlet_test(fixture_name: &str) {

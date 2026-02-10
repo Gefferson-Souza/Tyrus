@@ -1,17 +1,17 @@
 #[cfg(test)]
 mod executable_tests {
-    use tyrus_common::fs::FilePath;
     use std::fs;
     use std::path::PathBuf;
     use std::process::Command;
     use tempfile::TempDir;
+    use tyrus_common::fs::FilePath;
 
     #[test]
     fn test_compile_and_execute_simple_functions() {
         // Transpile TypeScript to Rust
         let ts_path = PathBuf::from("fixtures/executable_simple/input.ts");
-        let rust_code =
-            tyrus_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
+        let rust_code = tyrus_orchestrator::build(FilePath::from(ts_path))
+            .expect("Failed to generate Rust code");
 
         // Create complete executable program
         let program = format!(
@@ -77,8 +77,8 @@ fn main() {{
     fn test_compile_and_execute_class() {
         // Transpile class
         let ts_path = PathBuf::from("fixtures/exec_class/input.ts");
-        let mut rust_code =
-            tyrus_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
+        let mut rust_code = tyrus_orchestrator::build(FilePath::from(ts_path))
+            .expect("Failed to generate Rust code");
 
         // Remove serde derives for standalone compilation
         rust_code = rust_code.replace(", serde :: Serialize, serde :: Deserialize", "");
@@ -135,8 +135,8 @@ fn main() {{
         let ts_file = temp_dir.join("integration_test.ts");
         std::fs::write(&ts_file, ts_code).unwrap();
 
-        let rust_code =
-            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+        let rust_code = tyrus_orchestrator::build(FilePath::from(ts_file))
+            .expect("Failed to generate Rust code");
 
         let program = format!(
             r#"

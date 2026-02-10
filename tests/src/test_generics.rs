@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod generic_tests {
-    use tyrus_common::fs::FilePath;
     use std::fs;
     use std::process::Command;
     use tempfile::TempDir;
+    use tyrus_common::fs::FilePath;
 
     #[test]
     fn test_compile_and_execute_generics() {

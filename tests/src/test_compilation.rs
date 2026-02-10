@@ -134,9 +134,10 @@ fn main() {{
     {
         // Generate Rust code
         let ts_file = create_temp_ts_file(ts_code);
-        let rust_code =
-            tyrus_orchestrator::build(tyrus_common::fs::FilePath::from(ts_file.path().to_path_buf()))
-                .unwrap();
+        let rust_code = tyrus_orchestrator::build(tyrus_common::fs::FilePath::from(
+            ts_file.path().to_path_buf(),
+        ))
+        .unwrap();
 
         // Write to temp file
         let mut rs_file = NamedTempFile::new().unwrap();

@@ -1,6 +1,6 @@
 use miette::{NamedSource, SourceSpan};
-use tyrus_diagnostics::OxidizerError;
 use std::path::Path;
+use tyrus_diagnostics::OxidizerError;
 
 use swc_common::{
     errors::{ColorConfig, Handler},

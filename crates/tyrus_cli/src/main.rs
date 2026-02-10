@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use miette::Result;
-use tyrus_common::fs::FilePath;
 use std::path::PathBuf;
+use tyrus_common::fs::FilePath;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

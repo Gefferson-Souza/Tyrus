@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod stdlib_tests {
-    use tyrus_common::fs::FilePath;
     use std::fs;
     use std::process::Command;
     use tempfile::TempDir;
+    use tyrus_common::fs::FilePath;
 
     #[test]
     fn test_stdlib_math_execution() {
@@ -20,8 +20,8 @@ mod stdlib_tests {
         let ts_file = temp_dir.join("stdlib_math_test.ts");
         std::fs::write(&ts_file, ts_code).unwrap();
 
-        let rust_code =
-            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+        let rust_code = tyrus_orchestrator::build(FilePath::from(ts_file))
+            .expect("Failed to generate Rust code");
 
         println!("Generated Rust code:\n{}", rust_code);
 
@@ -55,8 +55,8 @@ fn main() {{
         let ts_file = temp_dir.join("stdlib_string_test.ts");
         std::fs::write(&ts_file, ts_code).unwrap();
 
-        let rust_code =
-            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+        let rust_code = tyrus_orchestrator::build(FilePath::from(ts_file))
+            .expect("Failed to generate Rust code");
 
         println!("Generated Rust code:\n{}", rust_code);
 
@@ -90,8 +90,8 @@ fn main() {{
         let ts_file = temp_dir.join("stdlib_console_test.ts");
         std::fs::write(&ts_file, ts_code).unwrap();
 
-        let rust_code =
-            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+        let rust_code = tyrus_orchestrator::build(FilePath::from(ts_file))
+            .expect("Failed to generate Rust code");
 
         println!("Generated Rust code:\n{}", rust_code);
 
