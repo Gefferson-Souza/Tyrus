@@ -46,6 +46,9 @@ pub fn build(path: FilePath) -> Result<String, OxidizerError> {
     if code.contains("crate::AppError") {
         // Replace crate:: prefix with local reference since we're inlining the struct
         code = code.replace("crate::AppError", "AppError");
+        code.push_str(get_app_error_code());
+    } else if code.contains("crate :: AppError") {
+        code = code.replace("crate :: AppError", "AppError");
         code.push('\n');
         code.push_str(get_app_error_code());
     }

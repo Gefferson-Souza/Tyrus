@@ -94,9 +94,9 @@ fn test_e2e_complex_scenario() {
         "Missing User.name field"
     );
     assert!(
-        stdout.contains("isActive")
-            && (stdout.contains("isActive: bool") || stdout.contains("isActive : bool")),
-        "Missing User.isActive field"
+        stdout.contains("is_active")
+            && (stdout.contains("is_active: bool") || stdout.contains("is_active : bool")),
+        "Missing User.is_active field"
     );
 
     // Verify Milestone 3: Functions with binary expressions

@@ -42,7 +42,7 @@ pub fn handle_method(obj: &Expr, method: &str, args: &[ExprOrSpread]) -> Option<
                 let callback = convert_expr_or_spread(&args[0]);
                 // Use filter on borrowed iter, then collect cloned values
                 Some(
-                    quote! { #obj_tokens.iter().filter(|x| (#callback)(x)).cloned().collect::<Vec<_>>() },
+                    quote! { #obj_tokens.iter().filter(|x| (#callback)((*x).clone())).cloned().collect::<Vec<_>>() },
                 )
             } else {
                 None

@@ -303,6 +303,15 @@ pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
         Expr::Array(arr) => convert_array_lit(arr),
         Expr::Update(update) => convert_update_expr(update),
         Expr::Assign(assign) => convert_assign_expr(assign),
+        Expr::Unary(unary) => {
+            let arg = convert_expr(&unary.arg);
+            match unary.op {
+                swc_ecma_ast::UnaryOp::Bang => quote! { !#arg },
+                swc_ecma_ast::UnaryOp::Minus => quote! { -#arg },
+                swc_ecma_ast::UnaryOp::Plus => quote! { +#arg },
+                _ => quote! { todo!("unsupported unary op") },
+            }
+        }
         _ => quote! { todo!() },
     }
 }
@@ -459,7 +468,8 @@ fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
 
     match &member.prop {
         swc_ecma_ast::MemberProp::Ident(ident) => {
-            let prop = format_ident!("{}", ident.sym.as_ref().to_string());
+            let prop_name = to_snake_case(ident.sym.as_ref());
+            let prop = format_ident!("{}", prop_name);
             quote! { #obj.#prop }
         }
         swc_ecma_ast::MemberProp::Computed(computed) => {
