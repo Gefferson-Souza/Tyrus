@@ -464,7 +464,7 @@ impl RustGenerator {
                 }
                 swc_ecma_ast::ParamOrTsParamProp::Param(pat_param) => {
                     if let Pat::Ident(ident) = &pat_param.pat {
-                        let param_name = format_ident!("{}", to_snake_case(&ident.sym.to_string()));
+                        let param_name = format_ident!("{}", to_snake_case(ident.sym.as_ref()));
                         let mut param_type = map_ts_type(ident.type_ann.as_ref());
 
                         // Check dependency

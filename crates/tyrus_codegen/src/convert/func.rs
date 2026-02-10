@@ -810,11 +810,10 @@ pub fn convert_arrow_expr_with_hint(
         .map(|(i, p)| {
             if let Pat::Ident(ident) = p {
                 let name = format_ident!("{}", to_snake_case(&ident.sym));
-                let ts_type = if let Some(ann) = &ident.type_ann {
-                    Some(super::type_mapper::map_ts_type(Some(ann)))
-                } else {
-                    None
-                };
+                let ts_type = ident
+                    .type_ann
+                    .as_ref()
+                    .map(|ann| super::type_mapper::map_ts_type(Some(ann)));
 
                 if let Some(t) = ts_type {
                     quote! { #name: #t }
