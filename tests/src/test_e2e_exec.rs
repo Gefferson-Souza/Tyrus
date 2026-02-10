@@ -84,6 +84,8 @@ fn main() {{
         rust_code = rust_code.replace(", serde :: Serialize, serde :: Deserialize", "");
         rust_code = rust_code.replace("serde :: Serialize, serde :: Deserialize, ", "");
         rust_code = rust_code.replace("serde :: Serialize, serde :: Deserialize", "");
+        // Remove serde attributes (rename_all, etc.) that require the serde crate
+        rust_code = remove_serde_attributes(&rust_code);
 
         // Create executable with class instantiation and method calls
         let program = format!(
@@ -206,6 +208,7 @@ fn main() {{
             .replace(", serde :: Serialize, serde :: Deserialize", "")
             .replace("serde :: Serialize, serde :: Deserialize, ", "")
             .replace("serde :: Serialize, serde :: Deserialize", "");
+        let models_rs = remove_serde_attributes(&models_rs);
         fs::write(temp_dir.path().join("models.rs"), models_rs).unwrap();
 
         // --- 3. main.ts ---
@@ -344,5 +347,14 @@ fn main() {{
                 test_name
             );
         }
+    }
+
+    /// Remove `#[serde(...)]` attribute lines from generated Rust code.
+    /// Needed for tests that compile with plain `rustc` (no serde crate).
+    fn remove_serde_attributes(code: &str) -> String {
+        code.lines()
+            .filter(|line| !line.trim().starts_with("#[serde("))
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 }

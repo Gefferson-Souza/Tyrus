@@ -39,7 +39,18 @@ pub fn build(path: FilePath) -> Result<String, OxidizerError> {
     let program = tyrus_parser::parse(path.as_ref())?;
     // Default to false for single file build
     let generated_code = tyrus_codegen::generate(&program, false);
-    format_code(generated_code.code)
+    let mut code = generated_code.code;
+
+    // Conditionally inject AppError boilerplate:
+    // Only needed when async functions generate `Result<T, crate::AppError>` return types
+    if code.contains("crate::AppError") {
+        // Replace crate:: prefix with local reference since we're inlining the struct
+        code = code.replace("crate::AppError", "AppError");
+        code.push('\n');
+        code.push_str(get_app_error_code());
+    }
+
+    format_code(code)
 }
 
 pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), OxidizerError> {
@@ -169,31 +180,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
 
     // Generate error.rs
     let error_rs = output_dir.join("src").join("error.rs");
-    let error_content = r#"
-use axum::{response::{IntoResponse, Response}, http::StatusCode};
-
-pub struct AppError(Box<dyn std::error::Error + Send + Sync>);
-
-impl IntoResponse for AppError {
-    fn into_response(self) -> Response {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            self.0.to_string(),
-        )
-            .into_response()
-    }
-}
-
-impl<E> From<E> for AppError
-where
-    E: std::error::Error + Send + Sync + 'static,
-{
-    fn from(err: E) -> Self {
-        Self(Box::new(err))
-    }
-}
-
-"#;
+    let error_content = get_app_error_code();
     fs::write(error_rs, error_content).map_err(OxidizerError::IoError)?;
 
     // Append mod error; pub use error::AppError; to lib.rs
@@ -441,4 +428,38 @@ fn format_code(code: String) -> Result<String, OxidizerError> {
             String::from_utf8_lossy(&output.stderr).to_string(),
         ))
     }
+}
+
+fn get_app_error_code() -> &'static str {
+    r#"
+use axum::{response::{IntoResponse, Response}, http::StatusCode};
+
+#[derive(Debug)]
+pub struct AppError(Box<dyn std::error::Error + Send + Sync>);
+
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            self.0.to_string(),
+        )
+            .into_response()
+    }
+}
+
+impl<E> From<E> for AppError
+where
+    E: std::error::Error + Send + Sync + 'static,
+{
+    fn from(err: E) -> Self {
+        Self(Box::new(err))
+    }
+}
+
+impl std::fmt::Display for AppError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+"#
 }

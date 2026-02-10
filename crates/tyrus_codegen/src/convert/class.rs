@@ -156,6 +156,7 @@ impl RustGenerator {
 
         let struct_def = quote! {
             #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+            #[serde(rename_all = "camelCase")]
             #vis struct #struct_name #generics_struct_decl {
                 #(#fields),*
             }
@@ -347,7 +348,7 @@ impl RustGenerator {
         } else {
             return None;
         };
-        let field_name = format_ident!("{}", field_name_str);
+        let field_name = format_ident!("{}", to_snake_case(&field_name_str));
         let mut field_type = map_ts_type(prop.type_ann.as_ref());
 
         // Check dependency
@@ -463,7 +464,7 @@ impl RustGenerator {
                 }
                 swc_ecma_ast::ParamOrTsParamProp::Param(pat_param) => {
                     if let Pat::Ident(ident) = &pat_param.pat {
-                        let param_name = format_ident!("{}", ident.sym.to_string());
+                        let param_name = format_ident!("{}", to_snake_case(&ident.sym.to_string()));
                         let mut param_type = map_ts_type(ident.type_ann.as_ref());
 
                         // Check dependency
@@ -517,7 +518,8 @@ impl RustGenerator {
                                 if member.obj.is_this() {
                                     if let Some(prop_ident) = member.prop.as_ident() {
                                         let field_name_str = prop_ident.sym.to_string();
-                                        let field_name = format_ident!("{}", field_name_str);
+                                        let field_name =
+                                            format_ident!("{}", to_snake_case(&field_name_str));
                                         let value = convert_expr_pub(&assign.right);
 
                                         // If field is optional but assigned value is not Option, wrap it?
@@ -573,7 +575,7 @@ impl RustGenerator {
         // Fill in missing optional fields with None
         for (name, is_optional) in class_fields {
             if *is_optional && !initialized_fields.contains(name) {
-                let field_name = format_ident!("{}", name);
+                let field_name = format_ident!("{}", to_snake_case(name));
                 field_inits.push(quote! { #field_name: None });
             }
         }
@@ -701,7 +703,7 @@ impl RustGenerator {
 
             for (name, _) in class_fields {
                 if !di_initialized_fields.contains(name) {
-                    let field_name = format_ident!("{}", name);
+                    let field_name = format_ident!("{}", to_snake_case(name));
                     di_field_inits.push(quote! { #field_name: Default::default() });
                 }
             }

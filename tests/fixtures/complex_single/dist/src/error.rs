@@ -1,6 +1,7 @@
 
 use axum::{response::{IntoResponse, Response}, http::StatusCode};
 
+#[derive(Debug)]
 pub struct AppError(Box<dyn std::error::Error + Send + Sync>);
 
 impl IntoResponse for AppError {
@@ -22,3 +23,8 @@ where
     }
 }
 
+impl std::fmt::Display for AppError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}

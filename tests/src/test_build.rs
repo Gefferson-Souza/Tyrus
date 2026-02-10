@@ -4,7 +4,7 @@ use std::process::Command;
 
 #[test]
 fn test_build_dto() {
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     let output = cmd
         .arg("build")
         .arg("fixtures/pass_simple_dto/input.ts")
@@ -23,7 +23,7 @@ fn test_build_dto() {
 
 #[test]
 fn test_build_simple_fn() {
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     let output = cmd
         .arg("build")
         .arg("fixtures/build_simple_fn/input.ts")
@@ -43,7 +43,7 @@ fn test_build_simple_fn() {
 
 #[test]
 fn test_build_async_fn() {
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     let output = cmd
         .arg("build")
         .arg("fixtures/build_async_fn/input.ts")
@@ -65,7 +65,7 @@ fn test_e2e_complex_scenario() {
     // - Milestone 2: Interfaces
     // - Milestone 3: Functions with math
     // - Milestone 4: Async/await
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     let output = cmd
         .arg("build")
         .arg("fixtures/e2e_complex/input.ts")

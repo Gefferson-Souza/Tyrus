@@ -1,0 +1,13 @@
+[package]
+name = "tyrus_test_utils"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cargo_metadata = "0.18"
+tempfile = "3.10"
+uuid = { version = "1.7", features = ["v4"] }
+miette = { version = "7.6.0", features = ["fancy"] }
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full", "macros"] }
+# We include dependencies that generated code might use, to ensure they are available in the temp environment

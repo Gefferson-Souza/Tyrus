@@ -41,7 +41,7 @@ impl Visit for RustGenerator {
                 } else {
                     continue; // Skip non-identifier keys for now
                 };
-                let field_name = format_ident!("{}", field_name_str);
+                let field_name = format_ident!("{}", super::func::to_snake_case(&field_name_str));
 
                 let mut field_type = map_ts_type(prop.type_ann.as_ref());
 
@@ -72,6 +72,7 @@ impl Visit for RustGenerator {
 
         let struct_def = quote! {
             #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+            #[serde(rename_all = "camelCase")]
             pub struct #struct_name #generics {
                 #(#fields),*
             }

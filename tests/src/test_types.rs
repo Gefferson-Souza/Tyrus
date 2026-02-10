@@ -58,11 +58,12 @@ mod type_tests {
 
         let rust_code = tyrus_orchestrator::build(FilePath::from(ts_file)).unwrap();
 
-        // Remove serde for standalone test
-        let rust_code = rust_code
-            .replace(", serde :: Serialize, serde :: Deserialize", "")
-            .replace("serde :: Serialize, serde :: Deserialize, ", "")
-            .replace("serde :: Serialize, serde :: Deserialize", "");
+        // Remove serde for standalone test - NO, keep it!
+        // let rust_code = rust_code
+        //     .replace(", serde :: Serialize, serde :: Deserialize", "")
+        //     .replace("serde :: Serialize, serde :: Deserialize, ", "")
+        //     .replace("serde :: Serialize, serde :: Deserialize", "");
+        // We added #[serde] attributes, so we need the derives.
 
         let program = format!(
             r#"
@@ -127,11 +128,13 @@ axum = "0.7"
             .expect("Failed to compile");
 
         if !compile.status.success() {
-            println!(
+            let error_msg = format!(
                 "Compilation failed:\nStderr:\n{}\nStdout:\n{}",
                 String::from_utf8_lossy(&compile.stderr),
                 String::from_utf8_lossy(&compile.stdout)
             );
+            fs::write("/tmp/compilation_error.txt", &error_msg).unwrap();
+            println!("{}", error_msg);
             println!("Generated Code:\n{}", rust_code);
         }
         assert!(compile.status.success(), "Compilation failed");

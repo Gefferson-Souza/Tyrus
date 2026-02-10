@@ -55,7 +55,17 @@ impl super::interface::RustGenerator {
                     body_stmts.push(convert_stmt_recursive(stmt, &|ret_stmt| {
                         if let Some(arg) = &ret_stmt.arg {
                             let expr = convert_expr(arg);
-                            quote! { return Ok(#expr); }
+
+                            // Heuristic: If returning an object literal, it is converted to json!() (Value).
+                            // But the function might return a struct (User).
+                            // We need to deserialize Value -> Struct.
+                            if !is_void && matches!(arg.as_ref(), swc_ecma_ast::Expr::Object(_)) {
+                                quote! {
+                                    return Ok(serde_json::from_value(#expr).unwrap_or_else(|e| panic!("Failed to convert return value: {}", e)));
+                                }
+                            } else {
+                                quote! { return Ok(#expr); }
+                            }
                         } else {
                             quote! { return Ok(()); }
                         }
@@ -79,7 +89,21 @@ impl super::interface::RustGenerator {
                 }
             } else {
                 for stmt in &block_stmt.stmts {
-                    body_stmts.push(convert_stmt(stmt));
+                    body_stmts.push(convert_stmt_recursive(stmt, &|ret_stmt| {
+                        if let Some(arg) = &ret_stmt.arg {
+                            let expr = convert_expr(arg);
+                            // Heuristic: same as async, needed for Struct return types
+                            if !is_void && matches!(arg.as_ref(), swc_ecma_ast::Expr::Object(_)) {
+                                quote! {
+                                    return serde_json::from_value(#expr).unwrap_or_else(|e| panic!("Failed to convert return value: {}", e));
+                                }
+                            } else {
+                                quote! { return #expr; }
+                            }
+                        } else {
+                            quote! { return; }
+                        }
+                    }));
                 }
             }
         }
@@ -339,17 +363,29 @@ fn convert_object_lit(obj: &swc_ecma_ast::ObjectLit) -> proc_macro2::TokenStream
     for prop in &obj.props {
         if let swc_ecma_ast::PropOrSpread::Prop(prop) = prop {
             match &**prop {
-                swc_ecma_ast::Prop::KeyValue(kv) => {
-                    let key = match &kv.key {
+                swc_ecma_ast::Prop::KeyValue(prop) => {
+                    let key = match &prop.key {
                         swc_ecma_ast::PropName::Ident(ident) => {
                             format!("{:?}", ident.sym).trim_matches('"').to_string()
                         }
                         swc_ecma_ast::PropName::Str(s) => {
                             format!("{:?}", s.value).trim_matches('"').to_string()
                         }
-                        _ => "unknown".to_string(),
+                        swc_ecma_ast::PropName::Num(n) => n.to_string(),
+                        swc_ecma_ast::PropName::Computed(_) => "computed_key".to_string(), // TODO
+                        swc_ecma_ast::PropName::BigInt(n) => n.value.to_string(),
                     };
-                    let value = convert_expr(&kv.value);
+
+                    let value = if let Expr::Ident(ident) = prop.value.as_ref() {
+                        if ident.sym == "undefined" {
+                            quote! { serde_json::Value::Null }
+                        } else {
+                            convert_expr(&prop.value)
+                        }
+                    } else {
+                        convert_expr(&prop.value)
+                    };
+
                     fields.push(quote! { #key: #value });
                 }
                 swc_ecma_ast::Prop::Shorthand(ident) => {
@@ -747,16 +783,33 @@ fn convert_fetch_call(args: &[ExprOrSpread]) -> proc_macro2::TokenStream {
     quote! { reqwest::get(#url) }
 }
 
-fn convert_arrow_expr(arrow: &swc_ecma_ast::ArrowExpr) -> proc_macro2::TokenStream {
+pub fn convert_arrow_expr(arrow: &swc_ecma_ast::ArrowExpr) -> proc_macro2::TokenStream {
+    convert_arrow_expr_with_hint(arrow, None)
+}
+
+pub fn convert_arrow_expr_with_hint(
+    arrow: &swc_ecma_ast::ArrowExpr,
+    type_hint: Option<proc_macro2::TokenStream>,
+) -> proc_macro2::TokenStream {
     let params = &arrow.params;
     let body = &arrow.body;
 
     let param_idents: Vec<_> = params
         .iter()
-        .map(|p| {
+        .enumerate()
+        .map(|(i, p)| {
             if let Pat::Ident(ident) = p {
                 let name = format_ident!("{}", to_snake_case(&ident.sym));
-                quote! { #name }
+                if let Some(hint) = &type_hint {
+                    // Only apply hint to the first parameter for now (common case for map/filter)
+                    if i == 0 {
+                        quote! { #name: #hint }
+                    } else {
+                        quote! { #name }
+                    }
+                } else {
+                    quote! { #name }
+                }
             } else {
                 quote! { _ }
             }
@@ -780,8 +833,6 @@ fn convert_arrow_expr(arrow: &swc_ecma_ast::ArrowExpr) -> proc_macro2::TokenStre
     } else {
         quote! {}
     };
-    // Rust closures don't support async easily without blocks, but for map/filter they are usually sync.
-    // If async, we might need `async move`.
 
     quote! { |#(#param_idents),*| #body_code }
 }

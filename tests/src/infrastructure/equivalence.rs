@@ -66,6 +66,7 @@ fn main() {
 
     if !rust_output.status.success() {
         let stderr = String::from_utf8_lossy(&rust_output.stderr);
+        std::fs::write("/tmp/equivalence_error.txt", stderr.as_bytes()).unwrap();
         panic!("Rust execution failed:\n{}", stderr);
     }
 

@@ -6,7 +6,7 @@ use std::process::Command;
 
 mod test_build;
 mod test_compilation;
-mod test_execute;
+mod test_e2e_exec;
 mod test_generics;
 mod test_nestjs;
 mod test_regression;
@@ -35,7 +35,7 @@ fn verify_equivalence() {
 
 #[test]
 fn test_cli_check_pass() {
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     cmd.arg("check")
         .arg("fixtures/pass_simple_dto/input.ts")
         .assert()
@@ -44,7 +44,7 @@ fn test_cli_check_pass() {
 
 #[test]
 fn test_smoke_valid() {
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     cmd.arg("check")
         .arg("fixtures/smoke_valid/input.ts")
         .assert()
@@ -53,7 +53,7 @@ fn test_smoke_valid() {
 
 #[test]
 fn test_smoke_error() {
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     cmd.arg("check")
         .arg("fixtures/smoke_error/input.ts")
         .assert()
@@ -63,7 +63,7 @@ fn test_smoke_error() {
 
 #[test]
 fn test_smoke_lint() {
-    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus_cli"));
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin("tyrus"));
     cmd.arg("check")
         .arg("fixtures/smoke_lint/input.ts")
         .assert()
