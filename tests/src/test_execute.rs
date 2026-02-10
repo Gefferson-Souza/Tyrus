@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod executable_tests {
-    use ox_common::fs::FilePath;
+    use tyrus_common::fs::FilePath;
     use std::fs;
     use std::path::PathBuf;
     use std::process::Command;
@@ -11,7 +11,7 @@ mod executable_tests {
         // Transpile TypeScript to Rust
         let ts_path = PathBuf::from("fixtures/executable_simple/input.ts");
         let rust_code =
-            ox_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
+            tyrus_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
 
         // Create complete executable program
         let program = format!(
@@ -78,7 +78,7 @@ fn main() {{
         // Transpile class
         let ts_path = PathBuf::from("fixtures/exec_class/input.ts");
         let mut rust_code =
-            ox_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
+            tyrus_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
 
         // Remove serde derives for standalone compilation
         rust_code = rust_code.replace(", serde :: Serialize, serde :: Deserialize", "");
@@ -136,7 +136,7 @@ fn main() {{
         std::fs::write(&ts_file, ts_code).unwrap();
 
         let rust_code =
-            ox_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
 
         let program = format!(
             r#"
@@ -180,7 +180,7 @@ fn main() {{
         "#;
         let math_ts_path = temp_dir.path().join("math.ts");
         fs::write(&math_ts_path, math_ts).unwrap();
-        let math_rs = ox_orchestrator::build(FilePath::from(math_ts_path)).unwrap();
+        let math_rs = tyrus_orchestrator::build(FilePath::from(math_ts_path)).unwrap();
         fs::write(temp_dir.path().join("math.rs"), math_rs).unwrap();
 
         // --- 2. models.ts ---
@@ -201,7 +201,7 @@ fn main() {{
         "#;
         let models_ts_path = temp_dir.path().join("models.ts");
         fs::write(&models_ts_path, models_ts).unwrap();
-        let models_rs = ox_orchestrator::build(FilePath::from(models_ts_path))
+        let models_rs = tyrus_orchestrator::build(FilePath::from(models_ts_path))
             .unwrap()
             .replace(", serde :: Serialize, serde :: Deserialize", "")
             .replace("serde :: Serialize, serde :: Deserialize, ", "")
@@ -232,7 +232,7 @@ fn main() {{
         "#;
         let main_ts_path = temp_dir.path().join("main.ts");
         fs::write(&main_ts_path, main_ts).unwrap();
-        let main_rs_body = ox_orchestrator::build(FilePath::from(main_ts_path)).unwrap();
+        let main_rs_body = tyrus_orchestrator::build(FilePath::from(main_ts_path)).unwrap();
         fs::write(temp_dir.path().join("main_module.rs"), main_rs_body).unwrap();
 
         // --- 4. Construct entry.rs (The Root) ---

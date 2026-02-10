@@ -1,19 +1,19 @@
-# Oxidizer
+# Tyrus
 
 > **Transpiler TypeScript → Rust**
 > _Academic Project: High-Performance Source-to-Source Compiler_
 
-![CI Status](https://github.com/gefferson-souza/TypeRust/actions/workflows/ci.yml/badge.svg)
+![CI Status](https://github.com/gefferson-souza/Tyrus/actions/workflows/ci.yml/badge.svg)
 ![Rust Version](https://img.shields.io/badge/rust-1.75%2B-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-Oxidizer é uma ferramenta experimental de engenharia de software projetada para analisar código TypeScript moderno (incluindo padrões NestJS) e transpilar para código Rust idiomático, seguro e performático.
+**Tyrus** (formerly _Oxidizer_) é uma ferramenta experimental de engenharia de software projetada para analisar código TypeScript moderno (incluindo padrões NestJS) e transpilar para código Rust idiomático, seguro e performático.
 
 O objetivo não é suportar 100% da especificação TypeScript, mas sim definir um subconjunto **"Oxidizable Standard"** que permite escrever backends robustos em TS e compilá-los para um binário nativo.
 
 ## 🚀 Filosofia
 
-1. **Safety First:** Se o código TS é inseguro (`any`, `eval`), o Oxidizer rejeita a compilação.
+1. **Safety First:** Se o código TS é inseguro (`any`, `eval`), o Tyrus rejeita a compilação.
 2. **Idiomatic Output:** Não geramos "JavaScript em Rust". Geramos Rust real (`Result`, `Option`, `Structs`, `Tokio`).
 3. **Opinionated:** Focamos em arquitetura backend moderna (Controller/Service/Repository).
 
@@ -35,6 +35,7 @@ O objetivo não é suportar 100% da especificação TypeScript, mas sim definir 
 
 - [x] `async/await` → `async fn` / `.await`
 - [x] `if/else`
+- [x] `while` loops
 - [x] Operações matemáticas básicas
 - [x] Métodos de Array: `map`, `filter`, `push`, `join`
 - [x] Manipulação de String: `replace`, `split`, `trim`, `toUpperCase`
@@ -51,13 +52,13 @@ Pré-requisitos: Rust 1.75+ e Cargo.
 
 ```bash
 # Clone o repositório
-git clone https://github.com/gefferson-souza/TypeRust.git
-cd TypeRust
+git clone https://github.com/gefferson-souza/Tyrus.git
+cd Tyrus
 
 # Compile o projeto
 cargo build --release
 
-# O binário estará em ./target/release/ox_cli
+# O binário estará em ./target/release/tyrus
 ```
 
 ## 📖 Uso
@@ -67,15 +68,15 @@ cargo build --release
 Analisa o projeto e aponta erros ou violações do padrão Oxidizable.
 
 ```bash
-./target/release/ox_cli check ./path/to/project/index.ts
+./target/release/tyrus check ./path/to/project/index.ts
 ```
 
 ### Compilar (Build)
 
-Gera o código Rust na pasta `typerust_output`.
+Gera o código Rust na pasta `tyrus_output`.
 
 ```bash
-./target/release/ox_cli build ./path/to/project/index.ts
+./target/release/tyrus build ./path/to/project/index.ts
 ```
 
 Ao final, você terá um novo projeto Rust completo. Basta entrar na pasta e rodar `cargo run`.

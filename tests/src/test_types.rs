@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod type_tests {
-    use ox_common::fs::FilePath;
+    use tyrus_common::fs::FilePath;
     use std::fs;
     use std::process::Command;
     use tempfile::TempDir;
@@ -56,7 +56,7 @@ mod type_tests {
         let ts_file = temp_dir.path().join("types.ts");
         fs::write(&ts_file, ts_code).unwrap();
 
-        let rust_code = ox_orchestrator::build(FilePath::from(ts_file)).unwrap();
+        let rust_code = tyrus_orchestrator::build(FilePath::from(ts_file)).unwrap();
 
         // Remove serde for standalone test
         let rust_code = rust_code

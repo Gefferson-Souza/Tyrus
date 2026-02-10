@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod stdlib_tests {
-    use ox_common::fs::FilePath;
+    use tyrus_common::fs::FilePath;
     use std::fs;
     use std::process::Command;
     use tempfile::TempDir;
@@ -21,7 +21,7 @@ mod stdlib_tests {
         std::fs::write(&ts_file, ts_code).unwrap();
 
         let rust_code =
-            ox_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
 
         println!("Generated Rust code:\n{}", rust_code);
 
@@ -56,7 +56,7 @@ fn main() {{
         std::fs::write(&ts_file, ts_code).unwrap();
 
         let rust_code =
-            ox_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
 
         println!("Generated Rust code:\n{}", rust_code);
 
@@ -91,7 +91,7 @@ fn main() {{
         std::fs::write(&ts_file, ts_code).unwrap();
 
         let rust_code =
-            ox_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
+            tyrus_orchestrator::build(FilePath::from(ts_file)).expect("Failed to generate Rust code");
 
         println!("Generated Rust code:\n{}", rust_code);
 

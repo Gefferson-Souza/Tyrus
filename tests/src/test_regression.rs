@@ -1,4 +1,4 @@
-use ox_orchestrator::build_project;
+use tyrus_orchestrator::build_project;
 use std::path::PathBuf;
 use std::process::Command;
 

@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use miette::Result;
-use ox_common::fs::FilePath;
+use tyrus_common::fs::FilePath;
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -21,7 +21,7 @@ enum Commands {
     Build {
         /// Input file or directory path
         path: PathBuf,
-        /// Output directory path (default: ./typerust_output)
+        /// Output directory path (default: ./tyrus_output)
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
@@ -36,15 +36,15 @@ async fn main() -> Result<()> {
 
     match cli.command {
         Commands::Check { path } => {
-            ox_orchestrator::check(FilePath::from(path))?;
+            tyrus_orchestrator::check(FilePath::from(path))?;
         }
         Commands::Build { path, output } => {
             if path.is_dir() {
-                let output_dir = output.unwrap_or_else(|| PathBuf::from("./typerust_output"));
-                ox_orchestrator::build_project(path, output_dir)?;
+                let output_dir = output.unwrap_or_else(|| PathBuf::from("./tyrus_output"));
+                tyrus_orchestrator::build_project(path, output_dir)?;
                 println!("✅ Project built successfully!");
             } else {
-                let output_code = ox_orchestrator::build(FilePath::from(path))?;
+                let output_code = tyrus_orchestrator::build(FilePath::from(path))?;
                 println!("{}", output_code);
             }
         }

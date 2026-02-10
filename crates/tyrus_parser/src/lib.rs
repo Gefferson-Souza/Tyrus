@@ -1,5 +1,5 @@
 use miette::{NamedSource, SourceSpan};
-use ox_diagnostics::OxidizerError;
+use tyrus_diagnostics::OxidizerError;
 use std::path::Path;
 
 use swc_common::{

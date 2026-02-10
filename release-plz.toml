@@ -1,0 +1,9 @@
+[workspace]
+allow_dirty = false
+changelog_config = "../git-cliff.toml"
+
+[workspace.release]
+release = true
+git_release_enable = true
+git_release_type = "prod"
+git_release_name = "v{{ version }}"

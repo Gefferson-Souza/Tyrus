@@ -1,5 +1,5 @@
 [package]
-name = "ox_parser"
+name = "tyrus_parser"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,6 +7,6 @@ edition = "2021"
 swc_ecma_parser = "27.0.7"
 swc_ecma_ast = "18.0.0"
 swc_common = { version = "17.0.1", features = ["tty-emitter"] }
-ox_ast = { path = "../ox_ast" }
-ox_diagnostics = { path = "../ox_diagnostics" }
+tyrus_ast = { path = "../tyrus_ast" }
+tyrus_diagnostics = { path = "../tyrus_diagnostics" }
 miette = { version = "7.6.0", features = ["fancy"] }

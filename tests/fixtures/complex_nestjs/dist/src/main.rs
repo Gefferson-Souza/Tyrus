@@ -5,14 +5,14 @@ use axum::Extension;
 
 #[tokio::main]
 async fn main() {
-    let fraud_service = Arc::new(typerust_app::services::fraud_service::FraudService::new_di());
-    let payment_service = Arc::new(typerust_app::services::payment_service::PaymentService::new_di(fraud_service.clone()));
-    let create_payment_dto = Arc::new(typerust_app::dtos::payment_dto::CreatePaymentDto::new_di());
-    let payment_controller = Arc::new(typerust_app::controllers::payment_controller::PaymentController::new_di(payment_service.clone()));
+    let fraud_service = Arc::new(tyrus_app::services::fraud_service::FraudService::new_di());
+    let payment_service = Arc::new(tyrus_app::services::payment_service::PaymentService::new_di(fraud_service.clone()));
+    let create_payment_dto = Arc::new(tyrus_app::dtos::payment_dto::CreatePaymentDto::new_di());
+    let payment_controller = Arc::new(tyrus_app::controllers::payment_controller::PaymentController::new_di(payment_service.clone()));
 
     // Build router
     let app = axum::Router::new()
-        .merge(typerust_app::controllers::payment_controller::PaymentController::router())
+        .merge(tyrus_app::controllers::payment_controller::PaymentController::router())
         .layer(Extension(fraud_service.clone()))
         .layer(Extension(payment_service.clone()))
         .layer(Extension(payment_controller.clone()))

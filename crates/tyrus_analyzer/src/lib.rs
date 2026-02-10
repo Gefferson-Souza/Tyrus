@@ -2,7 +2,7 @@ pub mod graph;
 pub mod lints;
 
 use crate::lints::LintVisitor;
-use ox_diagnostics::OxidizerError;
+use tyrus_diagnostics::OxidizerError;
 use swc_ecma_ast::Program;
 use swc_ecma_visit::VisitWith;
 

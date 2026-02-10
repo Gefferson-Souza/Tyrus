@@ -5,7 +5,7 @@ use axum::Extension;
 
 #[tokio::main]
 async fn main() {
-    let user_processor = Arc::new(typerust_app::services::user_processor::UserProcessor::new_di());
+    let user_processor = Arc::new(tyrus_app::services::user_processor::UserProcessor::new_di());
 
     // Build router
     let app = axum::Router::new()

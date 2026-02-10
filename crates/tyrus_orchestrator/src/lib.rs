@@ -1,19 +1,19 @@
-use ox_diagnostics::OxidizerError;
+use tyrus_diagnostics::OxidizerError;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use walkdir::WalkDir;
 
-use ox_common::fs::FilePath;
+use tyrus_common::fs::FilePath;
 
 pub fn check(path: FilePath) -> Result<(), OxidizerError> {
-    let program = ox_parser::parse(path.as_ref())?;
+    let program = tyrus_parser::parse(path.as_ref())?;
 
     // Read source code for error reporting
     let source_code = std::fs::read_to_string(path.as_ref()).map_err(OxidizerError::IoError)?;
     let file_name = path.as_ref().to_string_lossy().to_string();
 
-    let errors = ox_analyzer::Analyzer::analyze(&program, source_code, file_name);
+    let errors = tyrus_analyzer::Analyzer::analyze(&program, source_code, file_name);
 
     if !errors.is_empty() {
         for error in errors {
@@ -36,9 +36,9 @@ pub fn pipeline() -> Result<(), OxidizerError> {
 }
 
 pub fn build(path: FilePath) -> Result<String, OxidizerError> {
-    let program = ox_parser::parse(path.as_ref())?;
+    let program = tyrus_parser::parse(path.as_ref())?;
     // Default to false for single file build
-    let generated_code = ox_codegen::generate(&program, false);
+    let generated_code = tyrus_codegen::generate(&program, false);
     format_code(generated_code.code)
 }
 
@@ -56,7 +56,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
         let path = entry.path();
 
         if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("ts") {
-            let program = ox_parser::parse(path)?;
+            let program = tyrus_parser::parse(path)?;
 
             // Calculate module path
             let relative_path = path.strip_prefix(&input_dir).unwrap_or(path);
@@ -72,7 +72,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
             let sanitized_stem = file_stem.replace(['.', '-'], "_");
 
             let mut module_parts = Vec::new();
-            module_parts.push("typerust_app".to_string()); // Use lib crate name
+            module_parts.push("tyrus_app".to_string()); // Use lib crate name
 
             if let Some(parent) = relative_path.parent() {
                 for part in parent.components() {
@@ -115,7 +115,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
     }
 
     // 2. Analyze (Build Dependency Graph)
-    let graph = ox_analyzer::graph::build_graph(&programs);
+    let graph = tyrus_analyzer::graph::build_graph(&programs);
     let init_order = graph
         .get_initialization_order()
         .map_err(OxidizerError::FormattingError)?; // Using FormattingError as generic error for now
@@ -134,7 +134,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
         // Check if it's index.ts
         let is_index = path.file_stem().and_then(|s| s.to_str()) == Some("index");
 
-        let generated = ox_codegen::generate(program, is_index);
+        let generated = tyrus_codegen::generate(program, is_index);
         let formatted_code = format_code(generated.code)?;
 
         let output_file = output_path.with_file_name(format!("{}.rs", sanitized_stem));
@@ -229,7 +229,7 @@ fn generate_main_rs(
     init_order: &[String],
     class_module_map: &std::collections::HashMap<String, String>,
     controllers: &[String],
-    graph: &ox_analyzer::graph::DependencyGraph,
+    graph: &tyrus_analyzer::graph::DependencyGraph,
     generic_classes: &std::collections::HashSet<String>,
 ) -> Result<String, OxidizerError> {
     let mut main_content = String::new();
@@ -249,13 +249,13 @@ fn generate_main_rs(
             continue;
         }
         if let Some(module_path) = class_module_map.get(class_name) {
-            let var_name = ox_common::util::to_snake_case(class_name);
+            let var_name = tyrus_common::util::to_snake_case(class_name);
 
             // Get dependencies
             let deps = graph.get_dependencies(class_name).unwrap_or_default();
             let mut args = Vec::new();
             for dep in deps {
-                let dep_var = ox_common::util::to_snake_case(&dep);
+                let dep_var = tyrus_common::util::to_snake_case(&dep);
                 args.push(format!("{}.clone()", dep_var));
             }
 
@@ -306,7 +306,7 @@ fn generate_main_rs(
 
 fn generate_cargo_toml(output_dir: &Path) -> Result<(), OxidizerError> {
     let cargo_toml_content = r#"[package]
-name = "typerust_app"
+name = "tyrus_app"
 version = "0.1.0"
 edition = "2021"
 
@@ -327,7 +327,7 @@ name = "server"
 path = "src/main.rs"
 
 [lib]
-name = "typerust_app"
+name = "tyrus_app"
 path = "src/lib.rs"
 "#;
 

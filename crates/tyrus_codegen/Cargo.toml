@@ -1,5 +1,5 @@
 [package]
-name = "ox_codegen"
+name = "tyrus_codegen"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,5 +10,5 @@ syn = "2.0"
 swc_ecma_ast = "18.0.0"
 swc_ecma_visit = "18.0.0"
 swc_common = { version = "17.0.1", features = ["tty-emitter"] }
-ox_common = { path = "../ox_common" }
-ox_ast = { path = "../ox_ast" }
+tyrus_common = { path = "../tyrus_common" }
+tyrus_ast = { path = "../tyrus_ast" }

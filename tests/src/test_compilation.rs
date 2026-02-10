@@ -64,7 +64,7 @@ mod tests {
         "#;
 
         // Create a complete Rust program that can be executed
-        let generated = ox_orchestrator::build(ox_common::fs::FilePath::from(
+        let generated = tyrus_orchestrator::build(tyrus_common::fs::FilePath::from(
             create_temp_ts_file(ts_code).path().to_path_buf(),
         ))
         .unwrap();
@@ -135,7 +135,7 @@ fn main() {{
         // Generate Rust code
         let ts_file = create_temp_ts_file(ts_code);
         let rust_code =
-            ox_orchestrator::build(ox_common::fs::FilePath::from(ts_file.path().to_path_buf()))
+            tyrus_orchestrator::build(tyrus_common::fs::FilePath::from(ts_file.path().to_path_buf()))
                 .unwrap();
 
         // Write to temp file

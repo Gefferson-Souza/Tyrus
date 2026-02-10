@@ -1,5 +1,5 @@
 [package]
-name = "typerust_app"
+name = "tyrus_app"
 version = "0.1.0"
 edition = "2021"
 
@@ -20,5 +20,5 @@ name = "server"
 path = "src/main.rs"
 
 [lib]
-name = "typerust_app"
+name = "tyrus_app"
 path = "src/lib.rs"

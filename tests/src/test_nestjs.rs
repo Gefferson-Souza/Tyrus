@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod nestjs_tests {
-    use ox_common::fs::FilePath;
+    use tyrus_common::fs::FilePath;
     use std::path::PathBuf;
     use tempfile::TempDir;
 
@@ -8,7 +8,7 @@ mod nestjs_tests {
     fn test_nestjs_controller_generation() {
         let ts_path = PathBuf::from("fixtures/nestjs_controller/src/cats.controller.ts");
         let rust_code =
-            ox_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
+            tyrus_orchestrator::build(FilePath::from(ts_path)).expect("Failed to generate Rust code");
 
         println!("Generated Rust Code:\n{}", rust_code);
 
@@ -34,7 +34,7 @@ mod nestjs_tests {
         let input_dir = PathBuf::from("fixtures/nestjs_controller/src");
         let output_dir = temp_dir.path().to_path_buf();
 
-        ox_orchestrator::build_project(input_dir, output_dir.clone())
+        tyrus_orchestrator::build_project(input_dir, output_dir.clone())
             .expect("Failed to build project");
 
         let cargo_toml_path = output_dir.join("Cargo.toml");
@@ -59,7 +59,7 @@ mod nestjs_tests {
         let output_dir = temp_dir.path().to_path_buf(); // Project root
 
         // Build project
-        ox_orchestrator::build_project(input_dir, output_dir.clone())
+        tyrus_orchestrator::build_project(input_dir, output_dir.clone())
             .expect("Failed to build project");
 
         // Verify error.rs exists in src

@@ -1,7 +1,0 @@
-[package]
-name = "ox_ast"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-ox_common = { path = "../ox_common" }

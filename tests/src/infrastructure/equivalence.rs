@@ -40,7 +40,7 @@ pub fn assert_behavior(fixture_path: &str) {
 
     println!("Compiling to Rust in: {:?}", output_dir);
     // We use build_project to generate a full cargo project
-    ox_orchestrator::build_project(input_dir, output_dir.clone())
+    tyrus_orchestrator::build_project(input_dir, output_dir.clone())
         .expect("TypeRust compilation failed");
 
     // Overwrite main.rs to call the generated main function (from index.ts)
@@ -50,7 +50,7 @@ pub fn assert_behavior(fixture_path: &str) {
 fn main() {
     // Call the main function generated from index.ts
     // It should be exposed in the library root
-    typerust_app::main();
+    tyrus_app::main();
 }
 "#;
     std::fs::write(main_rs, custom_main).expect("Failed to overwrite main.rs");
