@@ -1,6 +1,6 @@
 # Plano de Padronização e Versionamento (Academic & Engineering Standard)
 
-Este documento define as regras para elevar o **Tyrus** (antigo Oxidizer) de um projeto experimental para um _Software Acadêmico e de Engenharia de Classe Mundial_.
+Este documento define as regras para elevar o **Tyrus** (antigo Tyrus) de um projeto experimental para um _Software Acadêmico e de Engenharia de Classe Mundial_.
 
 ## 1. Estratégia de Versionamento (SemVer)
 
@@ -73,9 +73,9 @@ Manteremos a estrutura de Workspace, mas com adições acadêmicas:
 
 ## ✅ Plano de Execução
 
-- [ ] **Fase 1: Definições (Meta)**
-  - [ ] Adotar SemVer no `Cargo.toml`.
-  - [ ] Criar `docs/specs/GRAMMAR.md` (Esqueleto).
+- [x] **Fase 1: Definições (Meta)**
+  - [x] Adotar SemVer no `Cargo.toml`.
+  - [x] Criar `docs/specs/GRAMMAR.md` (Esqueleto).
 - [ ] **Fase 2: Benchmarking (Evidência)**
   - [ ] Configurar `criterion` (crate de benchmark Rust).
   - [ ] Criar cenário de teste comparativo.

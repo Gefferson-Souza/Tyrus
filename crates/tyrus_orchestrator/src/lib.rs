@@ -1,16 +1,16 @@
 use std::fs;
 use std::path::{Path, PathBuf};
-use tyrus_diagnostics::OxidizerError;
+use tyrus_diagnostics::TyrusError;
 
 use walkdir::WalkDir;
 
 use tyrus_common::fs::FilePath;
 
-pub fn check(path: FilePath) -> Result<(), OxidizerError> {
+pub fn check(path: FilePath) -> Result<(), TyrusError> {
     let program = tyrus_parser::parse(path.as_ref())?;
 
     // Read source code for error reporting
-    let source_code = std::fs::read_to_string(path.as_ref()).map_err(OxidizerError::IoError)?;
+    let source_code = std::fs::read_to_string(path.as_ref()).map_err(TyrusError::IoError)?;
     let file_name = path.as_ref().to_string_lossy().to_string();
 
     let errors = tyrus_analyzer::Analyzer::analyze(&program, source_code, file_name);
@@ -30,12 +30,12 @@ pub fn check(path: FilePath) -> Result<(), OxidizerError> {
     Ok(())
 }
 
-pub fn pipeline() -> Result<(), OxidizerError> {
+pub fn pipeline() -> Result<(), TyrusError> {
     // Stub implementation
     Ok(())
 }
 
-pub fn build(path: FilePath) -> Result<String, OxidizerError> {
+pub fn build(path: FilePath) -> Result<String, TyrusError> {
     let program = tyrus_parser::parse(path.as_ref())?;
     // Default to false for single file build
     let generated_code = tyrus_codegen::generate(&program, false);
@@ -56,7 +56,7 @@ pub fn build(path: FilePath) -> Result<String, OxidizerError> {
     format_code(code)
 }
 
-pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), OxidizerError> {
+pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), TyrusError> {
     let mut controllers: Vec<String> = Vec::new(); // Just names of controllers
     let mut class_module_map: std::collections::HashMap<String, String> =
         std::collections::HashMap::new();
@@ -66,7 +66,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
 
     // 1. Walk, Parse, and Collect Info
     for entry in WalkDir::new(&input_dir) {
-        let entry = entry.map_err(|e| OxidizerError::IoError(e.into()))?;
+        let entry = entry.map_err(|e| TyrusError::IoError(e.into()))?;
         let path = entry.path();
 
         if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("ts") {
@@ -77,7 +77,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
             let file_stem = path
                 .file_stem()
                 .ok_or_else(|| {
-                    OxidizerError::IoError(std::io::Error::new(
+                    TyrusError::IoError(std::io::Error::new(
                         std::io::ErrorKind::InvalidInput,
                         "Invalid file path",
                     ))
@@ -132,7 +132,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
     let graph = tyrus_analyzer::graph::build_graph(&programs);
     let init_order = graph
         .get_initialization_order()
-        .map_err(OxidizerError::FormattingError)?; // Using FormattingError as generic error for now
+        .map_err(TyrusError::FormattingError)?; // Using FormattingError as generic error for now
 
     // 3. Transpile
     for (i, program) in programs.iter().enumerate() {
@@ -154,10 +154,10 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
         let output_file = output_path.with_file_name(format!("{}.rs", sanitized_stem));
 
         if let Some(parent) = output_file.parent() {
-            fs::create_dir_all(parent).map_err(OxidizerError::IoError)?;
+            fs::create_dir_all(parent).map_err(TyrusError::IoError)?;
         }
 
-        fs::write(output_file, formatted_code).map_err(OxidizerError::IoError)?;
+        fs::write(output_file, formatted_code).map_err(TyrusError::IoError)?;
 
         // Collect controllers
         for controller in generated.controllers {
@@ -167,7 +167,7 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
 
     // 4. Generate mod.rs
     for entry in WalkDir::new(&output_dir) {
-        let entry = entry.map_err(|e| OxidizerError::IoError(e.into()))?;
+        let entry = entry.map_err(|e| TyrusError::IoError(e.into()))?;
         let path = entry.path();
         if path.is_dir() {
             generate_mod_rs(path)?;
@@ -178,18 +178,18 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
     let src_mod = output_dir.join("src").join("mod.rs");
     let src_lib = output_dir.join("src").join("lib.rs");
     if src_mod.exists() {
-        fs::rename(src_mod, src_lib.clone()).map_err(OxidizerError::IoError)?;
+        fs::rename(src_mod, src_lib.clone()).map_err(TyrusError::IoError)?;
     }
 
     // Generate error.rs
     let error_rs = output_dir.join("src").join("error.rs");
     let error_content = get_app_error_code();
-    fs::write(error_rs, error_content).map_err(OxidizerError::IoError)?;
+    fs::write(error_rs, error_content).map_err(TyrusError::IoError)?;
 
     // Append mod error; pub use error::AppError; to lib.rs
-    let mut lib_content = fs::read_to_string(&src_lib).map_err(OxidizerError::IoError)?;
+    let mut lib_content = fs::read_to_string(&src_lib).map_err(TyrusError::IoError)?;
     lib_content.push_str("\npub mod error;\npub use error::AppError;\n");
-    fs::write(&src_lib, lib_content).map_err(OxidizerError::IoError)?;
+    fs::write(&src_lib, lib_content).map_err(TyrusError::IoError)?;
 
     // 5. Generate main.rs
     let main_content = generate_main_rs(
@@ -203,11 +203,11 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Oxid
     // Ensure src directory exists
     let src_dir = output_dir.join("src");
     if !src_dir.exists() {
-        fs::create_dir_all(&src_dir).map_err(OxidizerError::IoError)?;
+        fs::create_dir_all(&src_dir).map_err(TyrusError::IoError)?;
     }
 
     let main_rs = src_dir.join("main.rs");
-    fs::write(main_rs, main_content).map_err(OxidizerError::IoError)?;
+    fs::write(main_rs, main_content).map_err(TyrusError::IoError)?;
 
     // 6. Generate Cargo.toml
     generate_cargo_toml(&output_dir)?;
@@ -221,7 +221,7 @@ fn generate_main_rs(
     controllers: &[String],
     graph: &tyrus_analyzer::graph::DependencyGraph,
     generic_classes: &std::collections::HashSet<String>,
-) -> Result<String, OxidizerError> {
+) -> Result<String, TyrusError> {
     let mut main_content = String::new();
     main_content.push_str("#![allow(unused)]\n\n");
     main_content.push_str("use axum::Router;\n");
@@ -295,7 +295,7 @@ fn generate_main_rs(
     Ok(main_content)
 }
 
-fn generate_cargo_toml(output_dir: &Path) -> Result<(), OxidizerError> {
+fn generate_cargo_toml(output_dir: &Path) -> Result<(), TyrusError> {
     let cargo_toml_content = r#"[package]
 name = "tyrus_app"
 version = "0.1.0"
@@ -323,20 +323,20 @@ path = "src/lib.rs"
 "#;
 
     let cargo_toml_path = output_dir.join("Cargo.toml");
-    fs::write(cargo_toml_path, cargo_toml_content).map_err(OxidizerError::IoError)?;
+    fs::write(cargo_toml_path, cargo_toml_content).map_err(TyrusError::IoError)?;
     Ok(())
 }
 
-fn generate_mod_rs(dir: &Path) -> Result<(), OxidizerError> {
+fn generate_mod_rs(dir: &Path) -> Result<(), TyrusError> {
     let mut mod_content = String::new();
     let mut has_children = false;
     let mut index_content = String::new();
 
     // Read directory entries
-    let entries = fs::read_dir(dir).map_err(OxidizerError::IoError)?;
+    let entries = fs::read_dir(dir).map_err(TyrusError::IoError)?;
 
     for entry in entries {
-        let entry = entry.map_err(OxidizerError::IoError)?;
+        let entry = entry.map_err(TyrusError::IoError)?;
         let path = entry.path();
 
         // Skip mod.rs, lib.rs, and main.rs
@@ -359,8 +359,7 @@ fn generate_mod_rs(dir: &Path) -> Result<(), OxidizerError> {
                 if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
                     if stem == "index" {
                         // Capture index.rs content to append later
-                        index_content =
-                            fs::read_to_string(&path).map_err(OxidizerError::IoError)?;
+                        index_content = fs::read_to_string(&path).map_err(TyrusError::IoError)?;
                         // We will remove index.rs later or just ignore it in the final build?
                         // Usually we want to remove it so we don't have both mod.rs and index.rs
                         // But let's delete it after reading.
@@ -378,7 +377,7 @@ fn generate_mod_rs(dir: &Path) -> Result<(), OxidizerError> {
     // If we found index.rs, delete it and append its content
     let index_path = dir.join("index.rs");
     if index_path.exists() {
-        fs::remove_file(index_path).map_err(OxidizerError::IoError)?;
+        fs::remove_file(index_path).map_err(TyrusError::IoError)?;
     }
 
     // Append index content
@@ -393,13 +392,13 @@ fn generate_mod_rs(dir: &Path) -> Result<(), OxidizerError> {
     // Actually, Rust needs mod.rs to expose children. If a dir has children, it needs mod.rs.
     if has_children {
         let mod_path = dir.join("mod.rs");
-        fs::write(mod_path, mod_content).map_err(OxidizerError::IoError)?;
+        fs::write(mod_path, mod_content).map_err(TyrusError::IoError)?;
     }
 
     Ok(())
 }
 
-fn format_code(code: String) -> Result<String, OxidizerError> {
+fn format_code(code: String) -> Result<String, TyrusError> {
     // Skip formatting for code containing async (edition compatibility)
     if code.contains("async fn") {
         return Ok(format!(
@@ -415,20 +414,20 @@ fn format_code(code: String) -> Result<String, OxidizerError> {
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .map_err(OxidizerError::IoError)?;
+        .map_err(TyrusError::IoError)?;
 
     if let Some(mut stdin) = child.stdin.take() {
         stdin
             .write_all(code.as_bytes())
-            .map_err(OxidizerError::IoError)?;
+            .map_err(TyrusError::IoError)?;
     }
 
-    let output = child.wait_with_output().map_err(OxidizerError::IoError)?;
+    let output = child.wait_with_output().map_err(TyrusError::IoError)?;
 
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     } else {
-        Err(OxidizerError::FormattingError(
+        Err(TyrusError::FormattingError(
             String::from_utf8_lossy(&output.stderr).to_string(),
         ))
     }

@@ -3,13 +3,13 @@ use miette::{Diagnostic, NamedSource, SourceSpan};
 use thiserror::Error;
 
 #[derive(Error, Diagnostic, Debug)]
-pub enum OxidizerError {
+pub enum TyrusError {
     #[error("IO Error: {0}")]
-    #[diagnostic(code(oxidizer::io_error))]
+    #[diagnostic(code(tyrus::io_error))]
     IoError(#[from] std::io::Error),
 
     #[error("Parsing Error: {message}")]
-    #[diagnostic(code(oxidizer::parse_error))]
+    #[diagnostic(code(tyrus::parse_error))]
     ParserError {
         message: String,
         #[source_code]
@@ -19,7 +19,7 @@ pub enum OxidizerError {
     },
 
     #[error("Lint Error: Rust does not support 'var'. Use 'let' or 'const'.")]
-    #[diagnostic(code(oxidizer::lint::no_var))]
+    #[diagnostic(code(tyrus::lint::no_var))]
     UseOfVar {
         #[source_code]
         src: NamedSource<String>,
@@ -28,7 +28,7 @@ pub enum OxidizerError {
     },
 
     #[error("Lint Error: Rust requires strict typing. 'any' is not allowed.")]
-    #[diagnostic(code(oxidizer::lint::no_any))]
+    #[diagnostic(code(tyrus::lint::no_any))]
     UseOfAny {
         #[source_code]
         src: NamedSource<String>,
@@ -37,7 +37,7 @@ pub enum OxidizerError {
     },
 
     #[error("Lint Error: Code injection via 'eval' is unsafe and not supported in Rust.")]
-    #[diagnostic(code(oxidizer::lint::no_eval))]
+    #[diagnostic(code(tyrus::lint::no_eval))]
     UseOfEval {
         #[source_code]
         src: NamedSource<String>,
@@ -45,8 +45,8 @@ pub enum OxidizerError {
         span: SourceSpan,
     },
 
-    #[error("Unsupported Feature: {feature} is not yet supported in Oxidizer.")]
-    #[diagnostic(code(oxidizer::unsupported))]
+    #[error("Unsupported Feature: {feature} is not yet supported in Tyrus.")]
+    #[diagnostic(code(tyrus::unsupported))]
     UnsupportedFeature {
         feature: String,
         #[source_code]
@@ -56,10 +56,10 @@ pub enum OxidizerError {
     },
 
     #[error("Formatting Error: {0}")]
-    #[diagnostic(code(oxidizer::fmt_error))]
+    #[diagnostic(code(tyrus::fmt_error))]
     FormattingError(String),
 
     #[error("Unknown Error")]
-    #[diagnostic(code(oxidizer::unknown))]
+    #[diagnostic(code(tyrus::unknown))]
     Unknown,
 }

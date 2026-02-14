@@ -1,6 +1,6 @@
-# TypeRust Grammar Specification (Oxidizable subset)
+# Tyrus Grammar Specification (Oxidizable Subset)
 
-This document formally defines the subset of TypeScript supported by TypeRust using EBNF notation.
+This document formally defines the subset of TypeScript supported by Tyrus using EBNF notation.
 
 ## 1. Fundamentals
 
@@ -55,16 +55,16 @@ Type ::=
     | 'Promise' '<' Type '>'
 ```
 
-## 4. Control Flow (Supported)
+## 5. Control Flow (Supported)
 
 ```ebnf
 WhileStmt ::= 'while' '(' Expression ')' Block
 IfStmt ::= 'if' '(' Expression ')' Block ('else' Block)?
 ```
 
-## 5. Unsafe (Forbidden)
+## 6. Unsafe (Forbidden)
 
-The following constructs are explicitly rejected by the `typerust_analyzer`:
+The following constructs are explicitly rejected by the `tyrus_analyzer`:
 
 - `any` type usage.
 - `eval()` calls.

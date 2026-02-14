@@ -4,7 +4,7 @@ Data: 2025-11-22
 Status: Aceito
 
 ## Contexto
-O objetivo é criar o **Oxidizer**, uma ferramenta que analisa código TypeScript e o transpila para Rust idiomático.
+O objetivo é criar o **Tyrus**, uma ferramenta que analisa código TypeScript e o transpila para Rust idiomático.
 Os requisitos principais são:
 1. **Performance:** A ferramenta deve processar grandes projetos rapidamente.
 2. **Confiabilidade:** O código gerado deve ser seguro e a ferramenta não deve falhar inesperadamente.

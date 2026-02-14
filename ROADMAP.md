@@ -1,4 +1,4 @@
-# 🗺️ Oxidizer Roadmap
+# 🗺️ Tyrus Roadmap
 
 ## 🏁 Milestone 0: The Foundation (Current)
 
@@ -9,7 +9,7 @@
 
 ## � Milestone 1: The Analyzer (Complete)
 
-- [x] **Analyzer Core:** Implement `ox_analyzer` crate
+- [x] **Analyzer Core:** Implement `tyrus_analyzer` crate
 - [x] **Linter Rules:**
   - [x] Block `any`
   - [x] Block `eval`

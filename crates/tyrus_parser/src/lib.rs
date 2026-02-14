@@ -1,6 +1,6 @@
 use miette::{NamedSource, SourceSpan};
 use std::path::Path;
-use tyrus_diagnostics::OxidizerError;
+use tyrus_diagnostics::TyrusError;
 
 use swc_common::{
     errors::{ColorConfig, Handler},
@@ -10,11 +10,11 @@ use swc_common::{
 use swc_ecma_ast::Program;
 use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax, TsSyntax};
 
-pub fn parse(path: &Path) -> Result<Program, OxidizerError> {
+pub fn parse(path: &Path) -> Result<Program, TyrusError> {
     let cm: Lrc<SourceMap> = Default::default();
     let handler = Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(cm.clone()));
 
-    let fm = cm.load_file(path).map_err(OxidizerError::IoError)?;
+    let fm = cm.load_file(path).map_err(TyrusError::IoError)?;
 
     let lexer = Lexer::new(
         Syntax::Typescript(TsSyntax {
@@ -36,7 +36,7 @@ pub fn parse(path: &Path) -> Result<Program, OxidizerError> {
     match parser.parse_program() {
         Ok(program) => Ok(program),
         Err(e) => {
-            // Convert SWC error to OxidizerError
+            // Convert SWC error to TyrusError
             let span = e.span();
             let message = e.into_kind().msg().to_string();
 
@@ -45,7 +45,7 @@ pub fn parse(path: &Path) -> Result<Program, OxidizerError> {
             let end = span.hi.0 as usize - 1;
             let len = end - start;
 
-            Err(OxidizerError::ParserError {
+            Err(TyrusError::ParserError {
                 message,
                 src: NamedSource::new(path.to_string_lossy(), fm.src.to_string()),
                 span: SourceSpan::new(start.into(), len),

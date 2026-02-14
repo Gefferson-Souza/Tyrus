@@ -4,7 +4,7 @@ Data: 2025-11-22
 Status: Aceito
 
 ## Contexto
-Precisamos registrar decisões arquiteturais significativas para o projeto Oxidizer.
+Precisamos registrar decisões arquiteturais significativas para o projeto Tyrus.
 Como este projeto visa ser uma ferramenta de engenharia complexa (compilador) e um artefato acadêmico, é crucial manter um histórico do "porquê" e "como" as decisões foram tomadas.
 A falta de documentação sobre decisões de design pode levar a retrabalho, perda de contexto e dificuldade na defesa da tese de mestrado.
 

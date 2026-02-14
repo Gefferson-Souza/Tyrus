@@ -1,5 +1,5 @@
 use miette::{NamedSource, SourceSpan};
-use tyrus_diagnostics::OxidizerError;
+use tyrus_diagnostics::TyrusError;
 
 use swc_ecma_ast::{
     CallExpr, Callee, Expr, TsKeywordType, TsKeywordTypeKind, VarDecl, VarDeclKind,
@@ -7,7 +7,7 @@ use swc_ecma_ast::{
 use swc_ecma_visit::{Visit, VisitWith};
 
 pub struct LintVisitor {
-    pub errors: Vec<OxidizerError>,
+    pub errors: Vec<TyrusError>,
     pub source_code: String,
     pub file_name: String,
 }
@@ -32,7 +32,7 @@ impl LintVisitor {
 impl Visit for LintVisitor {
     fn visit_var_decl(&mut self, n: &VarDecl) {
         if n.kind == VarDeclKind::Var {
-            self.errors.push(OxidizerError::UseOfVar {
+            self.errors.push(TyrusError::UseOfVar {
                 src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
                 span: self.create_span(n.span),
             });
@@ -42,7 +42,7 @@ impl Visit for LintVisitor {
 
     fn visit_ts_keyword_type(&mut self, n: &TsKeywordType) {
         if n.kind == TsKeywordTypeKind::TsAnyKeyword {
-            self.errors.push(OxidizerError::UseOfAny {
+            self.errors.push(TyrusError::UseOfAny {
                 src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
                 span: self.create_span(n.span),
             });
@@ -54,7 +54,7 @@ impl Visit for LintVisitor {
         if let Callee::Expr(expr) = &n.callee {
             if let Expr::Ident(ident) = &**expr {
                 if ident.sym == "eval" {
-                    self.errors.push(OxidizerError::UseOfEval {
+                    self.errors.push(TyrusError::UseOfEval {
                         src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
                         span: self.create_span(n.span),
                     });
@@ -68,7 +68,7 @@ impl Visit for LintVisitor {
     // fn visit_while_stmt(&mut self, n: &swc_ecma_ast::WhileStmt) { ... }
 
     fn visit_do_while_stmt(&mut self, n: &swc_ecma_ast::DoWhileStmt) {
-        self.errors.push(OxidizerError::UnsupportedFeature {
+        self.errors.push(TyrusError::UnsupportedFeature {
             feature: "do-while loops".to_string(),
             src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
             span: self.create_span(n.span),
@@ -77,7 +77,7 @@ impl Visit for LintVisitor {
     }
 
     fn visit_for_stmt(&mut self, n: &swc_ecma_ast::ForStmt) {
-        self.errors.push(OxidizerError::UnsupportedFeature {
+        self.errors.push(TyrusError::UnsupportedFeature {
             feature: "for loops".to_string(),
             src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
             span: self.create_span(n.span),
@@ -86,7 +86,7 @@ impl Visit for LintVisitor {
     }
 
     fn visit_for_of_stmt(&mut self, n: &swc_ecma_ast::ForOfStmt) {
-        self.errors.push(OxidizerError::UnsupportedFeature {
+        self.errors.push(TyrusError::UnsupportedFeature {
             feature: "for-of loops".to_string(),
             src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
             span: self.create_span(n.span),
@@ -95,7 +95,7 @@ impl Visit for LintVisitor {
     }
 
     fn visit_for_in_stmt(&mut self, n: &swc_ecma_ast::ForInStmt) {
-        self.errors.push(OxidizerError::UnsupportedFeature {
+        self.errors.push(TyrusError::UnsupportedFeature {
             feature: "for-in loops".to_string(),
             src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
             span: self.create_span(n.span),
@@ -104,7 +104,7 @@ impl Visit for LintVisitor {
     }
 
     fn visit_try_stmt(&mut self, n: &swc_ecma_ast::TryStmt) {
-        self.errors.push(OxidizerError::UnsupportedFeature {
+        self.errors.push(TyrusError::UnsupportedFeature {
             feature: "try-catch blocks".to_string(),
             src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
             span: self.create_span(n.span),
@@ -113,7 +113,7 @@ impl Visit for LintVisitor {
     }
 
     fn visit_switch_stmt(&mut self, n: &swc_ecma_ast::SwitchStmt) {
-        self.errors.push(OxidizerError::UnsupportedFeature {
+        self.errors.push(TyrusError::UnsupportedFeature {
             feature: "switch statements".to_string(),
             src: NamedSource::new(self.file_name.clone(), self.source_code.clone()),
             span: self.create_span(n.span),
