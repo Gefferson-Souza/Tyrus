@@ -33,6 +33,9 @@ jobs:
       - name: Clippy (Linting)
         run: cargo clippy --workspace -- -D warnings
 
+      - name: Build
+        run: cargo build --workspace
+
       - name: Run Tests
         run: cargo test --workspace
 

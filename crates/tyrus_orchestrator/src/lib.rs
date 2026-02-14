@@ -223,6 +223,7 @@ fn generate_main_rs(
     generic_classes: &std::collections::HashSet<String>,
 ) -> Result<String, OxidizerError> {
     let mut main_content = String::new();
+    main_content.push_str("#![allow(unused)]\n\n");
     main_content.push_str("use axum::Router;\n");
     main_content.push_str("use tokio::net::TcpListener;\n");
     main_content.push_str("use std::sync::Arc;\n");

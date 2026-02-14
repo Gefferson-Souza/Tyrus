@@ -187,13 +187,18 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
 
                     if let Some(init) = &decl.init {
                         let init_expr = convert_expr(init);
-                        // Always use `let mut` for now (safe default)
-                        // In the future, we could analyze reassignments
-                        declarations.push(quote! {
-                            let mut #var_ident = #init_expr;
-                        });
+                        // Use `let` for `const` (immutable) and `let mut` for `let`/`var`
+                        if matches!(var_decl.kind, swc_ecma_ast::VarDeclKind::Const) {
+                            declarations.push(quote! {
+                                let #var_ident = #init_expr;
+                            });
+                        } else {
+                            declarations.push(quote! {
+                                let mut #var_ident = #init_expr;
+                            });
+                        }
                     } else {
-                        // Uninitialized variable
+                        // Uninitialized variable — always mut
                         declarations.push(quote! {
                             let mut #var_ident;
                         });

@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use axum::Router;
 use tokio::net::TcpListener;
 use std::sync::Arc;

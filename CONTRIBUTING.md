@@ -1,4 +1,4 @@
-# Contribuindo para o Oxidizer
+# Contribuindo para o Tyrus
 
 Obrigado por seu interesse em contribuir! Este é um projeto acadêmico e open-source.
 
@@ -10,14 +10,16 @@ Obrigado por seu interesse em contribuir! Este é um projeto acadêmico e open-s
 
 ## 🧪 Rodando Testes
 
-Antes de submeter um PR, certifique-se de que todos os testes passam:
+O projeto utiliza um harness personalizado (`tyrus_test_utils`) que garante que todo código gerado seja compilável.
 
 ```bash
-# Rodar todos os testes
+# Rodar a suite completa (Unitários + Integração + Snapshots)
 cargo test --workspace
 
 # Se houver snapshots novos (e corretos), atualize-os:
 cargo insta review
+# Ou aceite automaticamente se tiver certeza:
+cargo insta test --accept
 ```
 
 ## 🧹 Linting e Formatação

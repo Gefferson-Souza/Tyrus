@@ -30,7 +30,20 @@ ClassMember ::= PropertyDecl | MethodDecl
 FunctionDecl ::= 'async'? 'function' Identifier '(' ParamList ')' ':' Type '{' Block '}'
 ```
 
-## 3. Types
+## 3. Expressions
+
+```ebnf
+Expression ::=
+    | BinaryExpr
+    | UnaryExpr
+    | CallExpr
+    | MemberExpr
+    | Literal
+
+UnaryExpr ::= ('!' | '-' | '+') Expression
+```
+
+## 4. Types
 
 ```ebnf
 Type ::=
