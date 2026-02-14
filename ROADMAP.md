@@ -35,7 +35,7 @@ This roadmap tracks the evolution of Tyrus from a research prototype to a produc
 
 ### Tier 4: Advanced OOP & Metaprogramming
 
-- [ ] **Advanced Inheritance:** Mapping complex prototype chains to Rust Traits and Composition.
+- [ ] **Class Inheritance:** Mapping complex prototype chains to Rust Traits and Composition.
 - [ ] **Custom Decorators:** Support for user-defined metadata and proxy logic.
 - [ ] **Macro System:** Compiling TypeScript template literals and type-level programming into Rust macros.
 
