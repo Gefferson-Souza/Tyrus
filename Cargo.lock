@@ -609,8 +609,11 @@ dependencies = [
  "predicates",
  "serde_json",
  "tempfile",
+ "tyrus_analyzer",
  "tyrus_common",
+ "tyrus_di",
  "tyrus_orchestrator",
+ "tyrus_parser",
  "tyrus_test_utils",
 ]
 
@@ -1639,7 +1642,8 @@ dependencies = [
  "swc_common",
  "swc_ecma_ast",
  "swc_ecma_visit",
- "tyrus_ast",
+ "tyrus_common",
+ "tyrus_di",
  "tyrus_diagnostics",
 ]
 
@@ -1689,6 +1693,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tyrus_di"
+version = "0.1.0"
+dependencies = [
+ "petgraph",
+ "serde",
+ "thiserror",
+ "tyrus_common",
+]
+
+[[package]]
 name = "tyrus_diagnostics"
 version = "0.1.0"
 dependencies = [
@@ -1701,10 +1715,13 @@ name = "tyrus_orchestrator"
 version = "0.1.0"
 dependencies = [
  "miette",
+ "swc_common",
  "swc_ecma_ast",
+ "tokio",
  "tyrus_analyzer",
  "tyrus_codegen",
  "tyrus_common",
+ "tyrus_di",
  "tyrus_diagnostics",
  "tyrus_parser",
  "walkdir",

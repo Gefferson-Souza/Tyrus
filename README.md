@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 # Tyrus: A High-Fidelity TypeScript-to-Rust Compiler
 
 _Academic Project in Compiler Theory & Semantic Preservation_
@@ -82,3 +84,4 @@ For a deep dive into the compiler's internals, see [docs/ARCHITECTURE.md](docs/A
 ## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
+>>>>>>> origin/main

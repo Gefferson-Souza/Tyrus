@@ -18,9 +18,15 @@ tyrus_output/
 *_output.txt
 *_output/
 *.log
+# Generated Artifacts (Node/Rust)
+dist/
+output/
+node_modules/
 
-# RustRover / JetBrains
-#.idea/
+# Rust
+target/
+**/*.rs.bk
+
 
 # Agent configuration (local only)
 # .agent
