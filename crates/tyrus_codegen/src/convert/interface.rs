@@ -1,5 +1,5 @@
 use quote::{format_ident, quote};
-use swc_ecma_ast::{TsInterfaceDecl, TsTypeElement};
+use swc_ecma_ast::{Lit, TsInterfaceDecl, TsTypeElement};
 use swc_ecma_visit::{Visit, VisitWith};
 
 use super::type_mapper::map_ts_type;
@@ -91,7 +91,111 @@ impl Visit for RustGenerator {
     }
 
     fn visit_ts_type_alias_decl(&mut self, n: &swc_ecma_ast::TsTypeAliasDecl) {
-        let alias_name = format_ident!("{}", n.id.sym.to_string());
+        let alias_name_str = n.id.sym.to_string();
+        let alias_name = format_ident!("{}", alias_name_str);
+
+        // Check for String Union: type Status = "open" | "closed"
+        // let mut is_string_union = false; (Unused)
+        if let swc_ecma_ast::TsType::TsUnionOrIntersectionType(
+            swc_ecma_ast::TsUnionOrIntersectionType::TsUnionType(union),
+        ) = &*n.type_ann
+        {
+            // Check if all members are string literals
+            if !union.types.is_empty()
+                && union.types.iter().all(|t| {
+                    matches!(
+                        &**t,
+                        swc_ecma_ast::TsType::TsLitType(lit)
+                            if matches!(lit.lit, swc_ecma_ast::TsLit::Str(_))
+                    )
+                })
+            {
+                // is_string_union = true; (Unused variable removed)
+
+                // Generate Enum
+                let mut valid_variants = Vec::new();
+
+                for t in &union.types {
+                    if let swc_ecma_ast::TsType::TsLitType(lit) = &**t {
+                        if let swc_ecma_ast::TsLit::Str(s) = &lit.lit {
+                            let value = s.value.as_str().unwrap_or("").to_string();
+                            let variant_name = super::func::to_pascal_case(&value);
+                            let variant_ident = format_ident!("{}", variant_name);
+                            valid_variants.push((value, variant_ident));
+                        }
+                    }
+                }
+
+                let variants: Vec<_> = valid_variants
+                    .iter()
+                    .enumerate()
+                    .map(|(i, (value, variant_ident))| {
+                        let default_attr = if i == 0 {
+                            quote! { #[default] }
+                        } else {
+                            quote! {}
+                        };
+                        quote! {
+                            #default_attr
+                            #[serde(rename = #value)]
+                            #variant_ident
+                        }
+                    })
+                    .collect();
+
+                let eq_arms_string: Vec<_> = valid_variants
+                    .iter()
+                    .map(|(value, variant_ident)| {
+                        quote! {
+                            #alias_name::#variant_ident => other == #value
+                        }
+                    })
+                    .collect();
+
+                let eq_arms_str: Vec<_> = valid_variants
+                    .iter()
+                    .map(|(value, variant_ident)| {
+                        quote! {
+                            #alias_name::#variant_ident => *other == #value
+                        }
+                    })
+                    .collect();
+
+                let vis = if self.is_exporting {
+                    quote! { pub }
+                } else {
+                    quote! {}
+                };
+
+                // Add Default to derive
+                let enum_def = quote! {
+                    #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+                    #vis enum #alias_name {
+                        #(#variants),*
+                    }
+
+                    impl PartialEq<String> for #alias_name {
+                        fn eq(&self, other: &String) -> bool {
+                            match self {
+                                #(#eq_arms_string),*
+                            }
+                        }
+                    }
+
+                    impl PartialEq<&str> for #alias_name {
+                        fn eq(&self, other: &&str) -> bool {
+                             match self {
+                                #(#eq_arms_str),*
+                            }
+                        }
+                    }
+                };
+                self.code.push_str(&enum_def.to_string());
+                self.code.push('\n');
+                return;
+            }
+        }
+
         let alias_type = map_ts_type(Some(&Box::new(swc_ecma_ast::TsTypeAnn {
             span: swc_common::DUMMY_SP,
             type_ann: n.type_ann.clone(),
@@ -109,6 +213,117 @@ impl Visit for RustGenerator {
 
         self.code.push_str(&type_def.to_string());
         self.code.push('\n');
+    }
+
+    fn visit_ts_enum_decl(&mut self, n: &swc_ecma_ast::TsEnumDecl) {
+        let enum_name = format_ident!("{}", n.id.sym.to_string());
+
+        // Detect if this is a string enum or numeric enum
+        let is_string_enum = n.members.iter().any(|m| {
+            m.init
+                .as_ref()
+                .is_some_and(|init| matches!(init.as_ref(), swc_ecma_ast::Expr::Lit(Lit::Str(_))))
+        });
+
+        if is_string_enum {
+            // String enum → derive Serialize/Deserialize for JSON compat
+            let variants: Vec<_> = n
+                .members
+                .iter()
+                .map(|m| {
+                    let variant_name_str = match &m.id {
+                        swc_ecma_ast::TsEnumMemberId::Ident(i) => i.sym.to_string(),
+                        swc_ecma_ast::TsEnumMemberId::Str(s) => {
+                            s.value.as_str().unwrap_or("").to_string()
+                        }
+                    };
+                    let variant_ident = format_ident!("{}", variant_name_str);
+
+                    // Extract the string value for serde rename
+                    let rename = m
+                        .init
+                        .as_ref()
+                        .and_then(|init| {
+                            if let swc_ecma_ast::Expr::Lit(Lit::Str(s)) = init.as_ref() {
+                                Some(s.value.as_str().unwrap_or("").to_string())
+                            } else {
+                                None
+                            }
+                        })
+                        .unwrap_or_else(|| variant_name_str.clone());
+
+                    if rename == variant_name_str {
+                        quote! { #variant_ident }
+                    } else {
+                        quote! {
+                            #[serde(rename = #rename)]
+                            #variant_ident
+                        }
+                    }
+                })
+                .collect();
+
+            let vis = if self.is_exporting {
+                quote! { pub }
+            } else {
+                quote! {}
+            };
+
+            let enum_def = quote! {
+                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+                #vis enum #enum_name {
+                    #(#variants),*
+                }
+            };
+
+            self.code.push_str(&enum_def.to_string());
+            self.code.push('\n');
+        } else {
+            // Numeric enum → use repr(i32) with explicit discriminants
+            let mut current_value: i64 = 0;
+            let variants: Vec<_> = n
+                .members
+                .iter()
+                .map(|m| {
+                    let variant_name_str = match &m.id {
+                        swc_ecma_ast::TsEnumMemberId::Ident(i) => i.sym.to_string(),
+                        swc_ecma_ast::TsEnumMemberId::Str(s) => {
+                            s.value.as_str().unwrap_or("").to_string()
+                        }
+                    };
+                    let variant_ident = format_ident!("{}", variant_name_str);
+
+                    // Check if there's an explicit numeric value
+                    if let Some(init) = &m.init {
+                        if let swc_ecma_ast::Expr::Lit(Lit::Num(num)) = init.as_ref() {
+                            current_value = num.value as i64;
+                        }
+                    }
+
+                    let val = current_value as i32;
+                    current_value += 1;
+
+                    quote! { #variant_ident = #val }
+                })
+                .collect();
+
+            let vis = if self.is_exporting {
+                quote! { pub }
+            } else {
+                quote! {}
+            };
+
+            let enum_def = quote! {
+                #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+                #[repr(i32)]
+                #vis enum #enum_name {
+                    #(#variants),*
+                }
+            };
+
+            self.code.push_str(&enum_def.to_string());
+            self.code.push('\n');
+        }
     }
 
     fn visit_module_item(&mut self, n: &swc_ecma_ast::ModuleItem) {

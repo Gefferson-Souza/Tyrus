@@ -4,7 +4,7 @@ interface Metric {
     tags: string[];
 }
 
-function calculateMetrics(data: number[]): Metric[] {
+function calculateMetrics(data: number[]): any[] {
     // Test Array Methods & Arrow Functions
     const filtered = data
         .filter(n => n > 0)

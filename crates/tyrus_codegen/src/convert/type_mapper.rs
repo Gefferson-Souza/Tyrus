@@ -35,6 +35,19 @@ pub fn map_ts_type(type_ann: Option<&Box<TsTypeAnn>>) -> TokenStream {
                                 quote! { Vec<serde_json::Value> }
                             }
                         }
+                        "Record" => {
+                            if let Some(type_params) = &t.type_params {
+                                if type_params.params.len() >= 2 {
+                                    let key = map_inner_type(&type_params.params[0]);
+                                    let value = map_inner_type(&type_params.params[1]);
+                                    quote! { std::collections::HashMap<#key, #value> }
+                                } else {
+                                    quote! { std::collections::HashMap<String, serde_json::Value> }
+                                }
+                            } else {
+                                quote! { std::collections::HashMap<String, serde_json::Value> }
+                            }
+                        }
                         _ => {
                             // User defined type (Struct or Enum)
                             let type_ident =
@@ -206,6 +219,19 @@ pub fn map_inner_type(ts_type: &swc_ecma_ast::TsType) -> TokenStream {
                             }
                         } else {
                             quote! { Vec<serde_json::Value> }
+                        }
+                    }
+                    "Record" => {
+                        if let Some(type_params) = &t.type_params {
+                            if type_params.params.len() >= 2 {
+                                let key = map_inner_type(&type_params.params[0]);
+                                let value = map_inner_type(&type_params.params[1]);
+                                quote! { std::collections::HashMap<#key, #value> }
+                            } else {
+                                quote! { std::collections::HashMap<String, serde_json::Value> }
+                            }
+                        } else {
+                            quote! { std::collections::HashMap<String, serde_json::Value> }
                         }
                     }
                     _ => {

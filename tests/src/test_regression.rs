@@ -33,6 +33,21 @@ fn test_scenario_1_complex_single() {
 }
 
 #[test]
+fn test_tier1_features() {
+    run_gauntlet_test("tier1_features");
+}
+
+#[test]
+fn test_tier2_features() {
+    run_gauntlet_test("tier2_features");
+}
+
+#[test]
+fn test_tier3_features() {
+    run_gauntlet_test("tier3_features");
+}
+
+#[test]
 fn test_scenario_2_complex_node() {
     run_gauntlet_test("complex_node");
 }
