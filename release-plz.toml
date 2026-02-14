@@ -1,15 +1,12 @@
 [workspace]
 allow_dirty = false
 publish = false
+changelog_update = true
 git_release_enable = true
 git_release_type = "prod"
 git_release_name = "v{{ version }}"
 
 [[package]]
-name = "tyrus_cli"
-publish = true
-
-[[package]]
 name = "integration_tests"
-publish = false
 release = false
+changelog_update = false
