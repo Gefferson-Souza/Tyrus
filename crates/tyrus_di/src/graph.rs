@@ -34,7 +34,9 @@ impl Default for DiGraph {
     fn default() -> Self {
         Self::new()
     }
+}
 
+impl DiGraph {
     pub fn add_module(&mut self, module: Module) {
         self.modules.insert(module.name.clone(), module);
     }

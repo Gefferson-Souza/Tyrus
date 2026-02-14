@@ -16,7 +16,15 @@ impl DecoratorVisitor {
             current_module: None,
         }
     }
+}
 
+impl Default for DecoratorVisitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DecoratorVisitor {
     fn extract_decorator_args(&self, decorator: &Decorator) -> Option<ObjectLit> {
         if let Expr::Call(call_expr) = &*decorator.expr {
             if let Some(arg) = call_expr.args.first() {
