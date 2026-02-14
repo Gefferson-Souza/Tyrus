@@ -46,6 +46,12 @@ Tyrus enforces a strict subset of TypeScript called the "Oxidizable Standard." I
 - JSON Serialization/Deserialization (via `serde`)
 - HTTP Client and REST patterns (via `axum` & `reqwest`)
 
+### Tier 4: Architectural Abstractions (Preview)
+
+- **Dependency Injection:** Full support for NestJS-style `@Injectable()` and `@Module()` patterns.
+- **Controller Generation:** Automatic mapping of decorated classes to `axum::Router` definitions.
+- **Graph Resolution:** Topological sorting of dependencies for correct initialization order.
+
 ---
 
 ## 🛠 Installation & Usage

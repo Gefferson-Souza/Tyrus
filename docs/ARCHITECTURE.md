@@ -26,9 +26,18 @@ This stage validates the AST against the **Oxidizable Standard**.
 The "brain" of the compiler.
 
 - **Responsibility:** Manages multi-file resolution, project scoping, and the generation of the Rust directory structure (e.g., creating `Cargo.toml`, `src/main.rs`).
-- **Dependency Injection:** Resolves singleton patterns (like Services in NestJS) to `Arc<T>` or `State` in Rust.
+- **Dependency Injection:** Resolves singleton patterns (like Services in NestJS) to `Arc<T>` or `State` in Rust using `tyrus_di`.
+- **Graph Resolution:** Uses `tyrus_di` to topologically sort dependencies and determine instantiation order.
 
-### 4. Code Generation (`tyrus_codegen`)
+### 4. Dependency Management (`tyrus_di`)
+
+A dedicated crate for handling the application's dependency graph.
+
+- **Input:** Module metadata and provider definitions.
+- **Algorithm:** Topological sort via `petgraph`.
+- **Output:** Ordered initialization list and separation of concerns (Modules vs Providers vs Controllers).
+
+### 5. Code Generation (`tyrus_codegen`)
 
 The final stage that renders the Rust source code.
 
@@ -40,13 +49,14 @@ The final stage that renders the Rust source code.
 
 ## 📦 Crate Breakdown
 
-| Crate               | Responsibility                                              |
-| :------------------ | :---------------------------------------------------------- |
-| `tyrus_ast`         | Formal definition of the project's internal representation. |
-| `tyrus_cli`         | Command-line interface and user interaction logic.          |
-| `tyrus_common`      | Generic utilities and shared types (e.g., `FilePath`).      |
-| `tyrus_diagnostics` | Error reporting and tracing infrastructure.                 |
-| `tyrus_test_utils`  | Custom harness for regression and compiler-output testing.  |
+| Crate               | Responsibility                                               |
+| :------------------ | :----------------------------------------------------------- |
+| `tyrus_ast`         | Formal definition of the project's internal representation.  |
+| `tyrus_cli`         | Command-line interface and user interaction logic.           |
+| `tyrus_common`      | Generic utilities and shared types (e.g., `FilePath`).       |
+| `tyrus_diagnostics` | Error reporting and tracing infrastructure.                  |
+| `tyrus_di`          | Dependency Injection graph resolution and module management. |
+| `tyrus_test_utils`  | Custom harness for regression and compiler-output testing.   |
 
 ---
 
