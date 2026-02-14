@@ -37,13 +37,15 @@ A dedicated crate for handling the application's dependency graph.
 - **Algorithm:** Topological sort via `petgraph`.
 - **Output:** Ordered initialization list and separation of concerns (Modules vs Providers vs Controllers).
 
-### 5. Code Generation (`tyrus_codegen`)
+### 5. Code Generation (`tyrus_codegen`) & DI (`tyrus_di`)
 
-The final stage that renders the Rust source code.
-
-- **Input:** Analyzed AST.
-- **Technology:** Uses the `quote!` and `proc-macro2` crates for idiomatic formatting.
-- **Output:** `.rs` files that follow Rust's strict safety and ownership rules.
+- **Responsibility**: usage of `quote!` to emit Rust tokens.
+- **DI Engine**: `tyrus_di` analyzes the dependency graph between classes (Providers/Controllers) and orchestrates:
+  - Initialization order (managing lifetimes and dependencies).
+  - `Arc<T>` wrapping for shared state.
+  - Module wiring for Axum routers.
+- **Output**: Formatted Rust code to `src/`.
+  that follow Rust's strict safety and ownership rules.
 
 ---
 
