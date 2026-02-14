@@ -181,27 +181,101 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
             // Handle variable declarations (const/let)
             let mut declarations = Vec::new();
             for decl in &var_decl.decls {
-                if let Pat::Ident(ident) = &decl.name {
-                    let var_name = to_snake_case(&ident.id.sym);
-                    let var_ident = format_ident!("{}", var_name);
+                // If there is an initializer, convert it
+                let init_expr_opt = decl.init.as_ref().map(|init| convert_expr(init));
 
-                    if let Some(init) = &decl.init {
-                        let init_expr = convert_expr(init);
-                        // Use `let` for `const` (immutable) and `let mut` for `let`/`var`
-                        if matches!(var_decl.kind, swc_ecma_ast::VarDeclKind::Const) {
-                            declarations.push(quote! {
-                                let #var_ident = #init_expr;
-                            });
+                match &decl.name {
+                    Pat::Ident(ident) => {
+                        let var_name = to_snake_case(&ident.id.sym);
+                        let var_ident = format_ident!("{}", var_name);
+
+                        // If uninitialized
+                        if let Some(init_expr) = init_expr_opt {
+                            if matches!(var_decl.kind, swc_ecma_ast::VarDeclKind::Const) {
+                                declarations.push(quote! {
+                                    let #var_ident = #init_expr;
+                                });
+                            } else {
+                                declarations.push(quote! {
+                                    let mut #var_ident = #init_expr;
+                                });
+                            }
                         } else {
                             declarations.push(quote! {
-                                let mut #var_ident = #init_expr;
+                                let mut #var_ident;
                             });
                         }
-                    } else {
-                        // Uninitialized variable — always mut
-                        declarations.push(quote! {
-                            let mut #var_ident;
-                        });
+                    }
+                    Pat::Object(obj_pat) => {
+                        // const { a, b } = obj;
+                        if let Some(init_expr) = init_expr_opt {
+                            let temp_name = format_ident!("__destruct_val");
+                            declarations.push(quote! { let #temp_name = #init_expr; });
+
+                            for prop in &obj_pat.props {
+                                match prop {
+                                    swc_ecma_ast::ObjectPatProp::KeyValue(kv) => {
+                                        if let Pat::Ident(target) = &*kv.value {
+                                            let target_name =
+                                                format_ident!("{}", to_snake_case(&target.id.sym));
+                                            let source_key = match &kv.key {
+                                                swc_ecma_ast::PropName::Ident(i) => {
+                                                    i.sym.to_string()
+                                                }
+                                                swc_ecma_ast::PropName::Str(s) => {
+                                                    format!("{:?}", s.value)
+                                                        .trim_matches('"')
+                                                        .to_string()
+                                                }
+                                                _ => continue,
+                                            };
+                                            let source_ident =
+                                                format_ident!("{}", to_snake_case(&source_key));
+                                            declarations.push(quote! {
+                                                let #target_name = #temp_name.#source_ident.clone();
+                                            });
+                                        }
+                                    }
+                                    swc_ecma_ast::ObjectPatProp::Assign(assign) => {
+                                        let target_name =
+                                            format_ident!("{}", to_snake_case(&assign.key.sym));
+                                        let source_ident =
+                                            format_ident!("{}", to_snake_case(&assign.key.sym));
+                                        if let Some(default) = &assign.value {
+                                            let default_expr = convert_expr(default);
+                                            declarations.push(quote! {
+                                                let #target_name = #temp_name.#source_ident.clone().unwrap_or(#default_expr);
+                                            });
+                                        } else {
+                                            declarations.push(quote! {
+                                                let #target_name = #temp_name.#source_ident.clone();
+                                            });
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
+                    }
+                    Pat::Array(arr_pat) => {
+                        // const [a, b] = arr;
+                        if let Some(init_expr) = init_expr_opt {
+                            let temp_name = format_ident!("__destruct_val");
+                            declarations.push(quote! { let #temp_name = #init_expr; });
+
+                            for (i, elem) in arr_pat.elems.iter().enumerate() {
+                                if let Some(Pat::Ident(ident)) = elem {
+                                    let target_name =
+                                        format_ident!("{}", to_snake_case(&ident.id.sym));
+                                    declarations.push(quote! {
+                                        let #target_name = #temp_name[#i].clone();
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    _ => {
+                        declarations.push(quote! { /* unsupported pattern */ });
                     }
                 }
             }
@@ -255,6 +329,204 @@ pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
                 while #test #body_block
             }
         }
+        // for (const x of arr) → for x in arr
+        Stmt::ForOf(for_of) => {
+            let body = convert_stmt(&for_of.body);
+            let right = convert_expr(&for_of.right);
+            let body_block = if matches!(*for_of.body, Stmt::Block(_)) {
+                quote! { #body }
+            } else {
+                quote! { { #body } }
+            };
+
+            // Extract the loop variable name from the declaration
+            let var_ident = match &for_of.left {
+                swc_ecma_ast::ForHead::VarDecl(var_decl) => {
+                    if let Some(decl) = var_decl.decls.first() {
+                        if let Pat::Ident(ident) = &decl.name {
+                            let name = to_snake_case(&ident.id.sym);
+                            format_ident!("{}", name)
+                        } else {
+                            format_ident!("_item")
+                        }
+                    } else {
+                        format_ident!("_item")
+                    }
+                }
+                swc_ecma_ast::ForHead::Pat(pat) => {
+                    if let Pat::Ident(ident) = pat.as_ref() {
+                        let name = to_snake_case(&ident.id.sym);
+                        format_ident!("{}", name)
+                    } else {
+                        format_ident!("_item")
+                    }
+                }
+                _ => format_ident!("_item"),
+            };
+
+            quote! {
+                for #var_ident in #right #body_block
+            }
+        }
+        // for (const k in obj) → for k in obj.keys()
+        Stmt::ForIn(for_in) => {
+            let body = convert_stmt(&for_in.body);
+            let right = convert_expr(&for_in.right);
+            let body_block = if matches!(*for_in.body, Stmt::Block(_)) {
+                quote! { #body }
+            } else {
+                quote! { { #body } }
+            };
+
+            let var_ident = match &for_in.left {
+                swc_ecma_ast::ForHead::VarDecl(var_decl) => {
+                    if let Some(decl) = var_decl.decls.first() {
+                        if let Pat::Ident(ident) = &decl.name {
+                            let name = to_snake_case(&ident.id.sym);
+                            format_ident!("{}", name)
+                        } else {
+                            format_ident!("_key")
+                        }
+                    } else {
+                        format_ident!("_key")
+                    }
+                }
+                swc_ecma_ast::ForHead::Pat(pat) => {
+                    if let Pat::Ident(ident) = pat.as_ref() {
+                        let name = to_snake_case(&ident.id.sym);
+                        format_ident!("{}", name)
+                    } else {
+                        format_ident!("_key")
+                    }
+                }
+                _ => format_ident!("_key"),
+            };
+
+            quote! {
+                for #var_ident in #right.keys().cloned() #body_block
+            }
+        }
+        // do { ... } while (x) → loop { ...; if !x { break; } }
+        Stmt::DoWhile(do_while) => {
+            let body = convert_stmt(&do_while.body);
+            let test = convert_expr(&do_while.test);
+            let body_inner = if matches!(*do_while.body, Stmt::Block(_)) {
+                // Extract inner statements from block
+                quote! { #body }
+            } else {
+                quote! { #body }
+            };
+            quote! {
+                loop {
+                    #body_inner
+                    if !(#test) {
+                        break;
+                    }
+                }
+            }
+        }
+        // try { ... } catch (e) { ... } → match (|| { ... })() { Ok/Err }
+        Stmt::Try(try_stmt) => {
+            let try_body: Vec<_> = try_stmt.block.stmts.iter().map(convert_stmt).collect();
+
+            if let Some(catch) = &try_stmt.handler {
+                let catch_body: Vec<_> = catch.body.stmts.iter().map(convert_stmt).collect();
+                let err_ident = catch
+                    .param
+                    .as_ref()
+                    .and_then(|p| p.as_ident())
+                    .map(|i| format_ident!("{}", to_snake_case(&i.id.sym)))
+                    .unwrap_or_else(|| format_ident!("_err"));
+
+                if let Some(finalizer) = &try_stmt.finalizer {
+                    let finally_body: Vec<_> = finalizer.stmts.iter().map(convert_stmt).collect();
+                    quote! {
+                        let __try_result = (|| -> Result<(), Box<dyn std::error::Error>> {
+                            #(#try_body)*
+                            Ok(())
+                        })();
+                        if let Err(#err_ident) = __try_result {
+                            #(#catch_body)*
+                        }
+                        #(#finally_body)*
+                    }
+                } else {
+                    quote! {
+                        let __try_result = (|| -> Result<(), Box<dyn std::error::Error>> {
+                            #(#try_body)*
+                            Ok(())
+                        })();
+                        if let Err(#err_ident) = __try_result {
+                            #(#catch_body)*
+                        }
+                    }
+                }
+            } else if let Some(finalizer) = &try_stmt.finalizer {
+                let finally_body: Vec<_> = finalizer.stmts.iter().map(convert_stmt).collect();
+                quote! {
+                    {
+                        #(#try_body)*
+                    }
+                    #(#finally_body)*
+                }
+            } else {
+                quote! {
+                    #(#try_body)*
+                }
+            }
+        }
+        // throw new Error("msg") → return Err("msg".into())
+        Stmt::Throw(throw_stmt) => {
+            let arg = convert_expr(&throw_stmt.arg);
+            quote! {
+                return Err(#arg.into());
+            }
+        }
+        // switch (x) { case a: ...; break; } → match x { a => { ... } }
+        Stmt::Switch(switch_stmt) => {
+            let discriminant = convert_expr(&switch_stmt.discriminant);
+            let mut arms = Vec::new();
+
+            for case in &switch_stmt.cases {
+                // Filter out break statements from case body
+                let body_stmts: Vec<_> = case
+                    .cons
+                    .iter()
+                    .filter(|s| !matches!(s, Stmt::Break(_)))
+                    .map(convert_stmt)
+                    .collect();
+
+                if let Some(test) = &case.test {
+                    let test_expr = convert_expr(test);
+                    arms.push(quote! {
+                        x if x == #test_expr => {
+                            #(#body_stmts)*
+                        }
+                    });
+                } else {
+                    // default case
+                    arms.push(quote! {
+                        _ => {
+                            #(#body_stmts)*
+                        }
+                    });
+                }
+            }
+
+            // If no default arm was found, add a wildcard
+            let has_default = switch_stmt.cases.iter().any(|c| c.test.is_none());
+            if !has_default {
+                arms.push(quote! { _ => {} });
+            }
+
+            quote! {
+                match #discriminant {
+                    #(#arms)*
+                }
+            }
+        }
+        Stmt::Break(_) => quote! { break; },
+        Stmt::Continue(_) => quote! { continue; },
         _ => quote! { /* unsupported statement */ },
     }
 }
@@ -314,7 +586,48 @@ pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
                 swc_ecma_ast::UnaryOp::Bang => quote! { !#arg },
                 swc_ecma_ast::UnaryOp::Minus => quote! { -#arg },
                 swc_ecma_ast::UnaryOp::Plus => quote! { +#arg },
+                swc_ecma_ast::UnaryOp::TypeOf => {
+                    quote! { std::any::type_name_of_val(&#arg) }
+                }
                 _ => quote! { todo!("unsupported unary op") },
+            }
+        }
+        // Ternary: x ? a : b → if x { a } else { b }
+        Expr::Cond(cond) => {
+            let test = convert_expr(&cond.test);
+            let cons = convert_expr(&cond.cons);
+            let alt = convert_expr(&cond.alt);
+            quote! {
+                if #test { #cons } else { #alt }
+            }
+        }
+        // Parenthesized expression: (expr) → expr
+        Expr::Paren(paren) => convert_expr(&paren.expr),
+        // Optional chaining: obj?.prop → obj.as_ref().map(|v| v.prop)
+        Expr::OptChain(opt_chain) => match opt_chain.base.as_ref() {
+            swc_ecma_ast::OptChainBase::Member(member) => {
+                let obj = convert_expr(&member.obj);
+                if let Some(ident) = member.prop.as_ident() {
+                    let prop_name = format_ident!("{}", to_snake_case(&ident.sym));
+                    quote! { #obj.as_ref().map(|v| v.#prop_name.clone()).flatten() }
+                } else {
+                    quote! { #obj }
+                }
+            }
+            swc_ecma_ast::OptChainBase::Call(call) => {
+                let callee = convert_expr(&call.callee);
+                let args: Vec<_> = call.args.iter().map(|a| convert_expr(&a.expr)).collect();
+                quote! { #callee.as_ref().map(|v| v(#(#args),*)) }
+            }
+        },
+        // Sequence expression: (a, b, c) → { a; b; c }
+        Expr::Seq(seq) => {
+            let exprs: Vec<_> = seq.exprs.iter().map(|e| convert_expr(e)).collect();
+            if let Some(last) = exprs.last() {
+                let init = &exprs[..exprs.len() - 1];
+                quote! { { #(#init;)* #last } }
+            } else {
+                quote! { () }
             }
         }
         _ => quote! { todo!() },
@@ -473,9 +786,38 @@ fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
 
     match &member.prop {
         swc_ecma_ast::MemberProp::Ident(ident) => {
-            let prop_name = to_snake_case(ident.sym.as_ref());
-            let prop = format_ident!("{}", prop_name);
-            quote! { #obj.#prop }
+            // Check if obj is an identifier starting with uppercase (Enum or Class static)
+            // But we already converted obj to TokenStream. We need to check the original AST.
+            let is_static_access = if let swc_ecma_ast::Expr::Ident(obj_ident) = &*member.obj {
+                obj_ident
+                    .sym
+                    .chars()
+                    .next()
+                    .is_some_and(|c| c.is_uppercase())
+            } else {
+                false
+            };
+
+            if is_static_access {
+                // Static access: Enum.Variant or Class.Method
+                // Keep the property name as-is (don't force snake_case)
+                let prop_name = ident.sym.as_ref();
+                let prop = format_ident!("{}", prop_name);
+                // Also, we need the original object name, not the converted token stream
+                if let swc_ecma_ast::Expr::Ident(obj_ident) = &*member.obj {
+                    let obj_name = obj_ident.sym.as_ref();
+                    let obj_ident = format_ident!("{}", obj_name);
+                    quote! { #obj_ident::#prop }
+                } else {
+                    // Should be unreachable given is_static_access check
+                    quote! { #obj::#prop }
+                }
+            } else {
+                // Instance access: obj.prop -> obj.prop (snake_case)
+                let prop_name = to_snake_case(ident.sym.as_ref());
+                let prop = format_ident!("{}", prop_name);
+                quote! { #obj.#prop }
+            }
         }
         swc_ecma_ast::MemberProp::Computed(computed) => {
             // Check if expr is number literal
@@ -494,6 +836,10 @@ fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
 pub fn convert_bin_expr(bin: &BinExpr) -> proc_macro2::TokenStream {
     let left = convert_expr(&bin.left);
     let mut right = convert_expr(&bin.right);
+
+    if bin.op == BinaryOp::NullishCoalescing {
+        return quote! { #left.unwrap_or(#right) };
+    }
 
     if bin.op == BinaryOp::Add {
         // Check if left is string
@@ -870,6 +1216,22 @@ pub fn to_snake_case(s: &str) -> String {
             result.push('_');
         }
         result.push(ch.to_lowercase().next().unwrap_or(ch));
+    }
+    result
+}
+
+pub fn to_pascal_case(s: &str) -> String {
+    let mut result = String::new();
+    let mut capitalize_next = true;
+    for ch in s.chars() {
+        if !ch.is_alphanumeric() {
+            capitalize_next = true;
+        } else if capitalize_next {
+            result.push(ch.to_uppercase().next().unwrap_or(ch));
+            capitalize_next = false;
+        } else {
+            result.push(ch);
+        }
     }
     result
 }
