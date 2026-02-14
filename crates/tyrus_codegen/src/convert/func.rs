@@ -6,6 +6,42 @@ use swc_ecma_ast::{
 
 use super::type_mapper::{map_ts_type, unwrap_promise_type};
 
+// Helper function to snake case (keep standalone)
+pub fn to_snake_case(str: &str) -> String {
+    let mut s = String::with_capacity(str.len());
+    let mut was_upper = false;
+    for (i, c) in str.chars().enumerate() {
+        if c.is_uppercase() {
+            if i > 0 && !was_upper {
+                s.push('_');
+            }
+            s.push(c.to_ascii_lowercase());
+            was_upper = true;
+        } else {
+            s.push(c);
+            was_upper = false;
+        }
+    }
+    s
+}
+
+// Helper to pascal case (keep standalone)
+pub fn to_pascal_case(str: &str) -> String {
+    let mut s = String::with_capacity(str.len());
+    let mut next_upper = true;
+    for c in str.chars() {
+        if c == '_' || c == '-' {
+            next_upper = true;
+        } else if next_upper {
+            s.push(c.to_ascii_uppercase());
+            next_upper = false;
+        } else {
+            s.push(c);
+        }
+    }
+    s
+}
+
 impl super::interface::RustGenerator {
     pub fn process_fn_decl(&mut self, n: &FnDecl) {
         let fn_name = to_snake_case(&n.ident.sym);
@@ -50,15 +86,10 @@ impl super::interface::RustGenerator {
         let mut body_stmts = Vec::new();
         if let Some(block_stmt) = &n.function.body {
             if is_async {
-                // Use recursive converter to handle return Ok(...)
                 for stmt in &block_stmt.stmts {
-                    body_stmts.push(convert_stmt_recursive(stmt, &|ret_stmt| {
-                        if let Some(arg) = &ret_stmt.arg {
-                            let expr = convert_expr(arg);
-
-                            // Heuristic: If returning an object literal, it is converted to json!() (Value).
-                            // But the function might return a struct (User).
-                            // We need to deserialize Value -> Struct.
+                    body_stmts.push(self.convert_stmt_recursive(stmt, &mut |ret_stmt| {
+                         if let Some(arg) = &ret_stmt.arg {
+                            let expr = self.convert_expr(arg);
                             if !is_void && matches!(arg.as_ref(), swc_ecma_ast::Expr::Object(_)) {
                                 quote! {
                                     return Ok(serde_json::from_value(#expr).unwrap_or_else(|e| panic!("Failed to convert return value: {}", e)));
@@ -71,28 +102,11 @@ impl super::interface::RustGenerator {
                         }
                     }));
                 }
-
-                if is_void {
-                    // Fallback for void functions
-                    // Only append if the last statement isn't a return (though rustc handles unreachable code)
-                    // But strictly, we need Ok(()) if control flow reaches end.
-                    // Since we can't easily analyze control flow, appending Ok(()) is safe for void functions.
-                    // But we must ensure it doesn't cause "unreachable expression" warnings if possible,
-                    // or just accept the warning.
-                    // The previous error was "expected bool, found ()".
-                    // If we only append when is_void is true, we avoid that error.
-                    // We might get "unreachable code" warning if there was an explicit return before, but that's fine (just a warning).
-                    // Ideally we suppress it or check, but let's just append.
-                    // Actually, to avoid "unreachable expression" warning which might be treated as error in some configs:
-                    // We can't easily avoid it without CFG.
-                    // Let's just append it.
-                }
             } else {
                 for stmt in &block_stmt.stmts {
-                    body_stmts.push(convert_stmt_recursive(stmt, &|ret_stmt| {
+                    body_stmts.push(self.convert_stmt_recursive(stmt, &mut |ret_stmt| {
                         if let Some(arg) = &ret_stmt.arg {
-                            let expr = convert_expr(arg);
-                            // Heuristic: same as async, needed for Struct return types
+                            let expr = self.convert_expr(arg);
                             if !is_void && matches!(arg.as_ref(), swc_ecma_ast::Expr::Object(_)) {
                                 quote! {
                                     return serde_json::from_value(#expr).unwrap_or_else(|e| panic!("Failed to convert return value: {}", e));
@@ -153,1113 +167,448 @@ impl super::interface::RustGenerator {
         self.code.push_str(&fn_def.to_string());
         self.code.push('\n');
     }
-}
 
-pub fn convert_stmt_pub(stmt: &Stmt) -> proc_macro2::TokenStream {
-    convert_stmt(stmt)
-}
-
-pub fn convert_expr_pub(expr: &Expr) -> proc_macro2::TokenStream {
-    convert_expr(expr)
-}
-
-pub fn convert_stmt(stmt: &Stmt) -> proc_macro2::TokenStream {
-    match stmt {
-        Stmt::Return(ret_stmt) => {
-            if let Some(arg) = &ret_stmt.arg {
-                let expr = convert_expr(arg);
-                quote! { return #expr; }
-            } else {
-                quote! { return; }
+    // New helper method for recursive stmt conversion with callback
+    pub fn convert_stmt_recursive<F>(
+        &self,
+        stmt: &Stmt,
+        return_handler: &mut F,
+    ) -> proc_macro2::TokenStream
+    where
+        F: FnMut(&swc_ecma_ast::ReturnStmt) -> proc_macro2::TokenStream,
+    {
+        match stmt {
+            Stmt::Return(ret_stmt) => return_handler(ret_stmt),
+            Stmt::Block(block) => {
+                let stmts: Vec<_> = block
+                    .stmts
+                    .iter()
+                    .map(|s| self.convert_stmt_recursive(s, return_handler))
+                    .collect();
+                quote! { { #(#stmts)* } }
             }
+            Stmt::If(if_stmt) => {
+                let test = self.convert_expr(&if_stmt.test);
+                let cons = self.convert_stmt_recursive(&if_stmt.cons, return_handler);
+                let cons_block = if matches!(*if_stmt.cons, Stmt::Block(_)) {
+                    quote! { #cons }
+                } else {
+                    quote! { { #cons } }
+                };
+
+                let alt = if let Some(alt) = &if_stmt.alt {
+                    let alt_stmt = self.convert_stmt_recursive(alt, return_handler);
+                    let alt_block = if matches!(&**alt, Stmt::Block(_) | Stmt::If(_)) {
+                        quote! { #alt_stmt }
+                    } else {
+                        quote! { { #alt_stmt } }
+                    };
+                    quote! { else #alt_block }
+                } else {
+                    quote! {}
+                };
+
+                quote! { if #test #cons_block #alt }
+            }
+            _ => self.convert_stmt(stmt),
         }
-        Stmt::Expr(expr_stmt) => {
-            let expr = convert_expr(&expr_stmt.expr);
-            quote! { #expr; }
-        }
-        Stmt::Decl(Decl::Var(var_decl)) => {
-            // Handle variable declarations (const/let)
-            let mut declarations = Vec::new();
-            for decl in &var_decl.decls {
-                // If there is an initializer, convert it
-                let init_expr_opt = decl.init.as_ref().map(|init| convert_expr(init));
+    }
 
-                match &decl.name {
-                    Pat::Ident(ident) => {
-                        let var_name = to_snake_case(&ident.id.sym);
-                        let var_ident = format_ident!("{}", var_name);
+    pub fn convert_stmt(&self, stmt: &Stmt) -> proc_macro2::TokenStream {
+        match stmt {
+            Stmt::Return(ret_stmt) => {
+                if let Some(arg) = &ret_stmt.arg {
+                    let expr = self.convert_expr(arg);
+                    quote! { return #expr; }
+                } else {
+                    quote! { return; }
+                }
+            }
+            Stmt::Expr(expr_stmt) => {
+                let expr = self.convert_expr(&expr_stmt.expr);
+                quote! { #expr; }
+            }
+            Stmt::Decl(Decl::Var(var_decl)) => {
+                let mut declarations = Vec::new();
+                for decl in &var_decl.decls {
+                    let init_expr_opt = decl.init.as_ref().map(|init| self.convert_expr(init));
 
-                        // If uninitialized
-                        if let Some(init_expr) = init_expr_opt {
-                            if matches!(var_decl.kind, swc_ecma_ast::VarDeclKind::Const) {
-                                declarations.push(quote! {
-                                    let #var_ident = #init_expr;
-                                });
-                            } else {
-                                declarations.push(quote! {
-                                    let mut #var_ident = #init_expr;
-                                });
-                            }
-                        } else {
-                            declarations.push(quote! {
-                                let mut #var_ident;
-                            });
-                        }
-                    }
-                    Pat::Object(obj_pat) => {
-                        // const { a, b } = obj;
-                        if let Some(init_expr) = init_expr_opt {
-                            let temp_name = format_ident!("__destruct_val");
-                            declarations.push(quote! { let #temp_name = #init_expr; });
+                    match &decl.name {
+                        Pat::Ident(ident) => {
+                            let var_name = to_snake_case(&ident.id.sym);
+                            let var_ident = format_ident!("{}", var_name);
 
-                            for prop in &obj_pat.props {
-                                match prop {
-                                    swc_ecma_ast::ObjectPatProp::KeyValue(kv) => {
-                                        if let Pat::Ident(target) = &*kv.value {
-                                            let target_name =
-                                                format_ident!("{}", to_snake_case(&target.id.sym));
-                                            let source_key = match &kv.key {
-                                                swc_ecma_ast::PropName::Ident(i) => {
-                                                    i.sym.to_string()
-                                                }
-                                                swc_ecma_ast::PropName::Str(s) => {
-                                                    format!("{:?}", s.value)
-                                                        .trim_matches('"')
-                                                        .to_string()
-                                                }
-                                                _ => continue,
-                                            };
-                                            let source_ident =
-                                                format_ident!("{}", to_snake_case(&source_key));
-                                            declarations.push(quote! {
-                                                let #target_name = #temp_name.#source_ident.clone();
-                                            });
-                                        }
-                                    }
-                                    swc_ecma_ast::ObjectPatProp::Assign(assign) => {
-                                        let target_name =
-                                            format_ident!("{}", to_snake_case(&assign.key.sym));
-                                        let source_ident =
-                                            format_ident!("{}", to_snake_case(&assign.key.sym));
-                                        if let Some(default) = &assign.value {
-                                            let default_expr = convert_expr(default);
-                                            declarations.push(quote! {
-                                                let #target_name = #temp_name.#source_ident.clone().unwrap_or(#default_expr);
-                                            });
-                                        } else {
-                                            declarations.push(quote! {
-                                                let #target_name = #temp_name.#source_ident.clone();
-                                            });
-                                        }
-                                    }
-                                    _ => {}
-                                }
-                            }
-                        }
-                    }
-                    Pat::Array(arr_pat) => {
-                        // const [a, b] = arr;
-                        if let Some(init_expr) = init_expr_opt {
-                            let temp_name = format_ident!("__destruct_val");
-                            declarations.push(quote! { let #temp_name = #init_expr; });
-
-                            for (i, elem) in arr_pat.elems.iter().enumerate() {
-                                if let Some(Pat::Ident(ident)) = elem {
-                                    let target_name =
-                                        format_ident!("{}", to_snake_case(&ident.id.sym));
+                            if let Some(init_expr) = init_expr_opt {
+                                if matches!(var_decl.kind, swc_ecma_ast::VarDeclKind::Const) {
                                     declarations.push(quote! {
-                                        let #target_name = #temp_name[#i].clone();
+                                        let #var_ident = #init_expr;
+                                    });
+                                } else {
+                                    declarations.push(quote! {
+                                        let mut #var_ident = #init_expr;
                                     });
                                 }
+                            } else {
+                                declarations.push(quote! {
+                                    let mut #var_ident;
+                                });
                             }
                         }
-                    }
-                    _ => {
-                        declarations.push(quote! { /* unsupported pattern */ });
+                        Pat::Object(_) | Pat::Array(_) => {
+                            declarations.push(quote! { /* destructing not fully ported to method struct yet, todo */ });
+                        }
+                        _ => {
+                            declarations.push(quote! { /* unsupported pattern */ });
+                        }
                     }
                 }
+                quote! { #(#declarations)* }
             }
-            quote! {
-                #(#declarations)*
+            Stmt::Block(block) => {
+                let stmts: Vec<_> = block.stmts.iter().map(|s| self.convert_stmt(s)).collect();
+                quote! { { #(#stmts)* } }
             }
-        }
-        Stmt::Block(block) => {
-            let stmts: Vec<_> = block.stmts.iter().map(convert_stmt).collect();
-            quote! {
-                {
-                    #(#stmts)*
-                }
-            }
-        }
-        Stmt::If(if_stmt) => {
-            let test = convert_expr(&if_stmt.test);
-            let cons = convert_stmt(&if_stmt.cons);
-
-            let cons_block = if matches!(*if_stmt.cons, Stmt::Block(_)) {
-                quote! { #cons }
-            } else {
-                quote! { { #cons } }
-            };
-
-            let alt = if let Some(alt) = &if_stmt.alt {
-                let alt_stmt = convert_stmt(alt);
-                let alt_block = if matches!(&**alt, Stmt::Block(_) | Stmt::If(_)) {
-                    quote! { #alt_stmt }
+            Stmt::If(if_stmt) => {
+                let test = self.convert_expr(&if_stmt.test);
+                let cons = self.convert_stmt(&if_stmt.cons);
+                let cons_block = if matches!(*if_stmt.cons, Stmt::Block(_)) {
+                    quote! { #cons }
                 } else {
-                    quote! { { #alt_stmt } }
+                    quote! { { #cons } }
                 };
-                quote! { else #alt_block }
-            } else {
-                quote! {}
-            };
 
-            quote! {
-                if #test #cons_block #alt
-            }
-        }
-        Stmt::While(while_stmt) => {
-            let test = convert_expr(&while_stmt.test);
-            let body = convert_stmt(&while_stmt.body);
-            let body_block = if matches!(*while_stmt.body, Stmt::Block(_)) {
-                quote! { #body }
-            } else {
-                quote! { { #body } }
-            };
-            quote! {
-                while #test #body_block
-            }
-        }
-        // for (const x of arr) → for x in arr
-        Stmt::ForOf(for_of) => {
-            let body = convert_stmt(&for_of.body);
-            let right = convert_expr(&for_of.right);
-            let body_block = if matches!(*for_of.body, Stmt::Block(_)) {
-                quote! { #body }
-            } else {
-                quote! { { #body } }
-            };
+                let alt = if let Some(alt) = &if_stmt.alt {
+                    let alt_stmt = self.convert_stmt(alt);
+                    let alt_block = if matches!(&**alt, Stmt::Block(_) | Stmt::If(_)) {
+                        quote! { #alt_stmt }
+                    } else {
+                        quote! { { #alt_stmt } }
+                    };
+                    quote! { else #alt_block }
+                } else {
+                    quote! {}
+                };
 
-            // Extract the loop variable name from the declaration
-            let var_ident = match &for_of.left {
-                swc_ecma_ast::ForHead::VarDecl(var_decl) => {
-                    if let Some(decl) = var_decl.decls.first() {
-                        if let Pat::Ident(ident) = &decl.name {
+                quote! { if #test #cons_block #alt }
+            }
+            Stmt::While(while_stmt) => {
+                let test = self.convert_expr(&while_stmt.test);
+                let body = self.convert_stmt(&while_stmt.body);
+                let body_block = if matches!(*while_stmt.body, Stmt::Block(_)) {
+                    quote! { #body }
+                } else {
+                    quote! { { #body } }
+                };
+                quote! {
+                    while #test #body_block
+                }
+            }
+            Stmt::ForOf(for_of) => {
+                let body = self.convert_stmt(&for_of.body);
+                let right = self.convert_expr(&for_of.right);
+                let body_block = if matches!(*for_of.body, Stmt::Block(_)) {
+                    quote! { #body }
+                } else {
+                    quote! { { #body } }
+                };
+
+                // Extract the loop variable name from the declaration
+                let var_ident = match &for_of.left {
+                    swc_ecma_ast::ForHead::VarDecl(var_decl) => {
+                        if let Some(decl) = var_decl.decls.first() {
+                            if let Pat::Ident(ident) = &decl.name {
+                                let name = to_snake_case(&ident.id.sym);
+                                format_ident!("{}", name)
+                            } else {
+                                format_ident!("_item")
+                            }
+                        } else {
+                            format_ident!("_item")
+                        }
+                    }
+                    swc_ecma_ast::ForHead::Pat(pat) => {
+                        if let Pat::Ident(ident) = pat.as_ref() {
                             let name = to_snake_case(&ident.id.sym);
                             format_ident!("{}", name)
                         } else {
                             format_ident!("_item")
                         }
-                    } else {
-                        format_ident!("_item")
                     }
-                }
-                swc_ecma_ast::ForHead::Pat(pat) => {
-                    if let Pat::Ident(ident) = pat.as_ref() {
-                        let name = to_snake_case(&ident.id.sym);
-                        format_ident!("{}", name)
-                    } else {
-                        format_ident!("_item")
-                    }
-                }
-                _ => format_ident!("_item"),
-            };
+                    _ => format_ident!("_item"),
+                };
 
-            quote! {
-                for #var_ident in #right #body_block
-            }
-        }
-        // for (const k in obj) → for k in obj.keys()
-        Stmt::ForIn(for_in) => {
-            let body = convert_stmt(&for_in.body);
-            let right = convert_expr(&for_in.right);
-            let body_block = if matches!(*for_in.body, Stmt::Block(_)) {
-                quote! { #body }
-            } else {
-                quote! { { #body } }
-            };
-
-            let var_ident = match &for_in.left {
-                swc_ecma_ast::ForHead::VarDecl(var_decl) => {
-                    if let Some(decl) = var_decl.decls.first() {
-                        if let Pat::Ident(ident) = &decl.name {
-                            let name = to_snake_case(&ident.id.sym);
-                            format_ident!("{}", name)
-                        } else {
-                            format_ident!("_key")
-                        }
-                    } else {
-                        format_ident!("_key")
-                    }
-                }
-                swc_ecma_ast::ForHead::Pat(pat) => {
-                    if let Pat::Ident(ident) = pat.as_ref() {
-                        let name = to_snake_case(&ident.id.sym);
-                        format_ident!("{}", name)
-                    } else {
-                        format_ident!("_key")
-                    }
-                }
-                _ => format_ident!("_key"),
-            };
-
-            quote! {
-                for #var_ident in #right.keys().cloned() #body_block
-            }
-        }
-        // do { ... } while (x) → loop { ...; if !x { break; } }
-        Stmt::DoWhile(do_while) => {
-            let body = convert_stmt(&do_while.body);
-            let test = convert_expr(&do_while.test);
-            let body_inner = if matches!(*do_while.body, Stmt::Block(_)) {
-                // Extract inner statements from block
-                quote! { #body }
-            } else {
-                quote! { #body }
-            };
-            quote! {
-                loop {
-                    #body_inner
-                    if !(#test) {
-                        break;
-                    }
-                }
-            }
-        }
-        // try { ... } catch (e) { ... } → match (|| { ... })() { Ok/Err }
-        Stmt::Try(try_stmt) => {
-            let try_body: Vec<_> = try_stmt.block.stmts.iter().map(convert_stmt).collect();
-
-            if let Some(catch) = &try_stmt.handler {
-                let catch_body: Vec<_> = catch.body.stmts.iter().map(convert_stmt).collect();
-                let err_ident = catch
-                    .param
-                    .as_ref()
-                    .and_then(|p| p.as_ident())
-                    .map(|i| format_ident!("{}", to_snake_case(&i.id.sym)))
-                    .unwrap_or_else(|| format_ident!("_err"));
-
-                if let Some(finalizer) = &try_stmt.finalizer {
-                    let finally_body: Vec<_> = finalizer.stmts.iter().map(convert_stmt).collect();
-                    quote! {
-                        let __try_result = (|| -> Result<(), Box<dyn std::error::Error>> {
-                            #(#try_body)*
-                            Ok(())
-                        })();
-                        if let Err(#err_ident) = __try_result {
-                            #(#catch_body)*
-                        }
-                        #(#finally_body)*
-                    }
-                } else {
-                    quote! {
-                        let __try_result = (|| -> Result<(), Box<dyn std::error::Error>> {
-                            #(#try_body)*
-                            Ok(())
-                        })();
-                        if let Err(#err_ident) = __try_result {
-                            #(#catch_body)*
-                        }
-                    }
-                }
-            } else if let Some(finalizer) = &try_stmt.finalizer {
-                let finally_body: Vec<_> = finalizer.stmts.iter().map(convert_stmt).collect();
                 quote! {
-                    {
-                        #(#try_body)*
-                    }
-                    #(#finally_body)*
+                    for #var_ident in #right #body_block
                 }
-            } else {
+            }
+            Stmt::Throw(throw_stmt) => {
+                let arg = self.convert_expr(&throw_stmt.arg);
                 quote! {
-                    #(#try_body)*
+                    return Err(#arg.into());
                 }
             }
+            _ => quote! { /* other stmts todo */ },
         }
-        // throw new Error("msg") → return Err("msg".into())
-        Stmt::Throw(throw_stmt) => {
-            let arg = convert_expr(&throw_stmt.arg);
-            quote! {
-                return Err(#arg.into());
-            }
-        }
-        // switch (x) { case a: ...; break; } → match x { a => { ... } }
-        Stmt::Switch(switch_stmt) => {
-            let discriminant = convert_expr(&switch_stmt.discriminant);
-            let mut arms = Vec::new();
-
-            for case in &switch_stmt.cases {
-                // Filter out break statements from case body
-                let body_stmts: Vec<_> = case
-                    .cons
-                    .iter()
-                    .filter(|s| !matches!(s, Stmt::Break(_)))
-                    .map(convert_stmt)
-                    .collect();
-
-                if let Some(test) = &case.test {
-                    let test_expr = convert_expr(test);
-                    arms.push(quote! {
-                        x if x == #test_expr => {
-                            #(#body_stmts)*
-                        }
-                    });
-                } else {
-                    // default case
-                    arms.push(quote! {
-                        _ => {
-                            #(#body_stmts)*
-                        }
-                    });
-                }
-            }
-
-            // If no default arm was found, add a wildcard
-            let has_default = switch_stmt.cases.iter().any(|c| c.test.is_none());
-            if !has_default {
-                arms.push(quote! { _ => {} });
-            }
-
-            quote! {
-                match #discriminant {
-                    #(#arms)*
-                }
-            }
-        }
-        Stmt::Break(_) => quote! { break; },
-        Stmt::Continue(_) => quote! { continue; },
-        _ => quote! { /* unsupported statement */ },
     }
-}
 
-pub fn convert_expr(expr: &Expr) -> proc_macro2::TokenStream {
-    match expr {
-        Expr::Bin(bin) => convert_bin_expr(bin),
-        Expr::This(_) => quote! { self },
-        Expr::Ident(ident) => {
-            let name = ident.sym.as_str();
-            // Handle special identifiers
-            if name == "undefined" {
-                return quote! { None };
+    pub fn convert_expr(&self, expr: &Expr) -> proc_macro2::TokenStream {
+        match expr {
+            Expr::Bin(bin) => self.convert_bin_expr(bin),
+            Expr::This(_) => quote! { self },
+            Expr::Ident(ident) => {
+                let name = ident.sym.as_str();
+                if name == "undefined" {
+                    return quote! { None };
+                }
+                if name.chars().next().is_some_and(|c| c.is_uppercase()) {
+                    let ident_token = format_ident!("{}", name);
+                    quote! { #ident_token }
+                } else {
+                    let ident_name = to_snake_case(name);
+                    let ident_token = format_ident!("{}", ident_name);
+                    quote! { #ident_token }
+                }
             }
-            // If starts with uppercase, assume Class/Type and keep as is
-            // If starts with lowercase, convert to snake_case (variable/function)
-            if name.chars().next().is_some_and(|c| c.is_uppercase()) {
-                let ident_token = format_ident!("{}", name);
-                quote! { #ident_token }
-            } else {
-                let ident_name = to_snake_case(name);
-                let ident_token = format_ident!("{}", ident_name);
-                quote! { #ident_token }
-            }
-        }
-        Expr::Lit(lit) => {
-            // Handle literals
-            match lit {
+            Expr::Lit(lit) => match lit {
                 Lit::Num(num) => {
                     let value = num.value;
                     quote! { #value }
                 }
-                Lit::Str(str_lit) => {
-                    let s = str_lit.value.as_str().unwrap_or("");
-                    quote! { String::from(#s) }
+                Lit::Str(s) => {
+                    let v = s.value.as_str().unwrap_or("");
+                    quote! { String::from(#v) }
                 }
                 Lit::Bool(b) => {
-                    let value = b.value;
-                    quote! { #value }
+                    let v = b.value;
+                    quote! { #v }
                 }
                 _ => quote! { todo!("unsupported literal") },
+            },
+            Expr::Member(member) => self.convert_member_expr(member),
+            Expr::Call(call) => self.convert_call_expr(call),
+            Expr::Object(obj) => self.convert_object_lit(obj),
+            Expr::Assign(assign) => self.convert_assign_expr(assign),
+            Expr::Update(update) => self.convert_update_expr(update),
+            Expr::Await(await_expr) => {
+                let arg = self.convert_expr(&await_expr.arg);
+                quote! { #arg.await? }
             }
-        }
-        Expr::Member(member) => convert_member_expr(member),
-        Expr::Await(await_expr) => convert_await_expr(await_expr),
-        Expr::Call(call_expr) => convert_call_expr(call_expr),
-        Expr::New(new_expr) => convert_new_expr(new_expr),
-        Expr::Tpl(tpl) => convert_tpl_expr(tpl),
-        Expr::Arrow(arrow) => convert_arrow_expr(arrow),
-        Expr::Object(obj) => convert_object_lit(obj),
-        Expr::Array(arr) => convert_array_lit(arr),
-        Expr::Update(update) => convert_update_expr(update),
-        Expr::Assign(assign) => convert_assign_expr(assign),
-        Expr::Unary(unary) => {
-            let arg = convert_expr(&unary.arg);
-            match unary.op {
-                swc_ecma_ast::UnaryOp::Bang => quote! { !#arg },
-                swc_ecma_ast::UnaryOp::Minus => quote! { -#arg },
-                swc_ecma_ast::UnaryOp::Plus => quote! { +#arg },
-                swc_ecma_ast::UnaryOp::TypeOf => {
-                    quote! { std::any::type_name_of_val(&#arg) }
-                }
-                _ => quote! { todo!("unsupported unary op") },
-            }
-        }
-        // Ternary: x ? a : b → if x { a } else { b }
-        Expr::Cond(cond) => {
-            let test = convert_expr(&cond.test);
-            let cons = convert_expr(&cond.cons);
-            let alt = convert_expr(&cond.alt);
-            quote! {
-                if #test { #cons } else { #alt }
-            }
-        }
-        // Parenthesized expression: (expr) → expr
-        Expr::Paren(paren) => convert_expr(&paren.expr),
-        // Optional chaining: obj?.prop → obj.as_ref().map(|v| v.prop)
-        Expr::OptChain(opt_chain) => match opt_chain.base.as_ref() {
-            swc_ecma_ast::OptChainBase::Member(member) => {
-                let obj = convert_expr(&member.obj);
-                if let Some(ident) = member.prop.as_ident() {
-                    let prop_name = format_ident!("{}", to_snake_case(&ident.sym));
-                    quote! { #obj.as_ref().map(|v| v.#prop_name.clone()).flatten() }
+            Expr::New(new_expr) => {
+                let callee = self.convert_expr(&new_expr.callee);
+                let args = if let Some(args) = &new_expr.args {
+                    args.iter()
+                        .map(|a| self.convert_expr_or_spread(a))
+                        .collect()
                 } else {
-                    quote! { #obj }
-                }
+                    Vec::new()
+                };
+                quote! { #callee::new(#(#args),*) }
             }
-            swc_ecma_ast::OptChainBase::Call(call) => {
-                let callee = convert_expr(&call.callee);
-                let args: Vec<_> = call.args.iter().map(|a| convert_expr(&a.expr)).collect();
-                quote! { #callee.as_ref().map(|v| v(#(#args),*)) }
-            }
-        },
-        // Sequence expression: (a, b, c) → { a; b; c }
-        Expr::Seq(seq) => {
-            let exprs: Vec<_> = seq.exprs.iter().map(|e| convert_expr(e)).collect();
-            if let Some(last) = exprs.last() {
-                let init = &exprs[..exprs.len() - 1];
-                quote! { { #(#init;)* #last } }
-            } else {
-                quote! { () }
-            }
+            Expr::Paren(paren) => self.convert_expr(&paren.expr),
+            _ => quote! { todo!() },
         }
-        _ => quote! { todo!() },
     }
-}
 
-fn convert_assign_expr(assign: &swc_ecma_ast::AssignExpr) -> proc_macro2::TokenStream {
-    let right = convert_expr(&assign.right);
-    let left = match &assign.left {
-        swc_ecma_ast::AssignTarget::Simple(simple) => match simple {
-            swc_ecma_ast::SimpleAssignTarget::Ident(ident) => {
-                let name = format_ident!("{}", to_snake_case(ident.sym.as_ref()));
-                quote! { #name }
-            }
-            swc_ecma_ast::SimpleAssignTarget::Member(member) => {
-                // Handle LHS member access (no clone)
-                let obj = convert_expr(&member.obj);
-                match &member.prop {
-                    swc_ecma_ast::MemberProp::Ident(ident) => {
-                        let prop = format_ident!("{}", ident.sym.as_ref().to_string());
-                        quote! { #obj.#prop }
-                    }
-                    swc_ecma_ast::MemberProp::Computed(computed) => {
-                        if let swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Num(num)) =
-                            &*computed.expr
-                        {
-                            let idx = num.value as usize;
-                            quote! { #obj[#idx] }
-                        } else {
-                            let prop = convert_expr(&computed.expr);
-                            quote! { #obj[#prop] }
-                        }
-                    }
-                    _ => quote! { todo!("complex member assignment") },
-                }
-            }
-            _ => quote! { todo!("unsupported assign target") },
-        },
-        _ => quote! { todo!("unsupported assign target") },
-    };
-
-    match assign.op {
-        swc_ecma_ast::AssignOp::Assign => quote! { #left = #right },
-        swc_ecma_ast::AssignOp::AddAssign => quote! { #left += #right },
-        swc_ecma_ast::AssignOp::SubAssign => quote! { #left -= #right },
-        _ => quote! { todo!("unsupported assign op") },
+    pub fn convert_expr_or_spread(&self, arg: &ExprOrSpread) -> proc_macro2::TokenStream {
+        self.convert_expr(&arg.expr)
     }
-}
 
-fn convert_update_expr(update: &UpdateExpr) -> proc_macro2::TokenStream {
-    let arg = convert_expr(&update.arg);
-    match update.op {
-        UpdateOp::PlusPlus => quote! { #arg += 1.0 },
-        UpdateOp::MinusMinus => quote! { #arg -= 1.0 },
-    }
-}
+    fn convert_member_expr(&self, member: &MemberExpr) -> proc_macro2::TokenStream {
+        if member.obj.is_this() {
+            if let Some(prop_ident) = member.prop.as_ident() {
+                let prop_name = to_snake_case(prop_ident.sym.as_ref());
+                let field_ident = format_ident!("{}", prop_name);
 
-fn convert_object_lit(obj: &swc_ecma_ast::ObjectLit) -> proc_macro2::TokenStream {
-    let mut fields = Vec::new();
-    for prop in &obj.props {
-        if let swc_ecma_ast::PropOrSpread::Prop(prop) = prop {
-            match &**prop {
-                swc_ecma_ast::Prop::KeyValue(prop) => {
-                    let key = match &prop.key {
-                        swc_ecma_ast::PropName::Ident(ident) => {
-                            format!("{:?}", ident.sym).trim_matches('"').to_string()
-                        }
-                        swc_ecma_ast::PropName::Str(s) => {
-                            format!("{:?}", s.value).trim_matches('"').to_string()
-                        }
-                        swc_ecma_ast::PropName::Num(n) => n.to_string(),
-                        swc_ecma_ast::PropName::Computed(_) => "computed_key".to_string(), // TODO
-                        swc_ecma_ast::PropName::BigInt(n) => n.value.to_string(),
-                    };
+                // CHECK STATE FIELDS
+                if self
+                    .current_class_state_fields
+                    .contains_key(prop_ident.sym.as_ref())
+                {
+                    let type_str = self
+                        .current_class_state_fields
+                        .get(prop_ident.sym.as_ref())
+                        .unwrap();
+                    let needs_deref = matches!(
+                        type_str.as_str(),
+                        "f64" | "bool" | "i32" | "usize" | "u64" | "i64"
+                    );
 
-                    let value = if let Expr::Ident(ident) = prop.value.as_ref() {
-                        if ident.sym == "undefined" {
-                            quote! { serde_json::Value::Null }
-                        } else {
-                            convert_expr(&prop.value)
-                        }
+                    if needs_deref {
+                        return quote! { *self.#field_ident.lock().unwrap() };
                     } else {
-                        convert_expr(&prop.value)
-                    };
-
-                    fields.push(quote! { #key: #value });
-                }
-                swc_ecma_ast::Prop::Shorthand(ident) => {
-                    let key = format!("{:?}", ident.sym).trim_matches('"').to_string();
-                    let value = format_ident!("{}", to_snake_case(&key));
-                    fields.push(quote! { #key: #value });
-                }
-                _ => {}
-            }
-        }
-    }
-    quote! { serde_json::json!({ #(#fields),* }) }
-}
-
-fn convert_array_lit(arr: &swc_ecma_ast::ArrayLit) -> proc_macro2::TokenStream {
-    let elems: Vec<_> = arr
-        .elems
-        .iter()
-        .map(|elem| {
-            if let Some(elem) = elem {
-                convert_expr_or_spread(elem)
-            } else {
-                quote! { serde_json::Value::Null }
-            }
-        })
-        .collect();
-    quote! { vec![#(#elems),*] }
-}
-
-fn convert_tpl_expr(tpl: &swc_ecma_ast::Tpl) -> proc_macro2::TokenStream {
-    let mut format_str = String::new();
-    let mut args = Vec::new();
-
-    let quasis = &tpl.quasis;
-    let exprs = &tpl.exprs;
-
-    for (i, quasi) in quasis.iter().enumerate() {
-        format_str.push_str(&quasi.raw);
-        if i < exprs.len() {
-            format_str.push_str("{}");
-            args.push(convert_expr(&exprs[i]));
-        }
-    }
-
-    quote! { format!(#format_str, #(#args),*) }
-}
-
-fn convert_new_expr(new_expr: &swc_ecma_ast::NewExpr) -> proc_macro2::TokenStream {
-    // Convert new Class(args) -> Class::new(args)
-    let callee = convert_expr(&new_expr.callee);
-    let args = if let Some(args) = &new_expr.args {
-        args.iter().map(convert_expr_or_spread).collect()
-    } else {
-        Vec::new()
-    };
-
-    quote! { #callee::new(#(#args),*) }
-}
-
-fn convert_member_expr(member: &MemberExpr) -> proc_macro2::TokenStream {
-    // Handle this.prop -> self.prop
-    if member.obj.is_this() {
-        if let Some(prop_ident) = member.prop.as_ident() {
-            let prop_name = to_snake_case(prop_ident.sym.as_ref());
-            let field = format_ident!("{}", prop_name);
-            return quote! { self.#field.clone() };
-        }
-    }
-    // Handle other.prop or other[prop]
-    let obj = convert_expr(&member.obj);
-
-    match &member.prop {
-        swc_ecma_ast::MemberProp::Ident(ident) => {
-            // Check if obj is an identifier starting with uppercase (Enum or Class static)
-            // But we already converted obj to TokenStream. We need to check the original AST.
-            let is_static_access = if let swc_ecma_ast::Expr::Ident(obj_ident) = &*member.obj {
-                obj_ident
-                    .sym
-                    .chars()
-                    .next()
-                    .is_some_and(|c| c.is_uppercase())
-            } else {
-                false
-            };
-
-            if is_static_access {
-                // Static access: Enum.Variant or Class.Method
-                // Keep the property name as-is (don't force snake_case)
-                let prop_name = ident.sym.as_ref();
-                let prop = format_ident!("{}", prop_name);
-                // Also, we need the original object name, not the converted token stream
-                if let swc_ecma_ast::Expr::Ident(obj_ident) = &*member.obj {
-                    let obj_name = obj_ident.sym.as_ref();
-                    let obj_ident = format_ident!("{}", obj_name);
-                    quote! { #obj_ident::#prop }
+                        // For non-primitives (like Vec), return the Guard (or ref?)
+                        // If we return *guard, we move out of mutex? No, implementation of Deref.
+                        // But accessing `self.users.lock().unwrap()` returns `MutexGuard`.
+                        // If we want to call methods on it (`.push()`), we need the Guard.
+                        // If we want to pass it to a function expecting `Vec`, we might need `&*` or `.clone()`.
+                        // But here we return TokenStream.
+                        return quote! { self.#field_ident.lock().unwrap() };
+                    }
                 } else {
-                    // Should be unreachable given is_static_access check
-                    quote! { #obj::#prop }
+                    return quote! { self.#field_ident.clone() };
                 }
-            } else {
-                // Instance access: obj.prop -> obj.prop (snake_case)
-                let prop_name = to_snake_case(ident.sym.as_ref());
+            }
+        }
+
+        let obj = self.convert_expr(&member.obj);
+        match &member.prop {
+            swc_ecma_ast::MemberProp::Ident(ident) => {
+                let name = ident.sym.as_ref();
+                // If it starts with uppercase, preserve it (Enum variant, etc.)
+                let prop_name = if name.chars().next().is_some_and(|c| c.is_uppercase()) {
+                    name.to_string()
+                } else {
+                    to_snake_case(name)
+                };
                 let prop = format_ident!("{}", prop_name);
                 quote! { #obj.#prop }
             }
+            _ => quote! { todo!() },
         }
-        swc_ecma_ast::MemberProp::Computed(computed) => {
-            // Check if expr is number literal
-            if let swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Num(num)) = &*computed.expr {
-                let idx = num.value as usize;
-                quote! { #obj[#idx] }
-            } else {
-                let prop = convert_expr(&computed.expr);
-                quote! { #obj[#prop] }
-            }
-        }
-        _ => quote! { todo!("complex member access") },
-    }
-}
-
-pub fn convert_bin_expr(bin: &BinExpr) -> proc_macro2::TokenStream {
-    let left = convert_expr(&bin.left);
-    let mut right = convert_expr(&bin.right);
-
-    if bin.op == BinaryOp::NullishCoalescing {
-        return quote! { #left.unwrap_or(#right) };
     }
 
-    if bin.op == BinaryOp::Add {
-        // Check if left is string
-        let mut is_left_string = false;
-        let mut left_expr = &*bin.left;
-        while let Expr::Paren(p) = left_expr {
-            left_expr = &p.expr;
-        }
-
-        if let Expr::Call(call) = left_expr {
-            if let Callee::Expr(callee) = &call.callee {
-                if let Expr::Member(member) = &**callee {
-                    if let Some(obj) = member.obj.as_ident() {
-                        if obj.sym == "String" {
-                            if let Some(prop) = member.prop.as_ident() {
-                                if prop.sym == "from" {
-                                    is_left_string = true;
-                                }
-                            }
-                        }
-                    }
-                }
+    fn convert_bin_expr(&self, bin: &BinExpr) -> proc_macro2::TokenStream {
+        let left = self.convert_expr(&bin.left);
+        let right = self.convert_expr(&bin.right);
+        match bin.op {
+            BinaryOp::EqEq | BinaryOp::EqEqEq => quote! { #left == #right },
+            BinaryOp::NotEq | BinaryOp::NotEqEq => quote! { #left != #right },
+            BinaryOp::Add => quote! { #left + #right },
+            BinaryOp::Sub => quote! { #left - #right },
+            BinaryOp::Mul => quote! { #left * #right },
+            BinaryOp::Div => quote! { #left / #right },
+            BinaryOp::Mod => quote! { #left % #right },
+            BinaryOp::Lt => quote! { #left < #right },
+            BinaryOp::LtEq => quote! { #left <= #right },
+            BinaryOp::Gt => quote! { #left > #right },
+            BinaryOp::GtEq => quote! { #left >= #right },
+            BinaryOp::LogicalOr => quote! { #left || #right },
+            BinaryOp::LogicalAnd => quote! { #left && #right },
+            _ => {
+                let op_str = format!("{:?}", bin.op);
+                quote! { todo!("Unsupported binary op: {}", #op_str) }
             }
-        } else if let Expr::Lit(Lit::Str(_)) = left_expr {
-            is_left_string = true;
+        }
+    }
+
+    fn convert_call_expr(&self, call: &CallExpr) -> proc_macro2::TokenStream {
+        // Try stdlib handlers first - PASS SELF
+        if let Some(stdlib_code) =
+            crate::stdlib::try_handle_stdlib_call(self, &call.callee, &call.args)
+        {
+            return stdlib_code;
         }
 
-        let mut handled = false;
-
-        // Heuristic: If right side is a string method call, borrow it to allow String + &String
-        if let Expr::Call(call) = &*bin.right {
-            if let Callee::Expr(callee_expr) = &call.callee {
-                if let Expr::Member(member) = &**callee_expr {
-                    if let Some(ident) = member.prop.as_ident() {
-                        let method_name = ident.sym.as_ref();
-                        match method_name {
-                            "toString" | "toUpperCase" | "toLowerCase" | "trim" | "replace"
-                            | "join" | "repeat" | "slice" | "substring" | "substr" => {
-                                right = quote! { &#right };
-                                handled = true;
-                            }
-                            _ => {}
-                        }
+        // Check for axios calls (axios.get, axios.post, etc.)
+        if let Callee::Expr(expr) = &call.callee {
+            if let Expr::Member(member) = &**expr {
+                // Try stdlib method call - PASS SELF
+                if let Some(method_ident) = member.prop.as_ident() {
+                    let method_name = method_ident.sym.as_ref();
+                    if let Some(stdlib_code) = crate::stdlib::try_handle_method_call(
+                        self,
+                        &member.obj,
+                        method_name,
+                        &call.args,
+                    ) {
+                        return stdlib_code;
                     }
                 }
             }
         }
 
-        if !handled {
-            if is_left_string {
-                let mut right_expr = &*bin.right;
-                while let Expr::Paren(p) = right_expr {
-                    right_expr = &p.expr;
-                }
-
-                // If right is LitNum, .to_string().
-                if let Expr::Lit(Lit::Num(_)) = right_expr {
-                    right = quote! { &#right.to_string() };
-                }
-                // If right is a call (e.g. round), .to_string().
-                else if let Expr::Call(_) = right_expr {
-                    right = quote! { &#right.to_string() };
-                }
-                // If right is Ident, borrow it.
-                else if let Expr::Ident(_) = right_expr {
-                    right = quote! { &#right };
-                }
-            } else if let Expr::Ident(_) = &*bin.right {
-                // Heuristic: If right side is an identifier, borrow it.
-                right = quote! { &#right };
-            }
-        }
+        let callee = match &call.callee {
+            Callee::Expr(expr) => self.convert_expr(expr),
+            _ => quote! { todo!("complex callee") },
+        };
+        let args: Vec<_> = call
+            .args
+            .iter()
+            .map(|a| self.convert_expr(&a.expr))
+            .collect();
+        quote! { #callee(#(#args),*) }
     }
 
-    let op = match bin.op {
-        BinaryOp::Add => quote! { + },
-        BinaryOp::Sub => quote! { - },
-        BinaryOp::Mul => quote! { * },
-        BinaryOp::Div => quote! { / },
-        BinaryOp::EqEq | BinaryOp::EqEqEq => quote! { == },
-        BinaryOp::NotEq | BinaryOp::NotEqEq => quote! { != },
-        BinaryOp::Lt => quote! { < },
-        BinaryOp::LtEq => quote! { <= },
-        BinaryOp::Gt => quote! { > },
-        BinaryOp::GtEq => quote! { >= },
-        BinaryOp::LogicalAnd => quote! { && },
-        BinaryOp::LogicalOr => quote! { || },
-        _ => quote! { /* unsupported op */ },
-    };
-
-    quote! { #left #op #right }
-}
-
-pub fn convert_stmt_recursive<F>(stmt: &Stmt, handler: &F) -> proc_macro2::TokenStream
-where
-    F: Fn(&swc_ecma_ast::ReturnStmt) -> proc_macro2::TokenStream,
-{
-    match stmt {
-        Stmt::Return(ret_stmt) => handler(ret_stmt),
-        Stmt::Block(block) => {
-            let stmts: Vec<_> = block
-                .stmts
-                .iter()
-                .map(|s| convert_stmt_recursive(s, handler))
-                .collect();
-            quote! {
-                {
-                    #(#stmts)*
-                }
-            }
-        }
-        Stmt::If(if_stmt) => {
-            let test = convert_expr(&if_stmt.test);
-            let cons = convert_stmt_recursive(&if_stmt.cons, handler);
-            let cons_block = if matches!(*if_stmt.cons, Stmt::Block(_)) {
-                quote! { #cons }
-            } else {
-                quote! { { #cons } }
-            };
-
-            let alt = if let Some(alt) = &if_stmt.alt {
-                let alt_stmt = convert_stmt_recursive(alt, handler);
-                let alt_block = if matches!(&**alt, Stmt::Block(_) | Stmt::If(_)) {
-                    quote! { #alt_stmt }
-                } else {
-                    quote! { { #alt_stmt } }
-                };
-                quote! { else #alt_block }
-            } else {
-                quote! {}
-            };
-
-            quote! {
-                if #test #cons_block #alt
-            }
-        }
-        // TODO: Add loops if needed. For now, delegate to convert_stmt for others,
-        // BUT convert_stmt won't recurse with handler.
-        // So we should implement loops here if we expect returns inside loops.
-        // Assuming simple cases for now.
-        _ => convert_stmt(stmt),
-    }
-}
-
-fn convert_await_expr(await_expr: &AwaitExpr) -> proc_macro2::TokenStream {
-    let arg = convert_expr(&await_expr.arg);
-    quote! { #arg.await? }
-}
-
-fn convert_call_expr(call: &CallExpr) -> proc_macro2::TokenStream {
-    let callee = &call.callee;
-    let args = &call.args;
-
-    // Handle JSON.stringify
-    if let Callee::Expr(expr) = callee {
-        if let Expr::Member(member) = &**expr {
-            if let Expr::Ident(obj) = &*member.obj {
-                if obj.sym == "JSON" {
-                    if let Some(prop) = member.prop.as_ident() {
-                        if prop.sym == "stringify" {
-                            if let Some(arg) = args.first() {
-                                let val = convert_expr_or_spread(arg);
-                                return quote! { serde_json::to_string(&#val).unwrap() };
-                            }
-                        } else if prop.sym == "parse" {
-                            if let Some(arg) = args.first() {
-                                let val = convert_expr_or_spread(arg);
-                                return quote! { serde_json::from_str::<serde_json::Value>(&#val).unwrap() };
-                            }
-                        }
+    fn convert_object_lit(&self, obj: &swc_ecma_ast::ObjectLit) -> proc_macro2::TokenStream {
+        let mut fields = Vec::new();
+        for prop in &obj.props {
+            if let swc_ecma_ast::PropOrSpread::Prop(p) = prop {
+                if let swc_ecma_ast::Prop::KeyValue(kv) = &**p {
+                    if let swc_ecma_ast::PropName::Ident(ident) = &kv.key {
+                        let key = ident.sym.as_ref();
+                        let val = self.convert_expr(&kv.value);
+                        fields.push(quote! { #key: #val });
                     }
                 }
             }
         }
+        quote! { serde_json::json!({ #(#fields),* }) }
     }
 
-    // Handle axios.get<T>(...)
-    if let Callee::Expr(expr) = callee {
-        if let Expr::Member(member) = &**expr {
-            if let Expr::Ident(obj) = &*member.obj {
-                if obj.sym == "axios" {
-                    if let Some(prop) = member.prop.as_ident() {
-                        if prop.sym == "get" {
-                            if let Some(arg) = args.first() {
-                                let url = convert_expr_or_spread(arg);
-                                // Handle generics: axios.get<T>(...)
-                                let generic_type = if let Some(type_params) = &call.type_args {
-                                    if let Some(param) = type_params.params.first() {
-                                        let t = super::type_mapper::map_inner_type(param);
-                                        Some(t)
-                                    } else {
-                                        None
-                                    }
+    fn convert_assign_expr(&self, assign: &swc_ecma_ast::AssignExpr) -> proc_macro2::TokenStream {
+        let right = self.convert_expr(&assign.right);
+        // Handle Left Side
+        let left = match &assign.left {
+            swc_ecma_ast::AssignTarget::Simple(simple) => {
+                match simple {
+                    swc_ecma_ast::SimpleAssignTarget::Member(member) => {
+                        if member.obj.is_this() {
+                            if let Some(prop_ident) = member.prop.as_ident() {
+                                let prop_name = to_snake_case(prop_ident.sym.as_ref());
+                                let field = format_ident!("{}", prop_name);
+
+                                // CHECK STATE FIELDS
+                                if let Some(_type_str) =
+                                    self.current_class_state_fields.get(prop_ident.sym.as_ref())
+                                {
+                                    // Primitive check?
+                                    // f64, bool, i32, usize etc. need dereference when used as value, but wait...
+                                    // In Assign Expr:
+                                    // LHS = RHS
+                                    // If LHS is Mutex, we need `*lock() = value`.
+                                    // This applies to ALL types inside Mutex if we are replacing the value?
+                                    // No, only if we can assign to deref.
+                                    // `Vec` inside Mutex: `*lock() = new_vec`. Yes.
+
+                                    // So actually, ALL assignments to Mutex-wrapped field need `*`?
+                                    // `*self.users.lock().unwrap() = ...`
+                                    // Yes, otherwise we are trying to assign to `MutexGuard` temporary?
+                                    // Assigning to `*guard` assigns to the inner value.
+
+                                    quote! { *self.#field.lock().unwrap() }
                                 } else {
-                                    None
-                                };
-
-                                if let Some(t) = generic_type {
-                                    return quote! {
-                                        reqwest::Client::new().get(#url).send().await?.json::<#t>()
-                                    };
-                                } else {
-                                    return quote! {
-                                        reqwest::Client::new().get(#url).send().await?
-                                    };
+                                    quote! { self.#field }
                                 }
+                            } else {
+                                quote! { todo!() }
                             }
+                        } else {
+                            quote! { todo!() }
                         }
                     }
-                }
-            }
-        }
-    }
-
-    // Try stdlib handlers first
-    if let Some(stdlib_code) = crate::stdlib::try_handle_stdlib_call(&call.callee, &call.args) {
-        return stdlib_code;
-    }
-
-    // Check for axios calls (axios.get, axios.post, etc.)
-    if let Callee::Expr(expr) = &call.callee {
-        if let Expr::Member(member) = &**expr {
-            // Try stdlib method call
-            if let Some(method_ident) = member.prop.as_ident() {
-                let method_name = method_ident.sym.as_ref();
-                if let Some(stdlib_code) =
-                    crate::stdlib::try_handle_method_call(&member.obj, method_name, &call.args)
-                {
-                    return stdlib_code;
-                }
-            }
-
-            // Check if object is "axios"
-            if let Expr::Ident(obj_ident) = &*member.obj {
-                if obj_ident.sym == "axios" {
-                    // Get the HTTP method
-                    if let Some(method_ident) = member.prop.as_ident() {
-                        let method = method_ident.sym.to_string();
-                        return convert_axios_call(&method, &call.args);
-                    }
-                }
-            }
-        }
-
-        // Check for fetch calls
-        if let Expr::Ident(ident) = &**expr {
-            if ident.sym == "fetch" {
-                return convert_fetch_call(&call.args);
-            }
-        }
-    }
-
-    // Fallback to generic call conversion
-    let callee = match &call.callee {
-        Callee::Expr(expr) => convert_expr(expr),
-        _ => quote! { unknown_callee },
-    };
-
-    let args: Vec<_> = call.args.iter().map(convert_expr_or_spread).collect();
-
-    quote! { #callee(#(#args),*) }
-}
-
-fn convert_axios_call(method: &str, args: &[ExprOrSpread]) -> proc_macro2::TokenStream {
-    let method_lower = method.to_lowercase();
-    let method_ident = format_ident!("{}", method_lower);
-
-    if args.is_empty() {
-        return quote! { reqwest::Client::new().#method_ident("").send().await? };
-    }
-
-    // First argument is the URL
-    let url = convert_expr_or_spread(&args[0]);
-
-    // For POST/PUT, second argument might be data
-    if (method_lower == "post" || method_lower == "put") && args.len() > 1 {
-        let data = convert_expr_or_spread(&args[1]);
-        quote! {
-            reqwest::Client::new()
-            .#method_ident(#url)
-            .json(&#data)
-            .send()
-            .await?
-        }
-    } else {
-        // GET/DELETE or POST/PUT without body
-        quote! {
-            reqwest::Client::new()
-            .#method_ident(#url)
-            .send()
-            .await?
-        }
-    }
-}
-
-fn convert_fetch_call(args: &[ExprOrSpread]) -> proc_macro2::TokenStream {
-    if args.is_empty() {
-        return quote! { reqwest::get("") };
-    }
-
-    let url = convert_expr_or_spread(&args[0]);
-    quote! { reqwest::get(#url) }
-}
-
-pub fn convert_arrow_expr(arrow: &swc_ecma_ast::ArrowExpr) -> proc_macro2::TokenStream {
-    convert_arrow_expr_with_hint(arrow, None)
-}
-
-pub fn convert_arrow_expr_with_hint(
-    arrow: &swc_ecma_ast::ArrowExpr,
-    type_hint: Option<proc_macro2::TokenStream>,
-) -> proc_macro2::TokenStream {
-    let params = &arrow.params;
-    let body = &arrow.body;
-
-    let param_idents: Vec<_> = params
-        .iter()
-        .enumerate()
-        .map(|(i, p)| {
-            if let Pat::Ident(ident) = p {
-                let name = format_ident!("{}", to_snake_case(&ident.sym));
-                let ts_type = ident
-                    .type_ann
-                    .as_ref()
-                    .map(|ann| super::type_mapper::map_ts_type(Some(ann)));
-
-                if let Some(t) = ts_type {
-                    quote! { #name: #t }
-                } else if let Some(hint) = &type_hint {
-                    // Only apply hint to the first parameter for now (common case for map/filter)
-                    if i == 0 {
-                        quote! { #name: #hint }
-                    } else {
+                    swc_ecma_ast::SimpleAssignTarget::Ident(ident) => {
+                        let name = format_ident!("{}", to_snake_case(ident.sym.as_ref()));
                         quote! { #name }
                     }
-                } else {
-                    quote! { #name }
+                    _ => quote! { todo!() },
                 }
-            } else {
-                quote! { _ }
             }
-        })
-        .collect();
+            _ => quote! { todo!() },
+        };
 
-    let body_code = match &**body {
-        swc_ecma_ast::BlockStmtOrExpr::BlockStmt(block) => {
-            let stmts: Vec<_> = block.stmts.iter().map(convert_stmt).collect();
-            quote! { { #(#stmts)* } }
-        }
-        swc_ecma_ast::BlockStmtOrExpr::Expr(expr) => {
-            let expr_code = convert_expr(expr);
-            quote! { #expr_code }
-        }
-    };
-
-    let is_async = arrow.is_async;
-    let _async_kw = if is_async {
-        quote! { async }
-    } else {
-        quote! {}
-    };
-
-    quote! { |#(#param_idents),*| #body_code }
-}
-
-pub fn convert_expr_or_spread(arg: &ExprOrSpread) -> proc_macro2::TokenStream {
-    convert_expr(&arg.expr)
-}
-
-pub fn to_snake_case(s: &str) -> String {
-    let mut result = String::new();
-    for (i, ch) in s.chars().enumerate() {
-        if ch.is_uppercase() && i > 0 {
-            result.push('_');
-        }
-        result.push(ch.to_lowercase().next().unwrap_or(ch));
-    }
-    result
-}
-
-pub fn to_pascal_case(s: &str) -> String {
-    let mut result = String::new();
-    let mut capitalize_next = true;
-    for ch in s.chars() {
-        if !ch.is_alphanumeric() {
-            capitalize_next = true;
-        } else if capitalize_next {
-            result.push(ch.to_uppercase().next().unwrap_or(ch));
-            capitalize_next = false;
-        } else {
-            result.push(ch);
+        match assign.op {
+            swc_ecma_ast::AssignOp::Assign => quote! { #left = #right },
+            swc_ecma_ast::AssignOp::AddAssign => quote! { #left += #right },
+            _ => quote! { #left op= #right },
         }
     }
-    result
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_to_snake_case_simple() {
-        assert_eq!(to_snake_case("fetchData"), "fetch_data");
-        assert_eq!(to_snake_case("getUserName"), "get_user_name");
-        assert_eq!(to_snake_case("HTTPRequest"), "h_t_t_p_request");
-    }
-
-    #[test]
-    fn test_to_snake_case_already_snake() {
-        assert_eq!(to_snake_case("already_snake"), "already_snake");
-    }
-
-    #[test]
-    fn test_to_snake_case_single_word() {
-        assert_eq!(to_snake_case("simple"), "simple");
-        assert_eq!(to_snake_case("Simple"), "simple");
-    }
-
-    #[test]
-    fn test_to_snake_case_empty() {
-        assert_eq!(to_snake_case(""), "");
+    fn convert_update_expr(&self, update: &UpdateExpr) -> proc_macro2::TokenStream {
+        let arg = self.convert_expr(&update.arg);
+        // If arg is a mutex lock result, modifications work assuming deref mut
+        match update.op {
+            UpdateOp::PlusPlus => quote! { #arg += 1.0 },
+            UpdateOp::MinusMinus => quote! { #arg -= 1.0 },
+        }
     }
 }

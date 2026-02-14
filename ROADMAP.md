@@ -29,6 +29,13 @@ This roadmap tracks the evolution of Tyrus from a research prototype to a produc
 - [x] **Module System:** Support for `@Module()` decorators and cross-file wiring.
 - [x] **Controller Mapping:** First-class support for NestJS Controllers -> Axum Routers.
 
+### 🛠️ Milestone 8: Generator Maturity (Post-Demo Gaps)
+
+- [ ] **Unified Entry Point:** Generate `main.rs` with `tokio` runtime and `axum` server binding.
+- [ ] **Router Aggregation:** Auto-generate `router()` logic for `@Module` imports.
+- [ ] **DTO/Entity Unification:** Smart wrapping strategies to align Class (Mutex) and Interface (Raw) types.
+- [ ] **Thread-Safe Derives:** Implement custom `PartialEq` for structs containing `Mutex`.
+
 ---
 
 ## 🔬 Future Work (Academic Research)

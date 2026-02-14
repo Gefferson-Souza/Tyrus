@@ -2,23 +2,23 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use swc_ecma_ast::*;
 
-use super::super::convert::func::convert_expr_or_spread;
+use super::super::convert::interface::RustGenerator;
 
 /// Handle JSON.* calls
-pub fn handle(method: &str, args: &[ExprOrSpread]) -> Option<TokenStream> {
+pub fn handle(gen: &RustGenerator, method: &str, args: &[ExprOrSpread]) -> Option<TokenStream> {
     match method {
         "stringify" => {
-            if args.len() == 1 {
-                let obj = convert_expr_or_spread(&args[0]);
-                Some(quote! { serde_json::to_string(&#obj).unwrap() })
+            if let Some(arg) = args.first() {
+                let val = gen.convert_expr_or_spread(arg);
+                Some(quote! { serde_json::to_string(&#val).unwrap() })
             } else {
                 None
             }
         }
         "parse" => {
-            if args.len() == 1 {
-                let json_str = convert_expr_or_spread(&args[0]);
-                Some(quote! { serde_json::from_str(#json_str).unwrap() })
+            if let Some(arg) = args.first() {
+                let val = gen.convert_expr_or_spread(arg);
+                Some(quote! { serde_json::from_str::<serde_json::Value>(&#val).unwrap() })
             } else {
                 None
             }

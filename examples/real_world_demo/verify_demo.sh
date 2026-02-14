@@ -39,32 +39,6 @@ fi
 
 cd output
 if [ ! -f "target/release/server" ] && [ ! -f "target/debug/server" ]; then
-    echo "🔧 Patching generated code (Temporary fix for Tier 4 Alpha)..."
-    
-    # Fix 1: UsersService struct fields (Use Mutex for interior mutability)
-    sed -i 's/pub users: Vec<User>,/pub users: std::sync::Mutex<Vec<User>>,/g' src/users/users_service.rs
-    sed -i 's/pub id_counter: f64,/pub id_counter: std::sync::Mutex<f64>,/g' src/users/users_service.rs
-    
-    # Fix 2: UsersService::new() init
-    sed -i 's/Self::default()/Self { users: std::sync::Mutex::new(vec![]), id_counter: std::sync::Mutex::new(1.0) }/g' src/users/users_service.rs
-    
-    # Fix 3: UsersService::create logic
-    sed -i 's/let new_user =.*id_counter.*clone().*/let mut id_lock = self.id_counter.lock().unwrap(); let id = *id_lock; *id_lock += 1.0; let new_user = User { id, name: create_user_dto.name, email: create_user_dto.email, isActive: true };/g' src/users/users_service.rs
-    sed -i 's/self.idCounter = .*/ /g' src/users/users_service.rs
-    sed -i 's/self.users.clone().push(new_user);/self.users.lock().unwrap().push(new_user.clone());/g' src/users/users_service.rs
-
-    # Fix 4: UsersService::find_all logic
-    sed -i 's/return self.users.clone();/return self.users.lock().unwrap().clone();/g' src/users/users_service.rs
-
-    # Fix 5: UsersService::find_one logic
-    sed -i 's/let found = self/let users_lock = self.users.lock().unwrap(); let found = users_lock/g' src/users/users_service.rs
-    sed -i 's/if found.length > 0f64/if !found.is_empty()/g' src/users/users_service.rs
-    sed -i 's/return found\[0usize\];/return Some(found[0].clone());/g' src/users/users_service.rs
-    sed -i 's/return todo!("unsupported literal");/return None;/g' src/users/users_service.rs
-
-    # Fix 6: Remove PartialEq from UsersController (Arc<Mutex> is not PartialEq)
-    sed -i 's/PartialEq, //g' src/users/users_controller.rs
-
     echo "⚙️ Compiling Rust server..."
     cargo build --bin server
 fi
