@@ -42,7 +42,7 @@ if [ ! -f "target/release/server" ] && [ ! -f "target/debug/server" ]; then
     echo "⚙️ Compiling Rust server..."
     cargo build --bin server
 fi
-RUST_BIN=$(find target -name server -type f -executable | head -n 1)
+RUST_BIN=$(find "$(pwd)/target" -name server -type f -executable | head -n 1)
 cd ..
 
 # 3. Start Rust Server

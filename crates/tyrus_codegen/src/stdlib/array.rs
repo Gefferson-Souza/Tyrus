@@ -37,6 +37,14 @@ pub fn handle(
             // arr.filter(x => x > 1)
             None
         }
+        "find" => {
+            if args.len() == 1 {
+                let predicate = gen.convert_expr_or_spread(&args[0]);
+                Some(quote! { #obj_tokens.iter().find(#predicate).cloned() })
+            } else {
+                None
+            }
+        }
         "join" => {
             if args.len() == 1 {
                 let separator = gen.convert_expr_or_spread(&args[0]);

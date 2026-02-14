@@ -322,10 +322,12 @@ fn generate_main_rs(
     }
 
     main_content.push_str(";\n\n");
-    main_content
-        .push_str("    let listener = TcpListener::bind(\"0.0.0.0:3000\").await.unwrap();\n");
+    main_content.push_str("    let addr = \"0.0.0.0:3000\".parse().unwrap();\n");
     main_content.push_str("    println!(\"Server running on http://0.0.0.0:3000\");\n");
-    main_content.push_str("    axum::serve(listener, app).await.unwrap();\n");
+    main_content.push_str("    axum::Server::bind(&addr)\n");
+    main_content.push_str("        .serve(app.into_make_service())\n");
+    main_content.push_str("        .await\n");
+    main_content.push_str("        .unwrap();\n");
     main_content.push_str("}\n");
 
     Ok(main_content)

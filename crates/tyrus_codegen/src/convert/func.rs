@@ -1,7 +1,7 @@
 use quote::{format_ident, quote};
 use swc_ecma_ast::{
-    AwaitExpr, BinExpr, BinaryOp, CallExpr, Callee, Decl, Expr, ExprOrSpread, FnDecl, Lit,
-    MemberExpr, Pat, Stmt, UpdateExpr, UpdateOp,
+    ArrowExpr, BinExpr, BinaryOp, BlockStmtOrExpr, CallExpr, Callee, Decl, Expr, ExprOrSpread,
+    FnDecl, Lit, MemberExpr, Pat, Stmt, UpdateExpr, UpdateOp,
 };
 
 use super::type_mapper::{map_ts_type, unwrap_promise_type};
@@ -405,6 +405,7 @@ impl super::interface::RustGenerator {
                 quote! { #callee::new(#(#args),*) }
             }
             Expr::Paren(paren) => self.convert_expr(&paren.expr),
+            Expr::Arrow(arrow) => self.convert_arrow_expr(arrow),
             _ => quote! { todo!() },
         }
     }
@@ -609,6 +610,35 @@ impl super::interface::RustGenerator {
         match update.op {
             UpdateOp::PlusPlus => quote! { #arg += 1.0 },
             UpdateOp::MinusMinus => quote! { #arg -= 1.0 },
+        }
+    }
+
+    fn convert_arrow_expr(&self, arrow: &ArrowExpr) -> proc_macro2::TokenStream {
+        let params: Vec<_> = arrow
+            .params
+            .iter()
+            .map(|pat| {
+                if let Pat::Ident(ident) = pat {
+                    let name = format_ident!("{}", to_snake_case(&ident.id.sym));
+                    quote! { #name }
+                } else {
+                    quote! { _ }
+                }
+            })
+            .collect();
+
+        let body = match &*arrow.body {
+            BlockStmtOrExpr::BlockStmt(block) => {
+                let stmts: Vec<_> = block.stmts.iter().map(|s| self.convert_stmt(s)).collect();
+                quote! { { #(#stmts)* } }
+            }
+            BlockStmtOrExpr::Expr(expr) => self.convert_expr(expr),
+        };
+
+        // Note: We might need type annotations for params in complex cases,
+        // but for simple .find(|x| ...), inference usually works.
+        quote! {
+            |#(#params),*| #body
         }
     }
 }

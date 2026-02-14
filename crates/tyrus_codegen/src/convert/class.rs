@@ -14,6 +14,10 @@ impl RustGenerator {
 
         self.is_controller = class_name.ends_with("Controller");
 
+        let is_service_or_controller = class_name.ends_with("Service")
+            || class_name.ends_with("Controller")
+            || self.is_controller;
+
         // Extract generic params early
         let mut generic_params = std::collections::HashSet::new();
         if let Some(type_params) = &n.class.type_params {
@@ -35,13 +39,13 @@ impl RustGenerator {
         for member in &n.class.body {
             if let ClassMember::ClassProp(prop) = member {
                 if let Some((field_tokens, name, is_opt, is_dep, type_str)) =
-                    self.convert_prop(prop, &generic_params)
+                    self.convert_prop(prop, &generic_params, is_service_or_controller)
                 {
                     fields.push(field_tokens);
                     class_fields_meta.push((name.clone(), is_opt));
                     if is_dep {
                         dependency_fields.insert(name);
-                    } else {
+                    } else if is_service_or_controller {
                         // Store the type string to check for primitives later
                         self.current_class_state_fields.insert(name, type_str);
                     }
@@ -102,11 +106,13 @@ impl RustGenerator {
                         if is_dependency {
                             field_type = quote! { std::sync::Arc<#field_type> };
                             dependency_fields.insert(field_name_str.clone());
-                        } else {
+                        } else if is_service_or_controller {
                             // State field: Wrap in Arc<Mutex<T>>
                             field_type = quote! { std::sync::Arc<std::sync::Mutex<#field_type>> };
                             self.current_class_state_fields
                                 .insert(field_name_str.clone(), raw_type_str);
+                        } else {
+                            // DTO field: Raw type, no mutex
                         }
 
                         fields.push(quote! { pub #field_name: #field_type });
@@ -171,10 +177,6 @@ impl RustGenerator {
             (quote! {}, quote! {}, quote! {})
         };
 
-        let is_service_or_controller = class_name.ends_with("Service")
-            || class_name.ends_with("Controller")
-            || self.is_controller;
-
         let mut derives = vec![quote! { Default }, quote! { Debug }, quote! { Clone }];
         if !is_service_or_controller {
             derives.push(quote! { PartialEq });
@@ -215,6 +217,7 @@ impl RustGenerator {
                 n.class.type_params.is_some(),
                 &generic_params,
                 &dependency_fields,
+                is_service_or_controller,
             );
             impl_items.push(constructor_tokens);
         } else {
@@ -380,6 +383,7 @@ impl RustGenerator {
         &self,
         prop: &swc_ecma_ast::ClassProp,
         generic_params: &std::collections::HashSet<String>,
+        is_service_or_controller: bool,
     ) -> Option<(proc_macro2::TokenStream, String, bool, bool, String)> {
         let field_name_str = if let Some(ident) = prop.key.as_ident() {
             ident.sym.to_string()
@@ -417,10 +421,11 @@ impl RustGenerator {
 
         if is_dependency {
             field_type = quote! { std::sync::Arc<#field_type> };
-        } else {
-            // State field: Wrap in Arc<Mutex<T>> to allow shared mutable state across requests
-            // (Since the controller/service is cloned per request or helper threads)
+        } else if is_service_or_controller {
+            // State field: Wrap in Arc<Mutex<T>> ONLY for services/controllers
             field_type = quote! { std::sync::Arc<std::sync::Mutex<#field_type>> };
+        } else {
+            // DTO/Entity field: Keep raw type (or map type normally)
         }
 
         let is_optional_union = is_optional_type(prop.type_ann.as_deref());
@@ -428,8 +433,6 @@ impl RustGenerator {
 
         if prop.is_optional {
             // If it's optional via `?`, we wrap in Option.
-            // If it's optional via union `| undefined`, map_ts_type already wraps it in Option.
-            // But if it was already wrapped in Arc, we wrap Arc in Option? Option<Arc<T>>.
             field_type = quote! { Option<#field_type> };
         }
 
@@ -444,6 +447,7 @@ impl RustGenerator {
         ))
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn convert_constructor(
         &self,
         _struct_name: &proc_macro2::Ident,
@@ -452,6 +456,7 @@ impl RustGenerator {
         has_generics: bool,
         generic_params: &std::collections::HashSet<String>,
         dependency_fields: &std::collections::HashSet<String>,
+        is_service_or_controller: bool,
     ) -> proc_macro2::TokenStream {
         let mut params = Vec::new();
         let mut field_inits = Vec::new();
@@ -568,14 +573,6 @@ impl RustGenerator {
                                             format_ident!("{}", to_snake_case(&field_name_str));
                                         let value = self.convert_expr(&assign.right);
 
-                                        // If field is optional but assigned value is not Option, wrap it?
-                                        // Usually in Rust constructor we assign the value directly.
-                                        // But if the field is Option<T>, and we assign T, we need Some(T).
-                                        // This is tricky without type info of the expression.
-                                        // For now, assume user assigns correct type or we wrap in Some if it's a literal?
-                                        // Actually, if TS says `this.opt = "val"`, Rust expects `Option<String>`.
-                                        // We might need to wrap in `Some(...)`.
-                                        // Let's check if the field is optional.
                                         let is_optional = class_fields
                                             .iter()
                                             .find(|(n, _)| n == &field_name_str)
@@ -583,7 +580,7 @@ impl RustGenerator {
                                             .unwrap_or(false);
 
                                         let value = if is_optional {
-                                            quote! { Some(#value) } // Naive wrapping, might double wrap if already Some
+                                            quote! { Some(#value) }
                                         } else {
                                             value
                                         };
@@ -603,9 +600,12 @@ impl RustGenerator {
                                             } else {
                                                 quote! { std::sync::Arc::new(#value) }
                                             }
-                                        } else {
+                                        } else if is_service_or_controller {
                                             // State field: Wrap in Arc::new(Mutex::new(value))
                                             quote! { std::sync::Arc::new(std::sync::Mutex::new(#value)) }
+                                        } else {
+                                            // Plain field initialization
+                                            value
                                         };
 
                                         field_inits.push(quote! { #field_name: #value });
@@ -648,7 +648,6 @@ impl RustGenerator {
                             let type_ann = ident.type_ann.as_ref();
                             let mut param_type = map_ts_type(type_ann);
 
-                            let _type_str = param_type.to_string();
                             // Check if it's a dependency (not primitive/std type)
                             // We check if it starts with Vec, Option, or matches primitives
                             let is_dependency = if let Some(ann) = type_ann {
@@ -670,7 +669,6 @@ impl RustGenerator {
                                             )
                                         }
                                     } else {
-                                        // Complex type ref (e.g. qualified name), assume dependency
                                         true
                                     }
                                 } else {
@@ -751,7 +749,11 @@ impl RustGenerator {
             for (name, _) in class_fields {
                 if !di_initialized_fields.contains(name) {
                     let field_name = format_ident!("{}", to_snake_case(name));
-                    di_field_inits.push(quote! { #field_name: std::sync::Arc::new(std::sync::Mutex::new(Default::default())) });
+                    if is_service_or_controller {
+                        di_field_inits.push(quote! { #field_name: std::sync::Arc::new(std::sync::Mutex::new(Default::default())) });
+                    } else {
+                        di_field_inits.push(quote! { #field_name: Default::default() });
+                    }
                 }
             }
 

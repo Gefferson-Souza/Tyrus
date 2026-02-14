@@ -31,10 +31,10 @@ This roadmap tracks the evolution of Tyrus from a research prototype to a produc
 
 ### 🛠️ Milestone 8: Generator Maturity (Post-Demo Gaps)
 
-- [ ] **Unified Entry Point:** Generate `main.rs` with `tokio` runtime and `axum` server binding.
+- [x] **Unified Entry Point:** Generate `main.rs` with `tokio` runtime and `axum` server binding.
 - [ ] **Router Aggregation:** Auto-generate `router()` logic for `@Module` imports.
-- [ ] **DTO/Entity Unification:** Smart wrapping strategies to align Class (Mutex) and Interface (Raw) types.
-- [ ] **Thread-Safe Derives:** Implement custom `PartialEq` for structs containing `Mutex`.
+- [x] **DTO/Entity Unification:** Smart wrapping strategies to align Class (Mutex) and Interface (Raw) types.
+- [x] **Thread-Safe Derives:** `PartialEq` works on DTOs (Mutex removed).
 
 ---
 
