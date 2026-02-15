@@ -25,7 +25,7 @@ pub fn handle(
             if args.len() == 2 {
                 let pattern = gen.convert_expr_or_spread(&args[0]);
                 let replacement = gen.convert_expr_or_spread(&args[1]);
-                Some(quote! { #obj_tokens.replace(&#pattern, &#replacement) })
+                Some(quote! { #obj_tokens.replacen(&#pattern, &#replacement, 1) })
             } else {
                 None
             }

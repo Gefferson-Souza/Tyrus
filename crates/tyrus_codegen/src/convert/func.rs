@@ -241,7 +241,7 @@ impl super::interface::RustGenerator {
                             if let Some(init_expr) = init_expr_opt {
                                 if matches!(var_decl.kind, swc_ecma_ast::VarDeclKind::Const) {
                                     declarations.push(quote! {
-                                        let #var_ident = #init_expr;
+                                        let mut #var_ident = #init_expr;
                                     });
                                 } else {
                                     declarations.push(quote! {
@@ -382,6 +382,7 @@ impl super::interface::RustGenerator {
                     let v = b.value;
                     quote! { #v }
                 }
+                Lit::Null(_) => quote! { None },
                 _ => quote! { todo!("unsupported literal") },
             },
             Expr::Member(member) => self.convert_member_expr(member),
@@ -408,8 +409,29 @@ impl super::interface::RustGenerator {
             Expr::Arrow(arrow) => self.convert_arrow_expr(arrow),
 
             Expr::Array(arr) => self.convert_array_lit(arr),
+            Expr::Tpl(tpl) => self.convert_tpl(tpl),
             _ => quote! { todo!() },
         }
+    }
+
+    fn convert_tpl(&self, tpl: &swc_ecma_ast::Tpl) -> proc_macro2::TokenStream {
+        let mut fmt_str = String::new();
+        let mut args = Vec::new();
+
+        for (i, quasi) in tpl.quasis.iter().enumerate() {
+            if let Some(cooked) = &quasi.cooked {
+                fmt_str.push_str(cooked.as_str().expect("invalid cooked string"));
+            } else {
+                fmt_str.push_str(quasi.raw.as_str());
+            }
+
+            if i < tpl.exprs.len() {
+                fmt_str.push_str("{}");
+                args.push(self.convert_expr(&tpl.exprs[i]));
+            }
+        }
+
+        quote! { format!(#fmt_str, #(#args),*) }
     }
 
     fn convert_array_lit(&self, arr: &swc_ecma_ast::ArrayLit) -> proc_macro2::TokenStream {
@@ -477,11 +499,40 @@ impl super::interface::RustGenerator {
                     to_snake_case(name)
                 };
                 let prop = format_ident!("{}", prop_name);
+
+                // Fix for Enum access: if obj is Capitalized (e.g. Status), use ::
+                // This is a heuristic. Ideally we check the type map.
+                let obj_str = obj.to_string();
+                // Check if obj_str looks like a type name (Capitalized, no dots/method calls yet)
+                // Note: obj is a TokenStream, to_string gives "Status" or "self . status".
+                // Simple heuristic: if it's a single word starting with Uppercase, treat as Enum/Static.
+                if obj_str.chars().next().is_some_and(|c| c.is_uppercase())
+                    && !obj_str.contains('.')
+                    && !obj_str.contains('(')
+                {
+                    return quote! { #obj::#prop };
+                }
+
                 quote! { #obj.#prop }
             }
             swc_ecma_ast::MemberProp::Computed(computed) => {
-                let expr = self.convert_expr(&computed.expr);
-                quote! { #obj[#expr] }
+                // Unwrap parens helper
+                let mut expr = &*computed.expr;
+                while let Expr::Paren(p) = expr {
+                    expr = &p.expr;
+                }
+
+                // If the index is a number literal, it must be usize for Vec/Array indexing
+                if let Expr::Lit(Lit::Num(n)) = expr {
+                    let idx = n.value as usize;
+                    quote! { #obj[#idx] }
+                } else {
+                    let expr_tokens = self.convert_expr(&computed.expr);
+                    // Note: If 'expr' is a variable 'i' (f64), we might need casting 'as usize'
+                    // But determining if #obj is a Vec vs Map is hard without type info.
+                    // For now, we fix the literal 0 case which is most common in tuples/split.
+                    quote! { #obj[#expr_tokens] }
+                }
             }
             _ => quote! { todo!() },
         }
@@ -538,7 +589,112 @@ impl super::interface::RustGenerator {
         }
 
         let callee = match &call.callee {
-            Callee::Expr(expr) => self.convert_expr(expr),
+            Callee::Expr(expr) => {
+                // Intercept Array methods: map, filter, forEach, reduce, find, some, every
+                if let Expr::Member(member) = &**expr {
+                    if let Some(method_ident) = member.prop.as_ident() {
+                        let method_name = method_ident.sym.as_ref();
+                        match method_name {
+                            "map" | "filter" => {
+                                let obj = self.convert_expr(&member.obj);
+                                let method_ident = format_ident!("{}", to_snake_case(method_name));
+                                let args: Vec<_> = call
+                                    .args
+                                    .iter()
+                                    .map(|a| self.convert_expr(&a.expr))
+                                    .collect();
+                                // Eager evaluation to match TS semantics
+                                return quote! { #obj.clone().into_iter().#method_ident(#(#args),*).collect::<Vec<_>>() };
+                            }
+                            "forEach" => {
+                                let obj = self.convert_expr(&member.obj);
+                                let args: Vec<_> = call
+                                    .args
+                                    .iter()
+                                    .map(|a| self.convert_expr(&a.expr))
+                                    .collect();
+                                return quote! { #obj.into_iter().for_each(#(#args),*) };
+                            }
+                            "some" => {
+                                let obj = self.convert_expr(&member.obj);
+                                let args: Vec<_> = call
+                                    .args
+                                    .iter()
+                                    .map(|a| self.convert_expr(&a.expr))
+                                    .collect();
+                                return quote! { #obj.into_iter().any(#(#args),*) };
+                            }
+                            "every" => {
+                                let obj = self.convert_expr(&member.obj);
+                                let args: Vec<_> = call
+                                    .args
+                                    .iter()
+                                    .map(|a| self.convert_expr(&a.expr))
+                                    .collect();
+                                return quote! { #obj.into_iter().all(#(#args),*) };
+                            }
+                            "find" | "reduce" => {
+                                let obj = self.convert_expr(&member.obj);
+                                let method_ident = format_ident!("{}", to_snake_case(method_name));
+                                let args: Vec<_> = call
+                                    .args
+                                    .iter()
+                                    .map(|a| self.convert_expr(&a.expr))
+                                    .collect();
+                                return quote! { #obj.into_iter().#method_ident(#(#args),*) };
+                            }
+                            "push" => {
+                                let method_ident = format_ident!("push");
+                                let args: Vec<_> = call
+                                    .args
+                                    .iter()
+                                    .map(|a| self.convert_expr(&a.expr))
+                                    .collect();
+
+                                // Check for this.field.push()
+                                // member.obj is the expression on which push is called (e.g. this.field)
+                                if let Expr::Member(nested_member) = &*member.obj {
+                                    if nested_member.obj.is_this() {
+                                        if let Some(prop_ident) = nested_member.prop.as_ident() {
+                                            let prop_name = to_snake_case(prop_ident.sym.as_ref());
+                                            let field = format_ident!("{}", prop_name);
+                                            // Access field directly for mutation
+                                            return quote! { self.#field.#method_ident(#(#args),*) };
+                                        }
+                                    }
+                                }
+
+                                if member.obj.is_this() {
+                                    // this.push() - rare
+                                    return quote! { self.#method_ident(#(#args),*) };
+                                }
+
+                                let obj = self.convert_expr(&member.obj);
+                                return quote! { #obj.#method_ident(#(#args),*) };
+                            }
+                            "replace" => {
+                                let method_ident = format_ident!("replacen");
+                                let args: Vec<_> = call
+                                    .args
+                                    .iter()
+                                    .map(|a| self.convert_expr(&a.expr))
+                                    .collect();
+
+                                let obj = self.convert_expr(&member.obj);
+                                // TS replace(str, str) only replaces first occurrence. Rust replace() replaces all.
+                                // We use replacen(pat, to, 1).
+                                if args.len() == 2 {
+                                    return quote! { #obj.#method_ident(#(#args),*, 1) };
+                                }
+                                // Fallback for other signatures (regex?) - though replacen expects 3 args
+                                return quote! { #obj.replace(#(#args),*) };
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+                self.convert_expr(expr)
+            }
             _ => quote! { todo!("complex callee") },
         };
         let args: Vec<_> = call
@@ -556,8 +712,22 @@ impl super::interface::RustGenerator {
                 if let swc_ecma_ast::Prop::KeyValue(kv) = &**p {
                     if let swc_ecma_ast::PropName::Ident(ident) = &kv.key {
                         let key = ident.sym.as_ref();
-                        let val = self.convert_expr(&kv.value);
-                        fields.push(quote! { #key: #val });
+
+                        // Special handling for null/undefined in JSON macro context
+                        // They must be explicit Value::Null to avoid inference errors with None
+                        let is_null = matches!(&*kv.value, Expr::Lit(Lit::Null(_)));
+                        let is_undefined = if let Expr::Ident(id) = &*kv.value {
+                            id.sym.as_ref() == "undefined"
+                        } else {
+                            false
+                        };
+
+                        if is_null || is_undefined {
+                            fields.push(quote! { #key: serde_json::Value::Null });
+                        } else {
+                            let val = self.convert_expr(&kv.value);
+                            fields.push(quote! { #key: #val });
+                        }
                     }
                 }
             }
@@ -603,7 +773,14 @@ impl super::interface::RustGenerator {
                                 quote! { todo!() }
                             }
                         } else {
-                            quote! { todo!() }
+                            if let Some(prop_ident) = member.prop.as_ident() {
+                                let prop_name = to_snake_case(prop_ident.sym.as_ref());
+                                let field = format_ident!("{}", prop_name);
+                                let obj = self.convert_expr(&member.obj);
+                                quote! { #obj.#field }
+                            } else {
+                                quote! { todo!("complex member assign") }
+                            }
                         }
                     }
                     swc_ecma_ast::SimpleAssignTarget::Ident(ident) => {

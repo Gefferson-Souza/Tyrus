@@ -824,8 +824,8 @@ impl RustGenerator {
             // For handlers, we consume self (injected via FromRequest)
             params.push(quote! { self });
         } else {
-            // For regular methods, use &self
-            params.push(quote! { &self });
+            // For regular methods, use &mut self to allow mutation
+            params.push(quote! { &mut self });
         }
 
         for param in &method.function.params {
@@ -858,13 +858,19 @@ impl RustGenerator {
         }
 
         let mut return_type = if method.function.is_async {
-            let inner =
-                super::type_mapper::unwrap_promise_type(method.function.return_type.as_ref());
+            let inner = if method.function.return_type.is_none() {
+                quote! { () }
+            } else {
+                super::type_mapper::unwrap_promise_type(method.function.return_type.as_ref())
+            };
+
             if !is_handler {
                 quote! { Result<#inner, crate::AppError> }
             } else {
                 inner
             }
+        } else if method.function.return_type.is_none() {
+            quote! { () }
         } else {
             map_ts_type(method.function.return_type.as_ref())
         };
