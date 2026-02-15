@@ -1,44 +1,45 @@
-# Contribuindo para o Tyrus
+# Contributing to Tyrus
 
-Obrigado por seu interesse em contribuir! Este é um projeto acadêmico e open-source.
+## 🌳 Git Workflow: The "Tyrus Pattern"
 
-## 🛠 Setup do Ambiente
+We follow a strict **Feature Branch Workflow** combined with **Conventional Commits**.
 
-1. **Rust:** Instale via [rustup.rs](https://rustup.rs). Versão mínima 1.75.
-2. **Dependências:** O projeto usa `cargo`.
-3. **Editor:** Recomendamos VS Code com a extensão `rust-analyzer`.
+### Branching Strategy
 
-## 🧪 Rodando Testes
+- **`main`**: Protected. Production-ready code only. No direct commits.
+- **`feat/`**: New features (e.g., `feat/async-await`, `feat/new-parser`).
+- **`fix/`**: Bug fixes (e.g., `fix/memory-leak`, `fix/cli-panic`).
+- **`chore/`**: Maintenance, config, docs (e.g., `chore/optimize-workflow`, `docs/update-readme`).
+- **`refactor/`**: Code restructuring without behavior change.
 
-O projeto utiliza um harness personalizado (`tyrus_test_utils`) que garante que todo código gerado seja compilável.
+### 📝 Commit Convention
 
-```bash
-# Rodar a suite completa (Unitários + Integração + Snapshots)
-cargo test --workspace
+We use [Conventional Commits](https://www.conventionalcommits.org/).
 
-# Se houver snapshots novos (e corretos), atualize-os:
-cargo insta review
-# Ou aceite automaticamente se tiver certeza:
-cargo insta test --accept
-```
+**Format:** `<type>(<scope>): <subject>`
 
-## 🧹 Linting e Formatação
+**Types:**
 
-O CI irá falhar se o código não estiver formatado ou tiver warnings.
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code (white-space, formatting, etc)
+- `refactor`: A code change that neither fixes a bug nor adds a feature
+- `perf`: A code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `chore`: Changes to the build process or auxiliary tools and libraries such as documentation generation
 
-```bash
-cargo fmt
-cargo clippy --workspace -- -D warnings
-```
+**Examples:**
 
-## 📝 Processo de Pull Request
+- `feat(codegen): implement structural typing for interfaces`
+- `fix(cli): resolve panic when input file is missing`
+- `chore(deps): upgrade axum to v0.7`
 
-1. Fork o projeto.
-2. Crie uma branch (`git checkout -b feature/minha-feature`).
-3. Comite suas mudanças seguindo [Conventional Commits](https://www.conventionalcommits.org/) (ex: `feat: implement while loops`).
-4. Abra um PR para a branch `main`.
-5. Aguarde a revisão.
+## 🚀 Pull Request Process
 
-## ⚖️ Padrões de Código
-
-Consulte `Guidelines.md` para entender as regras de engenharia (Newtypes, Visitor Pattern, Error Handling).
+1.  Create a branch complying with the strategy above.
+2.  Ensure `cargo test --workspace` passes locally.
+3.  Run `cargo clippy` and fix warnings.
+4.  Open a PR to `main`.
+5.  Fill out the **PR Template** completely.
+6.  Wait for CI checks to pass and request review.

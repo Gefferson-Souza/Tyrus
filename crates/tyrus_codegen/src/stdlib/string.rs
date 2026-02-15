@@ -2,33 +2,37 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use swc_ecma_ast::*;
 
-use super::super::convert::func::{convert_expr, convert_expr_or_spread};
+use super::super::convert::interface::RustGenerator;
 
 /// Handle string method calls
-pub fn handle_method(obj: &Expr, method: &str, args: &[ExprOrSpread]) -> Option<TokenStream> {
-    let obj_tokens = convert_expr(obj);
-
+pub fn handle(
+    gen: &RustGenerator,
+    obj: &Expr,
+    method: &str,
+    args: &[ExprOrSpread],
+) -> Option<TokenStream> {
+    let obj_tokens = gen.convert_expr(obj);
     match method {
         "includes" => {
-            if args.len() == 1 {
-                let arg = convert_expr_or_spread(&args[0]);
-                Some(quote! { #obj_tokens.contains(&#arg) })
+            if let Some(arg) = args.first() {
+                let val = gen.convert_expr_or_spread(arg);
+                Some(quote! { #obj_tokens.contains(#val) })
             } else {
                 None
             }
         }
         "replace" => {
             if args.len() == 2 {
-                let pattern = convert_expr_or_spread(&args[0]);
-                let replacement = convert_expr_or_spread(&args[1]);
-                Some(quote! { #obj_tokens.replace(&#pattern, &#replacement) })
+                let pattern = gen.convert_expr_or_spread(&args[0]);
+                let replacement = gen.convert_expr_or_spread(&args[1]);
+                Some(quote! { #obj_tokens.replacen(&#pattern, &#replacement, 1) })
             } else {
                 None
             }
         }
         "split" => {
-            if args.len() == 1 {
-                let delimiter = convert_expr_or_spread(&args[0]);
+            if let Some(arg) = args.first() {
+                let delimiter = gen.convert_expr_or_spread(arg);
                 Some(quote! { #obj_tokens.split(&#delimiter).collect::<Vec<_>>() })
             } else {
                 None

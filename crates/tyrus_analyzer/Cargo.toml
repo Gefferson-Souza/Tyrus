@@ -4,10 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-petgraph = "0.6"
-swc_ecma_visit = "18.0.0"
-swc_ecma_ast = "18.0.0"
-swc_common = "17.0.1"
-tyrus_ast = { path = "../tyrus_ast" }
+tyrus_common = { path = "../tyrus_common" }
 tyrus_diagnostics = { path = "../tyrus_diagnostics" }
+tyrus_di = { path = "../tyrus_di" }
+swc_ecma_ast = "18.0.0"
+swc_ecma_visit = "18.0.0"
+swc_common = { version = "17.0.1", features = ["tty-emitter"] }
+petgraph = "0.6"
 miette = { version = "7.6.0", features = ["fancy"] }

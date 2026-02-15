@@ -3,7 +3,7 @@ use swc_ecma_ast::{
     AssignTarget, ClassDecl, ClassMember, Constructor, Expr, ExprStmt, Lit, Pat, Stmt,
 };
 
-use super::func::{convert_expr_pub, convert_stmt_pub, to_snake_case};
+use super::func::to_snake_case;
 use super::interface::RustGenerator;
 use super::type_mapper::{is_optional_type, map_ts_type};
 
@@ -11,6 +11,12 @@ impl RustGenerator {
     pub fn process_class_decl(&mut self, n: &ClassDecl) {
         let class_name = n.ident.sym.to_string();
         let struct_name = format_ident!("{}", class_name);
+
+        self.is_controller = class_name.ends_with("Controller");
+
+        let is_service_or_controller = class_name.ends_with("Service")
+            || class_name.ends_with("Controller")
+            || self.is_controller;
 
         // Extract generic params early
         let mut generic_params = std::collections::HashSet::new();
@@ -27,20 +33,29 @@ impl RustGenerator {
         let mut class_fields_meta = Vec::new();
 
         let mut dependency_fields = std::collections::HashSet::new();
+        self.current_class_state_fields.clear();
 
+        // Pass 1: Process Properties (to populate state fields map)
         for member in &n.class.body {
-            match member {
-                ClassMember::ClassProp(prop) => {
-                    if let Some((field_tokens, name, is_opt, is_dep)) =
-                        self.convert_prop(prop, &generic_params)
-                    {
-                        fields.push(field_tokens);
-                        class_fields_meta.push((name.clone(), is_opt));
-                        if is_dep {
-                            dependency_fields.insert(name);
-                        }
+            if let ClassMember::ClassProp(prop) = member {
+                if let Some((field_tokens, name, is_opt, is_dep, type_str)) =
+                    self.convert_prop(prop, &generic_params, is_service_or_controller)
+                {
+                    fields.push(field_tokens);
+                    class_fields_meta.push((name.clone(), is_opt));
+                    if is_dep {
+                        dependency_fields.insert(name);
+                    } else if is_service_or_controller {
+                        // Store the type string to check for primitives later
+                        self.current_class_state_fields.insert(name, type_str);
                     }
                 }
+            }
+        }
+
+        // Pass 2: Process Methods and Constructor
+        for member in &n.class.body {
+            match member {
                 ClassMember::Method(method) => {
                     methods.push(method);
                 }
@@ -61,6 +76,7 @@ impl RustGenerator {
 
                         let type_ann = ident.type_ann.as_ref();
                         let mut field_type = map_ts_type(type_ann);
+                        let raw_type_str = field_type.to_string();
 
                         // Heuristic: If it's a TypeRef (not primitive), wrap in Arc
                         let is_dependency = if let Some(ann) = type_ann {
@@ -90,6 +106,13 @@ impl RustGenerator {
                         if is_dependency {
                             field_type = quote! { std::sync::Arc<#field_type> };
                             dependency_fields.insert(field_name_str.clone());
+                        } else if is_service_or_controller {
+                            // State field: Wrap in Arc<Mutex<T>>
+                            field_type = quote! { std::sync::Arc<std::sync::Mutex<#field_type>> };
+                            self.current_class_state_fields
+                                .insert(field_name_str.clone(), raw_type_str);
+                        } else {
+                            // DTO field: Raw type, no mutex
                         }
 
                         fields.push(quote! { pub #field_name: #field_type });
@@ -154,9 +177,26 @@ impl RustGenerator {
             (quote! {}, quote! {}, quote! {})
         };
 
+        let mut derives = vec![quote! { Default }, quote! { Debug }, quote! { Clone }];
+        if !is_service_or_controller {
+            derives.push(quote! { PartialEq });
+            derives.push(quote! { serde::Serialize });
+            derives.push(quote! { serde::Deserialize });
+        }
+
+        let derive_attr = quote! {
+            #[derive(#( #derives ),*)]
+        };
+
+        let serde_attr = if !is_service_or_controller {
+            quote! { #[serde(rename_all = "camelCase")] }
+        } else {
+            quote! {}
+        };
+
         let struct_def = quote! {
-            #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-            #[serde(rename_all = "camelCase")]
+            #derive_attr
+            #serde_attr
             #vis struct #struct_name #generics_struct_decl {
                 #(#fields),*
             }
@@ -177,6 +217,7 @@ impl RustGenerator {
                 n.class.type_params.is_some(),
                 &generic_params,
                 &dependency_fields,
+                is_service_or_controller,
             );
             impl_items.push(constructor_tokens);
         } else {
@@ -342,7 +383,8 @@ impl RustGenerator {
         &self,
         prop: &swc_ecma_ast::ClassProp,
         generic_params: &std::collections::HashSet<String>,
-    ) -> Option<(proc_macro2::TokenStream, String, bool, bool)> {
+        is_service_or_controller: bool,
+    ) -> Option<(proc_macro2::TokenStream, String, bool, bool, String)> {
         let field_name_str = if let Some(ident) = prop.key.as_ident() {
             ident.sym.to_string()
         } else {
@@ -350,6 +392,9 @@ impl RustGenerator {
         };
         let field_name = format_ident!("{}", to_snake_case(&field_name_str));
         let mut field_type = map_ts_type(prop.type_ann.as_ref());
+
+        // Capture the raw inner type string before wrapping in Option/Arc
+        let raw_type_str = field_type.to_string();
 
         // Check dependency
         let is_dependency = if let Some(ann) = prop.type_ann.as_ref() {
@@ -376,6 +421,11 @@ impl RustGenerator {
 
         if is_dependency {
             field_type = quote! { std::sync::Arc<#field_type> };
+        } else if is_service_or_controller {
+            // State field: Wrap in Arc<Mutex<T>> ONLY for services/controllers
+            field_type = quote! { std::sync::Arc<std::sync::Mutex<#field_type>> };
+        } else {
+            // DTO/Entity field: Keep raw type (or map type normally)
         }
 
         let is_optional_union = is_optional_type(prop.type_ann.as_deref());
@@ -383,8 +433,6 @@ impl RustGenerator {
 
         if prop.is_optional {
             // If it's optional via `?`, we wrap in Option.
-            // If it's optional via union `| undefined`, map_ts_type already wraps it in Option.
-            // But if it was already wrapped in Arc, we wrap Arc in Option? Option<Arc<T>>.
             field_type = quote! { Option<#field_type> };
         }
 
@@ -395,9 +443,11 @@ impl RustGenerator {
             field_name_str,
             is_effectively_optional,
             is_dependency,
+            raw_type_str,
         ))
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn convert_constructor(
         &self,
         _struct_name: &proc_macro2::Ident,
@@ -406,6 +456,7 @@ impl RustGenerator {
         has_generics: bool,
         generic_params: &std::collections::HashSet<String>,
         dependency_fields: &std::collections::HashSet<String>,
+        is_service_or_controller: bool,
     ) -> proc_macro2::TokenStream {
         let mut params = Vec::new();
         let mut field_inits = Vec::new();
@@ -520,16 +571,8 @@ impl RustGenerator {
                                         let field_name_str = prop_ident.sym.to_string();
                                         let field_name =
                                             format_ident!("{}", to_snake_case(&field_name_str));
-                                        let value = convert_expr_pub(&assign.right);
+                                        let value = self.convert_expr(&assign.right);
 
-                                        // If field is optional but assigned value is not Option, wrap it?
-                                        // Usually in Rust constructor we assign the value directly.
-                                        // But if the field is Option<T>, and we assign T, we need Some(T).
-                                        // This is tricky without type info of the expression.
-                                        // For now, assume user assigns correct type or we wrap in Some if it's a literal?
-                                        // Actually, if TS says `this.opt = "val"`, Rust expects `Option<String>`.
-                                        // We might need to wrap in `Some(...)`.
-                                        // Let's check if the field is optional.
                                         let is_optional = class_fields
                                             .iter()
                                             .find(|(n, _)| n == &field_name_str)
@@ -537,7 +580,7 @@ impl RustGenerator {
                                             .unwrap_or(false);
 
                                         let value = if is_optional {
-                                            quote! { Some(#value) } // Naive wrapping, might double wrap if already Some
+                                            quote! { Some(#value) }
                                         } else {
                                             value
                                         };
@@ -557,7 +600,11 @@ impl RustGenerator {
                                             } else {
                                                 quote! { std::sync::Arc::new(#value) }
                                             }
+                                        } else if is_service_or_controller {
+                                            // State field: Wrap in Arc::new(Mutex::new(value))
+                                            quote! { std::sync::Arc::new(std::sync::Mutex::new(#value)) }
                                         } else {
+                                            // Plain field initialization
                                             value
                                         };
 
@@ -601,7 +648,6 @@ impl RustGenerator {
                             let type_ann = ident.type_ann.as_ref();
                             let mut param_type = map_ts_type(type_ann);
 
-                            let _type_str = param_type.to_string();
                             // Check if it's a dependency (not primitive/std type)
                             // We check if it starts with Vec, Option, or matches primitives
                             let is_dependency = if let Some(ann) = type_ann {
@@ -623,7 +669,6 @@ impl RustGenerator {
                                             )
                                         }
                                     } else {
-                                        // Complex type ref (e.g. qualified name), assume dependency
                                         true
                                     }
                                 } else {
@@ -704,7 +749,11 @@ impl RustGenerator {
             for (name, _) in class_fields {
                 if !di_initialized_fields.contains(name) {
                     let field_name = format_ident!("{}", to_snake_case(name));
-                    di_field_inits.push(quote! { #field_name: Default::default() });
+                    if is_service_or_controller {
+                        di_field_inits.push(quote! { #field_name: std::sync::Arc::new(std::sync::Mutex::new(Default::default())) });
+                    } else {
+                        di_field_inits.push(quote! { #field_name: Default::default() });
+                    }
                 }
             }
 
@@ -766,12 +815,6 @@ impl RustGenerator {
         }
 
         let is_handler = http_method.is_some();
-        println!(
-            "Method: {}, is_handler: {}, decorators: {}",
-            method_name,
-            is_handler,
-            method.function.decorators.len()
-        );
 
         // Build parameters
         let mut params = Vec::new();
@@ -781,8 +824,8 @@ impl RustGenerator {
             // For handlers, we consume self (injected via FromRequest)
             params.push(quote! { self });
         } else {
-            // For regular methods, use &self
-            params.push(quote! { &self });
+            // For regular methods, use &mut self to allow mutation
+            params.push(quote! { &mut self });
         }
 
         for param in &method.function.params {
@@ -815,13 +858,19 @@ impl RustGenerator {
         }
 
         let mut return_type = if method.function.is_async {
-            let inner =
-                super::type_mapper::unwrap_promise_type(method.function.return_type.as_ref());
+            let inner = if method.function.return_type.is_none() {
+                quote! { () }
+            } else {
+                super::type_mapper::unwrap_promise_type(method.function.return_type.as_ref())
+            };
+
             if !is_handler {
                 quote! { Result<#inner, crate::AppError> }
             } else {
                 inner
             }
+        } else if method.function.return_type.is_none() {
+            quote! { () }
         } else {
             map_ts_type(method.function.return_type.as_ref())
         };
@@ -842,9 +891,9 @@ impl RustGenerator {
         let mut body_stmts = Vec::new();
         if let Some(body) = &method.function.body {
             // Define return handler
-            let return_handler = |ret: &swc_ecma_ast::ReturnStmt| -> proc_macro2::TokenStream {
+            let mut return_handler = |ret: &swc_ecma_ast::ReturnStmt| -> proc_macro2::TokenStream {
                 if let Some(arg) = &ret.arg {
-                    let expr = convert_expr_pub(arg);
+                    let expr = self.convert_expr(arg);
 
                     if is_handler {
                         // Check if we wrapped the return type in Json (inside Result)
@@ -869,9 +918,9 @@ impl RustGenerator {
 
             for stmt in &body.stmts {
                 if is_handler || method.function.is_async {
-                    body_stmts.push(super::func::convert_stmt_recursive(stmt, &return_handler));
+                    body_stmts.push(self.convert_stmt_recursive(stmt, &mut return_handler));
                 } else {
-                    body_stmts.push(convert_stmt_pub(stmt));
+                    body_stmts.push(self.convert_stmt(stmt));
                 }
             }
         }

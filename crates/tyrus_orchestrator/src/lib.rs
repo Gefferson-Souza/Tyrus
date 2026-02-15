@@ -13,7 +13,8 @@ pub fn check(path: FilePath) -> Result<(), TyrusError> {
     let source_code = std::fs::read_to_string(path.as_ref()).map_err(TyrusError::IoError)?;
     let file_name = path.as_ref().to_string_lossy().to_string();
 
-    let errors = tyrus_analyzer::Analyzer::analyze(&program, source_code, file_name);
+    let analysis_result = tyrus_analyzer::Analyzer::analyze(&program, source_code, file_name);
+    let errors = analysis_result.errors;
 
     if !errors.is_empty() {
         for error in errors {
@@ -121,6 +122,19 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Tyru
                         }
                     }
                 }
+            } else if let swc_ecma_ast::Program::Script(s) = &program {
+                for stmt in &s.body {
+                    if let swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::Class(class_decl)) = stmt {
+                        let class_name = class_decl.ident.sym.to_string();
+                        class_module_map.insert(class_name.clone(), module_path.clone());
+
+                        if let Some(type_params) = &class_decl.class.type_params {
+                            if !type_params.params.is_empty() {
+                                generic_classes.insert(class_name);
+                            }
+                        }
+                    }
+                }
             }
 
             programs.push(program);
@@ -129,10 +143,30 @@ pub fn build_project(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Tyru
     }
 
     // 2. Analyze (Build Dependency Graph)
-    let graph = tyrus_analyzer::graph::build_graph(&programs);
+    let mut graph = tyrus_di::graph::DiGraph::new();
+
+    // We already parsed programs in the loop above.
+    // Ideally we analyze inside the loop, but we need to iterate again or move analysis into step 1.
+    // Let's iterate programs again since we have them in memory.
+    for (i, program) in programs.iter().enumerate() {
+        let path = &file_paths[i];
+        let source_code = std::fs::read_to_string(path).map_err(TyrusError::IoError)?;
+        let file_name = path.to_string_lossy().to_string();
+
+        let analysis_result = tyrus_analyzer::Analyzer::analyze(program, source_code, file_name);
+        // We ignore errors here? Or should we report them?
+        // check() reported errors, build() might assume valid code or report again.
+        // Let's output errors if any.
+        for error in analysis_result.errors {
+            println!("Warning: {:?}", miette::Report::new(error));
+        }
+
+        graph.merge(analysis_result.graph);
+    }
+
     let init_order = graph
-        .get_initialization_order()
-        .map_err(TyrusError::FormattingError)?; // Using FormattingError as generic error for now
+        .resolve()
+        .map_err(|e| TyrusError::Validation(e.to_string()))?;
 
     // 3. Transpile
     for (i, program) in programs.iter().enumerate() {
@@ -219,7 +253,7 @@ fn generate_main_rs(
     init_order: &[String],
     class_module_map: &std::collections::HashMap<String, String>,
     controllers: &[String],
-    graph: &tyrus_analyzer::graph::DependencyGraph,
+    graph: &tyrus_di::graph::DiGraph,
     generic_classes: &std::collections::HashSet<String>,
 ) -> Result<String, TyrusError> {
     let mut main_content = String::new();
@@ -243,7 +277,9 @@ fn generate_main_rs(
             let var_name = tyrus_common::util::to_snake_case(class_name);
 
             // Get dependencies
-            let deps = graph.get_dependencies(class_name).unwrap_or_default();
+            let deps = graph
+                .get_provider_dependencies(class_name)
+                .unwrap_or_default();
             let mut args = Vec::new();
             for dep in deps {
                 let dep_var = tyrus_common::util::to_snake_case(&dep);
@@ -286,10 +322,12 @@ fn generate_main_rs(
     }
 
     main_content.push_str(";\n\n");
-    main_content
-        .push_str("    let listener = TcpListener::bind(\"0.0.0.0:3000\").await.unwrap();\n");
+    main_content.push_str("    let addr = \"0.0.0.0:3000\".parse().unwrap();\n");
     main_content.push_str("    println!(\"Server running on http://0.0.0.0:3000\");\n");
-    main_content.push_str("    axum::serve(listener, app).await.unwrap();\n");
+    main_content.push_str("    axum::Server::bind(&addr)\n");
+    main_content.push_str("        .serve(app.into_make_service())\n");
+    main_content.push_str("        .await\n");
+    main_content.push_str("        .unwrap();\n");
     main_content.push_str("}\n");
 
     Ok(main_content)
@@ -305,12 +343,12 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
-axum = "0.7"
+axum = "0.6"
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 reqwest = { version = "0.11", features = ["json"] }
 tower = { version = "0.4" }
-tower-http = { version = "0.5", features = ["trace"] }
+tower-http = { version = "0.4", features = ["trace"] }
 rand = "0.8"
 
 [[bin]]

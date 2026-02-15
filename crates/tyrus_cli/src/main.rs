@@ -45,7 +45,17 @@ async fn main() -> Result<()> {
                 println!("✅ Project built successfully!");
             } else {
                 let output_code = tyrus_orchestrator::build(FilePath::from(path))?;
-                println!("{}", output_code);
+                if let Some(output_path) = output {
+                    if let Some(parent) = output_path.parent() {
+                        std::fs::create_dir_all(parent)
+                            .map_err(|e| miette::miette!("Failed to create directory: {}", e))?;
+                    }
+                    std::fs::write(&output_path, output_code)
+                        .map_err(|e| miette::miette!("Failed to write output file: {}", e))?;
+                    eprintln!("✅ Built to {:?}", output_path);
+                } else {
+                    println!("{}", output_code);
+                }
             }
         }
     }

@@ -23,6 +23,18 @@ This roadmap tracks the evolution of Tyrus from a research prototype to a produc
 - [x] **Type Aliases:** String Unions to Enums, `Record<K,V>` to `HashMap`.
 - [x] **Shim Layer:** 100% coverage of core `Math`, `String`, and `Array` methods.
 
+### 🏛️ Milestone 7: Architecture & Dependency Injection (Tier 4)
+
+- [x] **Dependency Injection Engine:** Custom `tyrus_di` crate for graph resolution (Services & Controllers).
+- [x] **Module System:** Support for `@Module()` decorators and cross-file wiring.
+- [x] **Controller Mapping:** First-class support for NestJS Controllers -> Axum Routers.
+
+### 🛠️ Milestone 8: Generator Maturity (Production Polish)
+
+- [x] **Unified Entry Point:** Generate `main.rs` with `tokio` runtime and `axum` server binding.
+- [x] **DTO/Entity Unification:** Smart wrapping strategies to align Class (Mutex) and Interface (Raw) types.
+- [x] **Thread-Safe Derives:** `PartialEq` works on DTOs (Mutex removed).
+
 ---
 
 ## 🔬 Future Work (Academic Research)

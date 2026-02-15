@@ -40,8 +40,9 @@ mod nestjs_tests {
 
         let content = std::fs::read_to_string(cargo_toml_path).unwrap();
         assert!(content.contains("[dependencies]"));
-        assert!(content.contains("axum = \"0.7\""));
+        assert!(content.contains("axum = \"0.6\""));
         assert!(content.contains("tokio = { version = \"1.0\", features = [\"full\"] }"));
+        assert!(content.contains("serde = { version = \"1.0\", features = [\"derive\", \"rc\"] }"));
     }
 
     #[test]
