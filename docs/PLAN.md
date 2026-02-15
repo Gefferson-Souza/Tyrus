@@ -1,44 +1,56 @@
-# Project Alignment Plan: Safe Transpilation & Architecture
+# 📋 Regression Resolution Plan: Safe Transpilation Hardening
 
-**Goal:** Align `TypeRust` codebase with the architectural principles defined in the new documentation:
+This plan outlines the architectural stabilization of Tyrus to resolve current `cargo test` failures caused by paradigm mismatches between TypeScript (Shared-Mutable) and Rust (Owned-Immutable).
 
-1.  _The Architecture of Safe Transpilation_
-2.  _From Source to Syntax_
-3.  _Analysis of Rust Development Paradigms_
+## 🛠 Problem Analysis
 
-## Phase 1: Architectural Audit & Safety Hardening
+The root cause is a **Memory Semantics Mismatch**:
 
-- [ ] **Panic Elimination**: Scan codebase for `unwrap()`, `expect()`, and `todo!()`. Replace with proper `Result<T, OxidizerError>` handling.
-  - _Rationale_: "Parser is a Minefield". Panics are unacceptable vulnerabilities.
-- [ ] **AST Robustness**: Verify `tyrus_codegen` uses robust ADTs (Enums/Structs) as defined in _From Source to Syntax_.
-  - _Note_: `swc_ecma_ast` is already AST-based, but our _conversion logic_ must be strict.
-- [ ] **Error Handling**: Ensure all potential failure points in `tyrus_codegen` return `Err` (e.g., "unknown node type") rather than silent failure or panic.
+- **Services (Singletons)**: Currently generated as `Arc<T>`, but methods use `&mut self`. Rust forbids mutable borrowing of data inside an `Arc` without a lock.
+- **Iterator Semantics**: TS `map(val, index)` does not find a direct 1:1 match in Rust's `.map()`, leading to argument count errors.
+- **String Handling**: Perceived "Magic Strings" in TS lead to `String` vs `&str` errors in Rust when calling native methods (e.g., `.contains()`).
 
-## Phase 2: CI/CD & Quality Assurance
+## 🧱 Proposed Changes
 
-- [ ] **Linting (Strict)**: Enforce `clippy::pedantic` or at least `-D warnings` in `ci.yml`.
-  - _Reference_: "Code always has to follow best practices".
-- [ ] **Test Coverage**: Run `verify_equivalence` and `integration_tests`.
-  - _Action_: Ensure `todo.ts` issues (ownership) are clearly documented or resolved if blocking.
-- [ ] **CI Workflow**: Verify `.github/workflows/ci.yml` runs:
-  - `cargo check`
-  - `cargo clippy`
-  - `cargo test`
-  - `cargo fmt --check`
+### 1. Interior Mutability Policy (`tyrus_codegen`)
 
-## Phase 3: Documentation & Roadmap
+We will implement "Automatic Lock Injection" for all classes identified as Services/Controllers.
 
-- [ ] **Update Documentation**: Update `README.md` to reflect the "Safe Transpilation" philosophy.
-- [ ] **Artifact Update**: Ensure `walkthrough.md`, `task.md`, and logic maps are current.
+- **Class Definition**: Use `Arc<Mutex<T>>` for dependency inboxes instead of raw `Arc<T>`.
+- **Method Generation**:
+  - If Service/Controller: Use `&self`.
+  - **Auto-Locking**: In `convert_member_expr`, if accessing `this.field` where `field` is a Service, automatically wrap the access in a scoped lock: `{ let mut field = self.field.lock().unwrap(); field.method() }`.
+  - **Atomic Preference**: For primitive fields (`number`, `boolean`), use `std::sync::atomic` types (AtomicF64, AtomicBool) to avoid Mutex overhead where possible.
 
-## Phase 4: Verification
+### 2. Iterator Semantic Wrapper (`tyrus_codegen/src/convert/func.rs`)
 
-- [ ] **End-to-End Validation**: Run full suite.
-- [ ] **Orchestration Report**: Generate final report.
+Replace string-based "guesswork" with a robust AST-driven transformation for Array methods.
 
-## Execution Strategy
+- **Detection**: Check if `map`, `filter`, or `forEach` closures have 2 arguments.
+- **Transformation**:
+  - TS: `arr.map((v, i) => ...)`
+  - Rust: `arr.into_iter().enumerate().map(|(i, v)| { ... }).collect()`
+- **Safety**: Ensure `filter` correctly handles the `&(index, value)` reference pattern to prevent ownership leaks.
 
-1.  **Audit**: `grep` for panics/todos.
-2.  **Refactor**: Fix identified unsafe patterns.
-3.  **Verify**: Run local CI simulation.
-4.  **Document**: Update docs.
+### 3. String & Borrow Hardening
+
+Implement a dedicated `borrow_aware_concat` helper in `tyrus_codegen`.
+
+- TS: `str1 + str2` -> Rust: `format!("{}{}", str1, str2)` or `str1 + &str2`.
+- Detect calls to `.contains()` or `.starts_with()` and automatically borrow the argument if it's a `String`.
+
+### 4. Axiom / Http Client Fix (`tyrus_codegen`)
+
+- Ensure `HttpClient` (axios wrapper) is correctly generated with `axios` crate or a localized `mod axios` for the test fixtures.
+
+## 🧪 Verification Plan
+
+### Automated Tests
+
+- **Regression Suite**: `cargo test --package integration_tests --lib -- verify_equivalence`
+- **Fixture Audit**: Run `cargo check` on all `tests/fixtures/*/dist` directories.
+- **Clippy**: `cargo clippy --workspace -- -D warnings`
+
+### Manual Verification
+
+- Review the generated `src/utils/http_client.rs` for correct mutability and `axios` usage.

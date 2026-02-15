@@ -13,9 +13,18 @@ pub struct Config {
     pub retries: Option<f64>,
 }
 fn process_user(user: User) -> String {
-    let theme = todo!();
-    let retries = todo!("Unsupported binary op: {}", "\"??\"");
-    let calc = 1f64 + 2f64 * 3f64;
-    let list = vec![String::from("a"), String::from("b"), String::from("c")];
-    return todo!();
+    let mut theme = todo!();
+    let mut retries = todo!("Unsupported binary op: {}", "\"??\"");
+    let mut calc = 1f64 + 2f64 * 3f64;
+    let mut list = vec![String::from("a"), String::from("b"), String::from("c")];
+    return format!(
+        "User {} ({}): Theme {}, Retries {}, Calc {}, List {}-{}",
+        id,
+        name,
+        todo!("Unsupported binary op: {}", "\"??\""),
+        retries,
+        calc,
+        first,
+        second
+    );
 }

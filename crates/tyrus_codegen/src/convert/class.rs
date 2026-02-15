@@ -107,7 +107,7 @@ impl RustGenerator {
                             field_type = quote! { std::sync::Arc<#field_type> };
                             dependency_fields.insert(field_name_str.clone());
                         } else if is_service_or_controller {
-                            // State field: Wrap in Arc<Mutex<T>>
+                            // State field: Wrap in Arc<Mutex<T>> for Interior Mutability
                             field_type = quote! { std::sync::Arc<std::sync::Mutex<#field_type>> };
                             self.current_class_state_fields
                                 .insert(field_name_str.clone(), raw_type_str);
@@ -235,7 +235,7 @@ impl RustGenerator {
         // Methods
         let mut routes: Vec<(String, String, String)> = Vec::new();
         for method in methods {
-            let (method_tokens, route_info) = self.convert_method(method);
+            let (method_tokens, route_info) = self.convert_method(method, is_service_or_controller);
             impl_items.push(method_tokens);
             if let Some(info) = route_info {
                 routes.push(info);
@@ -783,6 +783,7 @@ impl RustGenerator {
     fn convert_method(
         &self,
         method: &swc_ecma_ast::ClassMethod,
+        is_service_or_controller: bool,
     ) -> (proc_macro2::TokenStream, Option<(String, String, String)>) {
         let method_name_str = if let Some(ident) = method.key.as_ident() {
             ident.sym.to_string()
@@ -823,8 +824,12 @@ impl RustGenerator {
         if is_handler {
             // For handlers, we consume self (injected via FromRequest)
             params.push(quote! { self });
+        } else if is_service_or_controller {
+            // For services/controllers (Singletons), we must use immutable &self (with interior mutability)
+            // to allow sharing via Arc across threads.
+            params.push(quote! { &self });
         } else {
-            // For regular methods, use &mut self to allow mutation
+            // For regular methods (DTOs/Entities), use &mut self to allow mutation
             params.push(quote! { &mut self });
         }
 

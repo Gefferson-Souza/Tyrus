@@ -24,7 +24,7 @@ pub fn to_snake_case(str: &str) -> String {
     }
     s
 }
-
+2   
 // Helper to pascal case (keep standalone)
 pub fn to_pascal_case(str: &str) -> String {
     let mut s = String::with_capacity(str.len());
@@ -239,15 +239,10 @@ impl super::interface::RustGenerator {
                             let var_ident = format_ident!("{}", var_name);
 
                             if let Some(init_expr) = init_expr_opt {
-                                if matches!(var_decl.kind, swc_ecma_ast::VarDeclKind::Const) {
-                                    declarations.push(quote! {
-                                        let mut #var_ident = #init_expr;
-                                    });
-                                } else {
-                                    declarations.push(quote! {
-                                        let mut #var_ident = #init_expr;
-                                    });
-                                }
+                                // Always use `let mut` for both let and const to support Rust's strict mutability rules unless optimization proves otherwise
+                                declarations.push(quote! {
+                                    let mut #var_ident = #init_expr;
+                                });
                             } else {
                                 declarations.push(quote! {
                                     let mut #var_ident;
@@ -420,7 +415,7 @@ impl super::interface::RustGenerator {
 
         for (i, quasi) in tpl.quasis.iter().enumerate() {
             if let Some(cooked) = &quasi.cooked {
-                fmt_str.push_str(cooked.as_str().expect("invalid cooked string"));
+                fmt_str.push_str(cooked.as_str().unwrap_or(quasi.raw.as_str()));
             } else {
                 fmt_str.push_str(quasi.raw.as_str());
             }
@@ -597,7 +592,43 @@ impl super::interface::RustGenerator {
                                     .iter()
                                     .map(|a| self.convert_expr(&a.expr))
                                     .collect();
-                                // Eager evaluation to match TS semantics
+
+                                // Check for 2-arg closure (item, index)
+                                let has_index_arg = if let Some(arg) = call.args.first() {
+                                    if let Expr::Arrow(arrow) = &*arg.expr {
+                                        arrow.params.len() == 2
+                                    } else if let Expr::Fn(fn_expr) = &*arg.expr {
+                                        fn_expr.function.params.len() == 2
+                                    } else {
+                                        false
+                                    }
+                                } else {
+                                    false
+                                };
+
+                                if has_index_arg {
+                                    let closure = &args[0];
+                                    if method_name == "filter" {
+                                        // filter: handle &(i, v) pattern and strip index from result
+                                        return quote! {
+                                            #obj.clone().into_iter()
+                                                .enumerate()
+                                                .filter(|(i, v)| (#closure)(v.clone(), *i as f64))
+                                                .map(|(_, v)| v)
+                                                .collect::<Vec<_>>()
+                                        };
+                                    } else {
+                                        // map: direct mapping
+                                        return quote! {
+                                            #obj.clone().into_iter()
+                                                .enumerate()
+                                                .map(|(i, v)| (#closure)(v, i as f64))
+                                                .collect::<Vec<_>>()
+                                        };
+                                    }
+                                }
+
+                                // Eager evaluation
                                 return quote! { #obj.clone().into_iter().#method_ident(#(#args),*).collect::<Vec<_>>() };
                             }
                             "forEach" => {
@@ -607,6 +638,28 @@ impl super::interface::RustGenerator {
                                     .iter()
                                     .map(|a| self.convert_expr(&a.expr))
                                     .collect();
+
+                                let has_index_arg = if let Some(arg) = call.args.first() {
+                                    if let Expr::Arrow(arrow) = &*arg.expr {
+                                        arrow.params.len() == 2
+                                    } else if let Expr::Fn(fn_expr) = &*arg.expr {
+                                        fn_expr.function.params.len() == 2
+                                    } else {
+                                        false
+                                    }
+                                } else {
+                                    false
+                                };
+
+                                if has_index_arg {
+                                    let closure = &args[0];
+                                    return quote! {
+                                        #obj.into_iter()
+                                            .enumerate()
+                                            .for_each(|(i, v)| (#closure)(v, i as f64))
+                                    };
+                                }
+
                                 return quote! { #obj.into_iter().for_each(#(#args),*) };
                             }
                             "some" => {
@@ -766,15 +819,13 @@ impl super::interface::RustGenerator {
                             } else {
                                 quote! { todo!() }
                             }
+                        } else if let Some(prop_ident) = member.prop.as_ident() {
+                            let prop_name = to_snake_case(prop_ident.sym.as_ref());
+                            let field = format_ident!("{}", prop_name);
+                            let obj = self.convert_expr(&member.obj);
+                            quote! { #obj.#field }
                         } else {
-                            if let Some(prop_ident) = member.prop.as_ident() {
-                                let prop_name = to_snake_case(prop_ident.sym.as_ref());
-                                let field = format_ident!("{}", prop_name);
-                                let obj = self.convert_expr(&member.obj);
-                                quote! { #obj.#field }
-                            } else {
-                                quote! { todo!("complex member assign") }
-                            }
+                            quote! { todo!("complex member assign") }
                         }
                     }
                     swc_ecma_ast::SimpleAssignTarget::Ident(ident) => {
