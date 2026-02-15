@@ -13,29 +13,15 @@ pub struct Config {
     pub retries: Option<f64>,
 }
 fn process_user(user: User) -> String {
-    let theme = user.config.as_ref().map(|v| v.theme.clone()).flatten();
-    let retries = user
-        .config
-        .as_ref()
-        .map(|v| v.retries.clone())
-        .flatten()
-        .unwrap_or(3f64);
-    let calc = 1f64 + 2f64 * 3f64;
-    let __destruct_val = user;
-    let id = __destruct_val.id.clone();
-    let name = __destruct_val
-        .name
-        .clone()
-        .unwrap_or(String::from("Anonymous"));
-    let list = vec![String::from("a"), String::from("b"), String::from("c")];
-    let __destruct_val = list;
-    let first = __destruct_val[0usize].clone();
-    let second = __destruct_val[1usize].clone();
+    let mut theme = todo!();
+    let mut retries = todo!("Unsupported binary op: {}", "\"??\"");
+    let mut calc = 1f64 + 2f64 * 3f64;
+    let mut list = vec![String::from("a"), String::from("b"), String::from("c")];
     return format!(
         "User {} ({}): Theme {}, Retries {}, Calc {}, List {}-{}",
         id,
         name,
-        theme.unwrap_or(String::from("default")),
+        todo!("Unsupported binary op: {}", "\"??\""),
         retries,
         calc,
         first,

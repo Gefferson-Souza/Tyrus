@@ -59,6 +59,10 @@ pub enum TyrusError {
     #[diagnostic(code(tyrus::fmt_error))]
     FormattingError(String),
 
+    #[error("Validation Error: {0}")]
+    #[diagnostic(code(tyrus::validation_error))]
+    Validation(String),
+
     #[error("Unknown Error")]
     #[diagnostic(code(tyrus::unknown))]
     Unknown,

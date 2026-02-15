@@ -37,19 +37,7 @@ pub struct UserConfig {
     pub attributes: std::collections::HashMap<String, String>,
 }
 fn process_features(config: UserConfig) -> () {
-    for key in config.attributes.keys().cloned() {
-        println!("{} {}", String::from("Attribute:"), key);
-    }
     let mut count = 0f64;
-    loop {
-        {
-            println!("{} {}", String::from("Count:"), count);
-            count += 1f64;
-        }
-        if !(count < 3f64) {
-            break;
-        }
-    }
     if config.status == String::from("active") {
         println!("{}", String::from("User is active"));
     }

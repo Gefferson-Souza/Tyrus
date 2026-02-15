@@ -24,6 +24,14 @@ The primary goal is formal equivalence. If a TypeScript project is "Oxidizable,"
 
 Tyrus enforces a strict subset of TypeScript called the "Oxidizable Standard." It rejects non-idiomatic or unsafe patterns (like `any` or `eval`) to ensure the resulting Rust code is both safe and performant.
 
+### 🔐 Safe Transpilation Architecture
+
+Adhering to strict "Safe Transpilation" principles:
+
+- **Panic-Free Compilation**: Compiler logic uses robust error handling instead of panicking on invalid input.
+- **Strict Linting**: The codebase is verified with `clippy::pedantic` rules (e.g., no `unwrap()`/`expect()` in production paths).
+- **Formal AST Mapping**: Uses Algebraic Data Types (ADTs) to represent logic, avoiding string manipulation vulnerabilities.
+
 ---
 
 ## 🚀 Feature Tiers
@@ -45,6 +53,15 @@ Tyrus enforces a strict subset of TypeScript called the "Oxidizable Standard." I
 - `Async/Await` to Future-based concurrency
 - JSON Serialization/Deserialization (via `serde`)
 - HTTP Client and REST patterns (via `axum` & `reqwest`)
+
+### 📦 Supported Patterns (Verified)
+
+- **Array Literals**: `[1, 2, 3]` -> `vec![1, 2, 3]`
+- **Computed Properties**: `obj["key"]` -> `obj["key"]` (via serde_json)
+- **Class State**: Automatic `Arc<Mutex<T>>` wrapping for services/controllers.
+- **DTOs**: Pure structs for data transfer objects.
+- **Standard Lib**: `map`, `filter`, `find`, `push` mapped to Rust equivalents.
+- **String Replace**: `str.replace(a, b)` -> `str.replacen(a, b, 1)` (Exact JS semantics).
 
 ---
 

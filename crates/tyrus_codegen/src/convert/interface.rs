@@ -11,8 +11,10 @@ pub struct RustGenerator {
     pub code: String,
     pub is_exporting: bool,
     pub is_index: bool,
+    pub is_controller: bool,
     pub controllers: Vec<ControllerMetadata>,
     pub main_body: String,
+    pub current_class_state_fields: std::collections::HashMap<String, String>,
 }
 
 impl RustGenerator {
@@ -21,8 +23,10 @@ impl RustGenerator {
             code: String::new(),
             is_exporting: false,
             is_index,
+            is_controller: false,
             controllers: Vec::new(),
             main_body: String::new(),
+            current_class_state_fields: std::collections::HashMap::new(),
         }
     }
 }
@@ -343,7 +347,7 @@ impl Visit for RustGenerator {
             }
             _ => {
                 // Script statements (ExprStmt, VarDecl, If, Loop, etc.): write to self.main_body
-                let stmt_code = super::func::convert_stmt(n);
+                let stmt_code = self.convert_stmt(n);
                 self.main_body.push_str(&stmt_code.to_string());
                 self.main_body.push('\n');
             }
