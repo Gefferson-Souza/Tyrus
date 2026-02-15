@@ -406,8 +406,20 @@ impl super::interface::RustGenerator {
             }
             Expr::Paren(paren) => self.convert_expr(&paren.expr),
             Expr::Arrow(arrow) => self.convert_arrow_expr(arrow),
+
+            Expr::Array(arr) => self.convert_array_lit(arr),
             _ => quote! { todo!() },
         }
+    }
+
+    fn convert_array_lit(&self, arr: &swc_ecma_ast::ArrayLit) -> proc_macro2::TokenStream {
+        let elems: Vec<_> = arr
+            .elems
+            .iter()
+            .flatten()
+            .map(|elem| self.convert_expr_or_spread(elem))
+            .collect();
+        quote! { vec![#(#elems),*] }
     }
 
     pub fn convert_expr_or_spread(&self, arg: &ExprOrSpread) -> proc_macro2::TokenStream {
@@ -436,6 +448,9 @@ impl super::interface::RustGenerator {
 
                     if needs_deref {
                         return quote! { *self.#field_ident.lock().unwrap() };
+                    } else if type_str == "String" {
+                        // String is not Copy, so we must clone it to return/use as value from MutexGuard
+                        return quote! { self.#field_ident.lock().unwrap().clone() };
                     } else {
                         // For non-primitives (like Vec), return the Guard (or ref?)
                         // If we return *guard, we move out of mutex? No, implementation of Deref.
@@ -463,6 +478,10 @@ impl super::interface::RustGenerator {
                 };
                 let prop = format_ident!("{}", prop_name);
                 quote! { #obj.#prop }
+            }
+            swc_ecma_ast::MemberProp::Computed(computed) => {
+                let expr = self.convert_expr(&computed.expr);
+                quote! { #obj[#expr] }
             }
             _ => quote! { todo!() },
         }

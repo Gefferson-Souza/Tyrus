@@ -26,6 +26,9 @@ fn verify_equivalence() {
         "fixtures/equivalence/recursion.ts",
         "fixtures/equivalence/data_processing.ts",
         "fixtures/equivalence/class_state.ts",
+        "fixtures/simple/todo.ts",
+        "fixtures/simple/calc.ts",
+        "fixtures/simple/strings.ts",
     ];
 
     for scenario in scenarios {

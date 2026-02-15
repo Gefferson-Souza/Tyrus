@@ -1,5 +1,5 @@
-<<<<<<< HEAD
-=======
+# <<<<<<< HEAD
+
 # Tyrus: A High-Fidelity TypeScript-to-Rust Compiler
 
 _Academic Project in Compiler Theory & Semantic Preservation_
@@ -48,6 +48,14 @@ Tyrus enforces a strict subset of TypeScript called the "Oxidizable Standard." I
 - JSON Serialization/Deserialization (via `serde`)
 - HTTP Client and REST patterns (via `axum` & `reqwest`)
 
+### 📦 Supported Patterns (Verified)
+
+- **Array Literals**: `[1, 2, 3]` -> `vec![1, 2, 3]`
+- **Computed Properties**: `obj["key"]` -> `obj["key"]` (via serde_json)
+- **Class State**: Automatic `Arc<Mutex<T>>` wrapping for services/controllers.
+- **DTOs**: Pure structs for data transfer objects.
+- **Standard Lib**: `map`, `filter`, `find`, `push` mapped to Rust equivalents.
+
 ---
 
 ## 🛠 Installation & Usage
@@ -84,4 +92,5 @@ For a deep dive into the compiler's internals, see [docs/ARCHITECTURE.md](docs/A
 ## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
->>>>>>> origin/main
+
+> > > > > > > origin/main

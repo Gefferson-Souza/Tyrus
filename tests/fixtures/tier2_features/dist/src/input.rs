@@ -16,6 +16,6 @@ fn process_user(user: User) -> String {
     let theme = todo!();
     let retries = todo!("Unsupported binary op: {}", "\"??\"");
     let calc = 1f64 + 2f64 * 3f64;
-    let list = todo!();
+    let list = vec![String::from("a"), String::from("b"), String::from("c")];
     return todo!();
 }
