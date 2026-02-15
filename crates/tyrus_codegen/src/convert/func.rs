@@ -455,14 +455,8 @@ impl super::interface::RustGenerator {
                 let field_ident = format_ident!("{}", prop_name);
 
                 // CHECK STATE FIELDS
-                if self
-                    .current_class_state_fields
-                    .contains_key(prop_ident.sym.as_ref())
+                if let Some(type_str) = self.current_class_state_fields.get(prop_ident.sym.as_ref())
                 {
-                    let type_str = self
-                        .current_class_state_fields
-                        .get(prop_ident.sym.as_ref())
-                        .unwrap();
                     let needs_deref = matches!(
                         type_str.as_str(),
                         "f64" | "bool" | "i32" | "usize" | "u64" | "i64"

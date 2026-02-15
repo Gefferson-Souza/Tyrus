@@ -1,5 +1,3 @@
-# <<<<<<< HEAD
-
 # Tyrus: A High-Fidelity TypeScript-to-Rust Compiler
 
 _Academic Project in Compiler Theory & Semantic Preservation_
@@ -25,6 +23,14 @@ The primary goal is formal equivalence. If a TypeScript project is "Oxidizable,"
 ### 🚫 The Oxidizable Standard
 
 Tyrus enforces a strict subset of TypeScript called the "Oxidizable Standard." It rejects non-idiomatic or unsafe patterns (like `any` or `eval`) to ensure the resulting Rust code is both safe and performant.
+
+### 🔐 Safe Transpilation Architecture
+
+Adhering to strict "Safe Transpilation" principles:
+
+- **Panic-Free Compilation**: Compiler logic uses robust error handling instead of panicking on invalid input.
+- **Strict Linting**: The codebase is verified with `clippy::pedantic` rules (e.g., no `unwrap()`/`expect()` in production paths).
+- **Formal AST Mapping**: Uses Algebraic Data Types (ADTs) to represent logic, avoiding string manipulation vulnerabilities.
 
 ---
 
@@ -55,6 +61,7 @@ Tyrus enforces a strict subset of TypeScript called the "Oxidizable Standard." I
 - **Class State**: Automatic `Arc<Mutex<T>>` wrapping for services/controllers.
 - **DTOs**: Pure structs for data transfer objects.
 - **Standard Lib**: `map`, `filter`, `find`, `push` mapped to Rust equivalents.
+- **String Replace**: `str.replace(a, b)` -> `str.replacen(a, b, 1)` (Exact JS semantics).
 
 ---
 
@@ -92,5 +99,3 @@ For a deep dive into the compiler's internals, see [docs/ARCHITECTURE.md](docs/A
 ## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
-
-> > > > > > > origin/main

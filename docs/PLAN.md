@@ -1,58 +1,44 @@
-# 🎼 Plan: Final Polish & Validation (Tyrus v1.0)
+# Project Alignment Plan: Safe Transpilation & Architecture
 
-**Objective:** Validate that Tyrus v1.0 meets all "Academic Standard" requirements: functional equivalence, strict code quality, robust CI, and up-to-date documentation.
+**Goal:** Align `TypeRust` codebase with the architectural principles defined in the new documentation:
 
-## 👥 Orchestration Team
+1.  _The Architecture of Safe Transpilation_
+2.  _From Source to Syntax_
+3.  _Analysis of Rust Development Paradigms_
 
-| Agent                  | Role                | Focus Area                                                     |
-| ---------------------- | ------------------- | -------------------------------------------------------------- |
-| `test-engineer`        | **Validation Lead** | Verify all tests (Unit, E2E, Equivalence) and CI workflows.    |
-| `backend-specialist`   | **Code Auditor**    | Audit generated code for Rust best practices (Clippy, Idioms). |
-| `documentation-writer` | **Scribe**          | Update ROADMAP, README, and ensure academic tone.              |
-| `devops-engineer`      | **Gatekeeper**      | Finalize CI/CD configuration.                                  |
+## Phase 1: Architectural Audit & Safety Hardening
 
-## 📅 Execution Phases
+- [ ] **Panic Elimination**: Scan codebase for `unwrap()`, `expect()`, and `todo!()`. Replace with proper `Result<T, OxidizerError>` handling.
+  - _Rationale_: "Parser is a Minefield". Panics are unacceptable vulnerabilities.
+- [ ] **AST Robustness**: Verify `tyrus_codegen` uses robust ADTs (Enums/Structs) as defined in _From Source to Syntax_.
+  - _Note_: `swc_ecma_ast` is already AST-based, but our _conversion logic_ must be strict.
+- [ ] **Error Handling**: Ensure all potential failure points in `tyrus_codegen` return `Err` (e.g., "unknown node type") rather than silent failure or panic.
 
-### Phase 1: Comprehensive Validation (`test-engineer`, `devops-engineer`)
+## Phase 2: CI/CD & Quality Assurance
 
-> **Goal:** Ensure "It just works" without warnings.
+- [ ] **Linting (Strict)**: Enforce `clippy::pedantic` or at least `-D warnings` in `ci.yml`.
+  - _Reference_: "Code always has to follow best practices".
+- [ ] **Test Coverage**: Run `verify_equivalence` and `integration_tests`.
+  - _Action_: Ensure `todo.ts` issues (ownership) are clearly documented or resolved if blocking.
+- [ ] **CI Workflow**: Verify `.github/workflows/ci.yml` runs:
+  - `cargo check`
+  - `cargo clippy`
+  - `cargo test`
+  - `cargo fmt --check`
 
-- [ ] **Full Test Suite:** Run `cargo test` (Unit + Integration).
-- [ ] **Equivalence Verification:** Run `verify_equivalence` (Todo, Calc, Strings, etc.).
-- [ ] **CI Simulation:** Run `cargo clippy -- -D warnings` and `cargo fmt -- --check`.
-- [ ] **Real-World Demo:** Execute `verify_demo.sh` one last time.
+## Phase 3: Documentation & Roadmap
 
-### Phase 2: Code Quality Audit (`backend-specialist`)
+- [ ] **Update Documentation**: Update `README.md` to reflect the "Safe Transpilation" philosophy.
+- [ ] **Artifact Update**: Ensure `walkthrough.md`, `task.md`, and logic maps are current.
 
-> **Goal:** Ensure generated code is "Idiomatic Rust".
+## Phase 4: Verification
 
-- [ ] **Audit Output:** Inspect `target/test_output` for:
-  - Unnecessary `clone()`.
-  - Proper use of `Arc<Mutex>`.
-  - Correct error handling (`?` vs `unwrap`).
-  - _Action:_ If strict clippy fails on generated code, fix the generator.
+- [ ] **End-to-End Validation**: Run full suite.
+- [ ] **Orchestration Report**: Generate final report.
 
-### Phase 3: Documentation & Release (`documentation-writer`)
+## Execution Strategy
 
-> **Goal:** Academic & Professional Presentation.
-
-- [ ] **ROADMAP.md:** Mark all v1 features as Complete.
-- [ ] **README.md:** Final polish, badges, installation instructions.
-- [ ] **Architecture:** Ensure `ARCHITECTURE.md` reflects the current state (codegen logic).
-
-### Phase 4: Final Sign-off
-
-- [ ] **Security Scan:** Run `security_scan.py`.
-- [ ] **Final Report:** Generate `orchestration_report.md`.
-
----
-
-## 🚦 Decision Point for User
-
-**Plan created.**
-
-1. Validate Tests & CI.
-2. Audit Code Quality.
-3. Update Docs.
-
-**Do you approve? (Y/N)**
+1.  **Audit**: `grep` for panics/todos.
+2.  **Refactor**: Fix identified unsafe patterns.
+3.  **Verify**: Run local CI simulation.
+4.  **Document**: Update docs.

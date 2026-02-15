@@ -34,7 +34,7 @@ jobs:
         run: cargo fmt -- --check
 
       - name: Clippy (Linting)
-        run: cargo clippy --workspace -- -D warnings
+        run: cargo clippy --workspace -- -D warnings -W clippy::unwrap_used -W clippy::expect_used -W clippy::panic
 
       - name: Build
         run: cargo build --workspace

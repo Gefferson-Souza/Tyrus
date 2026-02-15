@@ -1,4 +1,4 @@
-#![allow(deprecated)]
+#![allow(deprecated, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 #[cfg(test)]
 use assert_cmd::prelude::*;
 #[cfg(test)]

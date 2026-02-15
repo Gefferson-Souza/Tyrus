@@ -282,11 +282,11 @@ impl RustGenerator {
                 impl<S> axum::extract::FromRequestParts<S> for #struct_name
                 where S: Send + Sync
                 {
-                    type Rejection = std::convert::Infallible;
+                    type Rejection = axum::http::StatusCode;
                     async fn from_request_parts(parts: &mut axum::http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
                         let axum::Extension(controller) = axum::Extension::<std::sync::Arc<Self>>::from_request_parts(parts, state)
                             .await
-                            .expect("Controller extension missing");
+                            .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
                         Ok(controller.as_ref().clone())
                     }
                 }
