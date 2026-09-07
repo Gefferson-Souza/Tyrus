@@ -20,6 +20,11 @@ paths:
   statements, ambiguous main) are `TyrusError`. Soft findings (blocked APIs like
   `setTimeout`, `document`) are `Diagnostic` with severity — they only become fatal
   under `--strict`.
+- **Unknown decorators are not findings** (owner rule, #265): `DecoratorVisitor` consults
+  `DecoratorKind::from_name` only to build the DI graph. A decorator outside the registry
+  is valid TypeScript that codegen translates generically — never a `TyrusError`, and a
+  `Diagnostic` only under `--strict`, advisory. The analyzer rejects language-level
+  violations (lint codes), not names it has not seen.
 - Spans: `LintVisitor` subtracts 1 from SWC's `span.lo` offset. Keep new visitors
   consistent with that convention (divergence here already produced off-by-one labels).
 - `tyrus_diagnostics` and `tyrus_common`/`tyrus_decorator_kinds` are boundary crates:
