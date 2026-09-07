@@ -18,11 +18,13 @@
 ## Now — UAT criticals (dogfooding the compiler as a user would)
 
 1. **[#191](https://github.com/Gefferson-Souza/Tyrus/issues/191)** HIGH — `build` returns exit 0 on structurally incomplete output (no `fn main`, dropped statements). Same defect class: [#256](https://github.com/Gefferson-Souza/Tyrus/issues/256) (top-level `const` + declared `main()` drops the const).
-2. **[#189](https://github.com/Gefferson-Souza/Tyrus/issues/189)** HIGH — `tyrus run` looks for a `tyrus_app` binary but project scaffolds emit `server`.
-3. **[#190](https://github.com/Gefferson-Souza/Tyrus/issues/190)** HIGH — `@Injectable()` constructor body initializers silently dropped in `new_di()`.
-4. **[#192](https://github.com/Gefferson-Souza/Tyrus/issues/192)** HIGH — no file-extension validation (`.js`/`.txt` accepted, Oxidizable Standard bypassable).
-5. **[#194](https://github.com/Gefferson-Souza/Tyrus/issues/194)** HIGH — untyped parameters become `serde_json::Value` instead of an analyzer error.
-6. **[#255](https://github.com/Gefferson-Souza/Tyrus/issues/255)** — `declare var` in `.d.ts` trips E1001, so `build <dir>` refuses projects with ambient declarations (surfaced by the #188 gate).
+2. **[#265](https://github.com/Gefferson-Souza/Tyrus/issues/265)** HIGH — unknown decorators are dropped (analyzer `continue`, codegen ignores). Owner rule: decorators are generic; only `@Module`/`@Injectable`/`@Controller` + routing/params are semantic. ADR-shaped (generic form to be chosen).
+3. **[#266](https://github.com/Gefferson-Souza/Tyrus/issues/266)** — "Oxidizable NestJS Profile" spec: the finite semantic-override list, everything else generic. Docs only; owner reviews scope.
+4. **[#189](https://github.com/Gefferson-Souza/Tyrus/issues/189)** HIGH — `tyrus run` looks for a `tyrus_app` binary but project scaffolds emit `server`.
+5. **[#190](https://github.com/Gefferson-Souza/Tyrus/issues/190)** HIGH — `@Injectable()` constructor body initializers silently dropped in `new_di()`.
+6. **[#192](https://github.com/Gefferson-Souza/Tyrus/issues/192)** HIGH — no file-extension validation (`.js`/`.txt` accepted, Oxidizable Standard bypassable).
+7. **[#194](https://github.com/Gefferson-Souza/Tyrus/issues/194)** HIGH — untyped parameters become `serde_json::Value` instead of an analyzer error.
+8. **[#255](https://github.com/Gefferson-Souza/Tyrus/issues/255)** — `declare var` in `.d.ts` trips E1001, so `build <dir>` refuses projects with ambient declarations (surfaced by the #188 gate).
 
 ## Next — elite testing (standardization campaign, phase 4)
 
@@ -45,8 +47,7 @@
 
 ## Research horizon (unscheduled)
 
-Class inheritance via traits/composition (`enum_dispatch`) · user-defined decorators ·
-cross-function type inference (integer vs `f64`) · `Date` → `chrono` · IR optimization
+Class inheritance via traits/composition (`enum_dispatch`) · cross-function type inference (integer vs `f64`) · `Date` → `chrono` · IR optimization
 passes · formal verification of semantic preservation.
 
 ---

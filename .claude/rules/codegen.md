@@ -14,8 +14,14 @@ paths:
   decorator costs exactly: 1 handler file in `src/decorators/` + 1 `register_*` line in
   `default_registry()` + 1 variant in `tyrus_decorator_kinds::DecoratorKind`.
 - Decorator name → kind classification happens ONLY via `DecoratorKind::from_name`.
-  Never compare decorator names with raw strings. Unknown decorators are silently
-  skipped, never an error.
+  Never compare decorator names with raw strings.
+- **Decorators are generic (owner rule, restated 2026-09-07 — #265):** `Decorator` is one
+  AST node type and follows the same two-layer rule as every call and method. ONE
+  structural handler translates ALL decorators; the registry overrides only the NestJS
+  structural set (`@Module`, `@Injectable`, `@Controller`, routing, params) because Axum
+  needs different semantics there. Any other decorator — framework or user-defined — gets
+  the generic translation. Never an analyzer error, never a silent drop, never a new
+  handler "because the name is unknown".
 - **ADR 0012 boundary:** array methods needing IR context (map/filter/forEach/some/
   every/reduce/push/replace) live in `convert/expr/call_array.rs`; pure `Vec` ops live
   in `stdlib/array.rs`. A handler that can't decide returns `None` to defer — it never
