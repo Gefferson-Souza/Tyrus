@@ -20,7 +20,7 @@ tyrus_common = { path = "../tyrus_common" }
 tyrus_analyzer = { path = "../tyrus_analyzer" }
 tyrus_diagnostics = { path = "../tyrus_diagnostics" }
 console = "0.15"
-indicatif = "0.17"
+indicatif = "0.18"
 
 [lints]
 workspace = true
