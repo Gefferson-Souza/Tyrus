@@ -3,4 +3,5 @@
 #![forbid(unsafe_code)]
 
 pub mod error;
+pub mod shares;
 pub mod tuple;
