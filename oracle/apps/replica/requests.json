@@ -1,0 +1,862 @@
+{
+ "loadtest": {
+  "E4": {
+   "name": "Banana Prata 1kg",
+   "sku": "BANANA-1KG",
+   "description": "Penca com 6 unidades",
+   "price": 7.9,
+   "stock": 120,
+   "categoryId": 2
+  },
+  "E5": {
+   "name": "ab",
+   "sku": "bad sku",
+   "description": "x",
+   "price": 10.505,
+   "stock": 5,
+   "categoryId": 1
+  },
+  "E6_path": "/reports/sales-by-category?from=2026-03-01T00:00:00.000Z&to=2026-03-08T00:00:00.000Z"
+ },
+ "requests": [
+  {
+   "id": "01-health",
+   "endpoint": "E1",
+   "method": "GET",
+   "path": "/health",
+   "expect_status": 200
+  },
+  {
+   "id": "02-product-1",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/1",
+   "expect_status": 200,
+   "note": "null description"
+  },
+  {
+   "id": "03-product-2",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/2",
+   "expect_status": 200,
+   "note": "null description"
+  },
+  {
+   "id": "04-product-17",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/17",
+   "expect_status": 200,
+   "note": "plain"
+  },
+  {
+   "id": "05-product-9999",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/9999",
+   "expect_status": 200,
+   "note": "plain"
+  },
+  {
+   "id": "06-product-10000",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/10000",
+   "expect_status": 200,
+   "note": "last seeded id"
+  },
+  {
+   "id": "07-product-3",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/3",
+   "expect_status": 200,
+   "note": "description with backslash"
+  },
+  {
+   "id": "08-product-4",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/4",
+   "expect_status": 200,
+   "note": "inactive product"
+  },
+  {
+   "id": "09-product-6",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/6",
+   "expect_status": 200,
+   "note": "description with tab"
+  },
+  {
+   "id": "10-product-7",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/7",
+   "expect_status": 200,
+   "note": "description with emoji"
+  },
+  {
+   "id": "11-product-10",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/10",
+   "expect_status": 200,
+   "note": "description with newline"
+  },
+  {
+   "id": "12-product-16",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/16",
+   "expect_status": 200,
+   "note": "description with quotes and em dash"
+  },
+  {
+   "id": "13-product-35",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/35",
+   "expect_status": 200,
+   "note": "description with < and &"
+  },
+  {
+   "id": "14-product-165",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/165",
+   "expect_status": 200,
+   "note": "emoji in the name"
+  },
+  {
+   "id": "15-product-007",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/007",
+   "expect_status": 200,
+   "note": "ParseIntPipe accepts leading zeros: parsed as 7"
+  },
+  {
+   "id": "16-product-1.5",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/1.5",
+   "expect_status": 400,
+   "note": "ParseIntPipe rejects decimals"
+  },
+  {
+   "id": "17-product-10001",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/10001",
+   "expect_status": 404,
+   "note": "first id past the seed"
+  },
+  {
+   "id": "18-product-minus5",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/-5",
+   "expect_status": 404
+  },
+  {
+   "id": "19-product-abc",
+   "endpoint": "E2",
+   "method": "GET",
+   "path": "/products/abc",
+   "expect_status": 400
+  },
+  {
+   "id": "20-list-defaults",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products",
+   "expect_status": 200
+  },
+  {
+   "id": "21-list-5-37",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?limit=5&offset=37",
+   "expect_status": 200
+  },
+  {
+   "id": "22-list-100-9950",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?limit=100&offset=9950",
+   "expect_status": 200
+  },
+  {
+   "id": "23-list-20-20000",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?limit=20&offset=20000",
+   "expect_status": 200,
+   "note": "offset past the end: empty items"
+  },
+  {
+   "id": "24-list-offset-only",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?offset=100",
+   "expect_status": 200
+  },
+  {
+   "id": "25-list-limit-0",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?limit=0",
+   "expect_status": 400
+  },
+  {
+   "id": "26-list-limit-101",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?limit=101",
+   "expect_status": 400
+  },
+  {
+   "id": "27-list-limit-x",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?limit=x",
+   "expect_status": 400
+  },
+  {
+   "id": "28-list-offset-neg",
+   "endpoint": "E3",
+   "method": "GET",
+   "path": "/products?limit=5&offset=-1",
+   "expect_status": 400
+  },
+  {
+   "id": "29-report-7d",
+   "endpoint": "E6",
+   "method": "GET",
+   "path": "/reports/sales-by-category?from=2026-03-01T00:00:00.000Z&to=2026-03-08T00:00:00.000Z",
+   "expect_status": 200
+  },
+  {
+   "id": "30-report-empty",
+   "endpoint": "E6",
+   "method": "GET",
+   "path": "/reports/sales-by-category?from=2030-01-01T00:00:00.000Z&to=2030-01-02T00:00:00.000Z",
+   "expect_status": 200
+  },
+  {
+   "id": "31-report-1d",
+   "endpoint": "E6",
+   "method": "GET",
+   "path": "/reports/sales-by-category?from=2026-03-01T00:00:00Z&to=2026-03-02T00:00:00Z",
+   "expect_status": 200,
+   "note": "ISO 8601 without milliseconds; the echo keeps the raw strings"
+  },
+  {
+   "id": "32-report-date-only",
+   "endpoint": "E6",
+   "method": "GET",
+   "path": "/reports/sales-by-category?from=2026-06-10&to=2026-06-11",
+   "expect_status": 200,
+   "note": "date-only ISO 8601"
+  },
+  {
+   "id": "33-report-invalid-from",
+   "endpoint": "E6",
+   "method": "GET",
+   "path": "/reports/sales-by-category?from=nope&to=2026-03-02T00:00:00.000Z",
+   "expect_status": 400
+  },
+  {
+   "id": "34-report-both-invalid",
+   "endpoint": "E6",
+   "method": "GET",
+   "path": "/reports/sales-by-category?from=nope&to=also-nope",
+   "expect_status": 400
+  },
+  {
+   "id": "35-report-no-params",
+   "endpoint": "E6",
+   "method": "GET",
+   "path": "/reports/sales-by-category",
+   "expect_status": 400
+  },
+  {
+   "id": "36-post-invalid-loadtest",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": "ab",
+    "sku": "bad sku",
+    "description": "x",
+    "price": 10.505,
+    "stock": 5,
+    "categoryId": 1
+   },
+   "note": "the fixed 3-error body used by the load test"
+  },
+  {
+   "id": "37-post-invalid-missing-fields",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {}
+  },
+  {
+   "id": "38-post-invalid-wrong-types",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": 123,
+    "sku": 456,
+    "description": 42,
+    "price": "12.5",
+    "stock": "3",
+    "categoryId": "2",
+    "active": "yes"
+   }
+  },
+  {
+   "id": "39-post-invalid-too-short",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": "ab",
+    "sku": "tst",
+    "price": 1,
+    "stock": 1,
+    "categoryId": 1
+   }
+  },
+  {
+   "id": "40-post-invalid-negatives",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": "Teste",
+    "sku": "TST-0002",
+    "price": -1,
+    "stock": -1,
+    "categoryId": 0
+   }
+  },
+  {
+   "id": "41-post-invalid-extra-field",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": "ab",
+    "sku": "TST-0001",
+    "price": 1,
+    "stock": 1,
+    "categoryId": 1,
+    "isAdmin": true
+   }
+  },
+  {
+   "id": "42-post-invalid-emoji-length",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": "😀😀",
+    "sku": "TST-0003",
+    "price": 1,
+    "stock": 1,
+    "categoryId": 1
+   },
+   "note": "2 code points (4 UTF-16 units): Length rejects by code points but picks the message by UTF-16 length"
+  },
+  {
+   "id": "43-post-invalid-name-121",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+    "sku": "TST-0001",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 2
+   }
+  },
+  {
+   "id": "44-post-invalid-description-2001",
+   "endpoint": "E5",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body": {
+    "name": "Teste Produto Alfa",
+    "sku": "TST-0001",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 2,
+    "description": "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+   }
+  },
+  {
+   "id": "45-post-valid-loadtest",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body": {
+    "name": "Banana Prata 1kg",
+    "sku": "BANANA-1KG",
+    "description": "Penca com 6 unidades",
+    "price": 7.9,
+    "stock": 120,
+    "categoryId": 2
+   },
+   "mask_timestamps": true,
+   "note": "the fixed valid body used by the load test"
+  },
+  {
+   "id": "46-post-valid-minimal",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body": {
+    "name": "Teste Produto Alfa",
+    "sku": "TST-0001",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 2
+   },
+   "mask_timestamps": true,
+   "note": "no description, no active"
+  },
+  {
+   "id": "47-post-valid-active-false",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body": {
+    "name": "Teste Produto Alfa",
+    "sku": "TST-0004",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 2,
+    "active": false
+   },
+   "mask_timestamps": true
+  },
+  {
+   "id": "48-post-valid-extra-field",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body": {
+    "name": "Teste Produto Alfa",
+    "sku": "TST-0005",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 2,
+    "isAdmin": true
+   },
+   "mask_timestamps": true,
+   "note": "non-whitelisted field is stripped"
+  },
+  {
+   "id": "49-post-valid-description-null",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body": {
+    "name": "Teste Produto Alfa",
+    "sku": "TST-0006",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 2,
+    "description": null
+   },
+   "mask_timestamps": true,
+   "note": "null counts as provided: INSERT binds NULL"
+  },
+  {
+   "id": "50-post-valid-reversed-keys",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body": {
+    "active": true,
+    "description": "Chaves em ordem inversa",
+    "categoryId": 3,
+    "stock": 9,
+    "price": 0.1,
+    "sku": "TST-0007",
+    "name": "Teste Ordem das Chaves"
+   },
+   "mask_timestamps": true,
+   "note": "response key order does not follow the request key order"
+  },
+  {
+   "id": "51-post-valid-emoji-name",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body": {
+    "name": "😀😀😀",
+    "sku": "TST-0008",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 2,
+    "description": "Pão com ç, ã, é e 🍞"
+   },
+   "mask_timestamps": true,
+   "note": "3 code points: valid, stored and echoed as raw UTF-8"
+  },
+  {
+   "id": "52-post-valid-lone-surrogate",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body_raw": "{\"name\":\"a\\ud800b\",\"sku\":\"TST-0009\",\"price\":3,\"stock\":1,\"categoryId\":4}",
+   "mask_timestamps": true,
+   "note": "JS accepts the lone surrogate and echoes it as \\ud800; the DB stores U+FFFD"
+  },
+  {
+   "id": "53-post-valid-price-100.0",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 201,
+   "body_raw": "{\"name\":\"Preco com ponto zero\",\"sku\":\"TST-0010\",\"price\":100.0,\"stock\":1,\"categoryId\":5}",
+   "mask_timestamps": true,
+   "note": "JS number formatting: 100.0 echoes as 100"
+  },
+  {
+   "id": "54-post-fk-500",
+   "endpoint": "E4",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 500,
+   "body": {
+    "name": "Teste Produto Alfa",
+    "sku": "TST-0011",
+    "price": 12.5,
+    "stock": 3,
+    "categoryId": 99999
+   },
+   "note": "FK violation: ROLLBACK, a sequence value is consumed"
+  },
+  {
+   "id": "55-not-found-get",
+   "endpoint": "NF",
+   "method": "GET",
+   "path": "/nope",
+   "expect_status": 404
+  },
+  {
+   "id": "56-not-found-post",
+   "endpoint": "NF",
+   "method": "POST",
+   "path": "/nope",
+   "expect_status": 404,
+   "body": {}
+  },
+  {
+   "id": "57-malformed-json-eof",
+   "endpoint": "MJ",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body_raw": "{\"name\":"
+  },
+  {
+   "id": "58-malformed-json-key",
+   "endpoint": "MJ",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body_raw": "{bad}"
+  },
+  {
+   "id": "59-malformed-json-trailing-comma",
+   "endpoint": "MJ",
+   "method": "POST",
+   "path": "/products",
+   "expect_status": 400,
+   "body_raw": "{\"a\":1,}"
+  },
+  {
+   "id": "60-extras-no-key",
+   "endpoint": "EX",
+   "method": "GET",
+   "path": "/extras/whoami",
+   "expect_status": 403
+  },
+  {
+   "id": "61-extras-wrong-key",
+   "endpoint": "EX",
+   "method": "GET",
+   "path": "/extras/whoami",
+   "expect_status": 403,
+   "headers": {
+    "x-api-key": "nope"
+   }
+  },
+  {
+   "id": "62-extras-whoami-anonymous",
+   "endpoint": "EX",
+   "method": "GET",
+   "path": "/extras/whoami",
+   "expect_status": 200,
+   "headers": {
+    "x-api-key": "replica-key"
+   }
+  },
+  {
+   "id": "63-extras-whoami-client",
+   "endpoint": "EX",
+   "method": "GET",
+   "path": "/extras/whoami",
+   "expect_status": 200,
+   "headers": {
+    "x-api-key": "replica-key",
+    "x-client-id": "client-42"
+   }
+  },
+  {
+   "id": "64-extras-item-21",
+   "endpoint": "EX",
+   "method": "GET",
+   "path": "/extras/items/21",
+   "expect_status": 200,
+   "headers": {
+    "x-api-key": "replica-key"
+   }
+  },
+  {
+   "id": "65-extras-item-abc",
+   "endpoint": "EX",
+   "method": "GET",
+   "path": "/extras/items/abc",
+   "expect_status": 400,
+   "headers": {
+    "x-api-key": "replica-key"
+   }
+  },
+  {
+   "id": "66-extras-domain-error",
+   "endpoint": "EX",
+   "method": "GET",
+   "path": "/extras/domain-error",
+   "expect_status": 422,
+   "headers": {
+    "x-api-key": "replica-key"
+   }
+  },
+  {
+   "id": "67-extras-validate-valid",
+   "endpoint": "EX",
+   "method": "POST",
+   "path": "/extras/validate",
+   "expect_status": 201,
+   "body": {
+    "label": "  rotulo  ",
+    "priority": "high",
+    "contact": "a@b.co",
+    "tags": [
+     "x",
+     "y"
+    ],
+    "address": {
+     "city": "Rio",
+     "country": "BR"
+    }
+   },
+   "headers": {
+    "x-api-key": "replica-key"
+   },
+   "mask_timestamps": true,
+   "note": "Transform apara o rótulo"
+  },
+  {
+   "id": "68-extras-validate-invalid",
+   "endpoint": "EX",
+   "method": "POST",
+   "path": "/extras/validate",
+   "expect_status": 400,
+   "body": {
+    "label": "",
+    "priority": "mid",
+    "contact": "x",
+    "tags": [
+     1,
+     2,
+     3,
+     4
+    ],
+    "address": {
+     "city": 1
+    }
+   },
+   "headers": {
+    "x-api-key": "replica-key"
+   }
+  },
+  {
+   "id": "69-extras-validate-forbidden-first",
+   "endpoint": "EX",
+   "method": "POST",
+   "path": "/extras/validate",
+   "expect_status": 403,
+   "body": {}
+  },
+  {
+   "id": "70-throttled-ping-1",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/ping",
+   "expect_status": 200
+  },
+  {
+   "id": "71-throttled-ping-2",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/ping",
+   "expect_status": 200
+  },
+  {
+   "id": "72-throttled-ping-3",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/ping",
+   "expect_status": 200
+  },
+  {
+   "id": "73-throttled-ping-4",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/ping",
+   "expect_status": 200
+  },
+  {
+   "id": "74-throttled-ping-5",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/ping",
+   "expect_status": 200
+  },
+  {
+   "id": "75-throttled-ping-6",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/ping",
+   "expect_status": 429,
+   "volatile_headers": {
+    "retry-after": [
+     1,
+     60
+    ]
+   }
+  },
+  {
+   "id": "76-throttled-strict-1",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/strict",
+   "expect_status": 200
+  },
+  {
+   "id": "77-throttled-strict-2",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/strict",
+   "expect_status": 200
+  },
+  {
+   "id": "78-throttled-strict-3",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/strict",
+   "expect_status": 429,
+   "volatile_headers": {
+    "retry-after": [
+     1,
+     60
+    ]
+   }
+  },
+  {
+   "id": "79-throttled-skipped-1",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  },
+  {
+   "id": "80-throttled-skipped-2",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  },
+  {
+   "id": "81-throttled-skipped-3",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  },
+  {
+   "id": "82-throttled-skipped-4",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  },
+  {
+   "id": "83-throttled-skipped-5",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  },
+  {
+   "id": "84-throttled-skipped-6",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  },
+  {
+   "id": "85-throttled-skipped-7",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  },
+  {
+   "id": "86-throttled-skipped-8",
+   "endpoint": "TH",
+   "method": "GET",
+   "path": "/throttled/skipped",
+   "expect_status": 200
+  }
+ ]
+}
