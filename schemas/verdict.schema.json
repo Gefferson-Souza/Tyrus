@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gefferson-Souza/Tyrus/schemas/verdict.schema.json",
+  "title": "verdict-record",
+  "description": "Veredito fechado do oráculo com as frações de CPU (D21). Só o oráculo emite.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "shares"],
+  "properties": {
+    "verdict": { "$ref": "#/$defs/verdict" },
+    "shares": { "$ref": "#/$defs/shares" }
+  },
+  "$defs": {
+    "share": { "type": "number", "minimum": 0, "maximum": 1 },
+    "shares": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["native_share", "host_share", "platform_share", "refused_share"],
+      "properties": {
+        "native_share": { "$ref": "#/$defs/share" },
+        "host_share": { "$ref": "#/$defs/share" },
+        "platform_share": { "$ref": "#/$defs/share" },
+        "refused_share": { "$ref": "#/$defs/share" }
+      }
+    },
+    "normalizerId": { "enum": ["N-STACK"] },
+    "assumptionId": { "enum": ["A-NATIVE-TOSTRING"] },
+    "refusalCode": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{2,63}(\\([A-Za-z0-9._:-]{1,128}\\))?$"
+    },
+    "badProbeReason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[^\\p{Cc}]+$"
+    },
+    "verdict": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["identical", "nondeterministic_reference", "emit_skew", "different"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "normalizer"],
+          "properties": {
+            "kind": { "const": "normalized" },
+            "normalizer": { "$ref": "#/$defs/normalizerId" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "code"],
+          "properties": {
+            "kind": { "const": "refused" },
+            "code": { "$ref": "#/$defs/refusalCode" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "assumptions"],
+          "properties": {
+            "kind": { "const": "identical_under_assumption" },
+            "assumptions": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/assumptionId" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "reason"],
+          "properties": {
+            "kind": { "const": "bad_probe" },
+            "reason": { "$ref": "#/$defs/badProbeReason" }
+          }
+        }
+      ]
+    }
+  }
+}
