@@ -320,5 +320,71 @@ class FingerprintTest(unittest.TestCase):
         self.assertEqual(first, second)
 
 
+class ReferenceEngineTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.reference = require_env("TYRUS_NODE_REFERENCE")
+
+    def test_golden_meta_matches_reference_tuple(self):
+        with open(os.path.join(GOLDEN_DIR, "meta.json"), encoding="utf-8") as handle:
+            self.assertEqual(json.load(handle)["tuple"], RUN.reference_tuple(load_index()))
+
+    def test_compare_against_goldens_is_green_and_reproducible(self):
+        first = run_cli("--engine-cmd", self.reference, "--compare", GOLDEN_DIR)
+        second = run_cli("--engine-cmd", self.reference, "--compare", GOLDEN_DIR)
+        self.assertEqual(first[0], 0, first[2])
+        self.assertEqual(first, second)
+        report = json.loads(first[1])
+        self.assertTrue(report["tuple_matches"])
+        self.assertEqual(report["diff_classes"], [])
+        self.assertGreaterEqual(report["counts"]["total"], 130)
+        self.assertEqual({s["status"] for s in report["sections"].values()}, {"same"})
+
+    def test_class_filter_only_runs_what_was_asked(self):
+        code, out, _ = run_cli("--engine-cmd", self.reference, "--compare", GOLDEN_DIR, "--class", "fingerprint.sin,litmus.L01*")
+        self.assertEqual(code, 0)
+        self.assertEqual(sorted(json.loads(out)["statuses"]), ["fingerprint.sin", "litmus.L01_tick_vs_promise_main"])
+
+    def test_record_refuses_unstable_scripts(self):
+        with tempfile.TemporaryDirectory() as temp:
+            clone = os.path.join(temp, "batteries")
+            shutil.copytree(ROOT, clone, ignore=shutil.ignore_patterns("goldens", "__pycache__"))
+            shutil.copy(os.path.join(ROOT, "perturbation", "P01_hrtime_noise.js"), os.path.join(clone, "litmus"))
+            runner = load_runner(os.path.join(clone, "run.py"))
+            with contextlib.redirect_stderr(io.StringIO()):
+                code = runner.main(["--engine-cmd", self.reference, "--record", os.path.join(temp, "g"), "--stability", "3"])
+            self.assertEqual(code, 2)
+            self.assertFalse(os.path.exists(os.path.join(temp, "g", "golden.json")))
+
+    def test_missing_engine_is_a_harness_error(self):
+        code, _, err = run_cli("--engine-cmd", "/nonexistent/engine", "--compare", GOLDEN_DIR)
+        self.assertEqual(code, 2)
+        self.assertIn("ERRO DO HARNESS", err)
+
+    def test_missing_golden_dir_is_a_harness_error(self):
+        code, _, _ = run_cli("--engine-cmd", self.reference, "--compare", "/nonexistent/goldens")
+        self.assertEqual(code, 2)
+
+    def test_record_requires_the_reference_tuple(self):
+        with tempfile.TemporaryDirectory() as temp:
+            code, _, err = run_cli("--engine-cmd", require_env("TYRUS_NODE_SEED"), "--record", os.path.join(temp, "g"), "--stability", "1")
+            self.assertEqual(code, 2)
+            self.assertIn("difere da referencia", err)
+
+    def test_class_without_golden_is_a_harness_error(self):
+        with tempfile.TemporaryDirectory() as temp:
+            clone = os.path.join(temp, "g")
+            shutil.copytree(GOLDEN_DIR, clone)
+            path = os.path.join(clone, "golden.json")
+            with open(path, encoding="utf-8") as handle:
+                golden = json.load(handle)
+            del golden["classes"]["litmus.L01_tick_vs_promise_main"]
+            with open(path, "w", encoding="utf-8") as handle:
+                json.dump(golden, handle)
+            code, _, err = run_cli("--engine-cmd", self.reference, "--compare", clone)
+            self.assertEqual(code, 2)
+            self.assertIn("desatualizados", err)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,9 @@
+sync
+tick1
+tick2
+tick-in-tick1
+promise1
+promise2
+promise-in-tick1
+promise-in-promise1
+tick-in-promise1

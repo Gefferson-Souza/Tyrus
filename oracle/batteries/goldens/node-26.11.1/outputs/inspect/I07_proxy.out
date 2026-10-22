@@ -1,0 +1,12 @@
+Proxy({ a: 1, nested: { b: 2 } })
+Proxy [
+  { a: 1, nested: { b: 2 } },
+  Proxy [ {}, { get: [Function: get] } ]
+]
+Proxy [ [ 1, 2, 3 ], {} ]
+Proxy([ 1, 2, 3 ])
+Proxy([Function: fn])
+Proxy(Map(1) { 1 => 2 })
+<Revoked Proxy>
+Proxy({})
+trapsTouchedByInspect 0

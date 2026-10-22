@@ -1,0 +1,18 @@
+[ "it's", 'say "hi"', `both ' and "`, 'back`tick \' "', 'plain' ]
+{ s: 'line1\nline2', t: 'tab\there', u: '\x00\x1F\x7F' }
+[ '\ud83d', 'ok😀', '\ud83d', 'é', ' ' ]
+'xxxxxxxxxx'... 20 more characters
+{
+  long: 'word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word '
+}
+[ 'a\nba\nba\nba\nba\nb' ]
+top-level string is raw [ "nested's" ]
+"single'only" 'dq"only' '`' '\\'
+{
+  '3': 3,
+  'key with space': 1,
+  valid_id: 2,
+  'dash-key': 4,
+  '': 5,
+  Symbol(s): 6
+}

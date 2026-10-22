@@ -1,0 +1,5 @@
+tick
+listener
+after-emit
+promise
+once-resolved 7

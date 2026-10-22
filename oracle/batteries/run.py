@@ -216,3 +216,71 @@ def collect(engine_cmd, wanted, golden_classes, stability, extra_env):
             classes.update(found)
             outputs.update(out)
     return tuple_info, classes, failed, outputs, index
+
+
+def record(engine_cmd, directory, allow_any_tuple, stability, extra_env):
+    tuple_info, classes, failed, outputs, index = collect(engine_cmd, None, None, stability, extra_env)
+    if failed:
+        raise HarnessError(f"sondas com erro: {failed}")
+    expected = reference_tuple(index)
+    if tuple_info != expected and not allow_any_tuple:
+        raise HarnessError(f"tupla do motor {tuple_info} difere da referencia {expected}")
+    bad = sorted(c for c, v in classes.items() if v.get("unstable") or "error" in v)
+    if bad:
+        raise HarnessError(f"classes instaveis ou com erro (mover para perturbation/): {bad}")
+    os.makedirs(directory, exist_ok=True)
+    for class_id, data in outputs.items():
+        path = os.path.join(directory, "outputs", class_id.replace(".", "/", 1) + ".out")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as handle:
+            handle.write(data)
+    with open(os.path.join(directory, "golden.json"), "w", encoding="utf-8") as handle:
+        json.dump({"schema": 1, "classes": classes}, handle, indent=1, sort_keys=True)
+        handle.write("\n")
+    with open(os.path.join(directory, "meta.json"), "w", encoding="utf-8") as handle:
+        json.dump({"schema": 1, "tuple": tuple_info, "classes": len(classes), "stability_runs": stability}, handle, indent=1, sort_keys=True)
+        handle.write("\n")
+    return {"recorded": len(classes), "tuple": tuple_info}
+
+
+def parse_args(argv):
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--engine-cmd", required=True, help="comando do motor; o script e anexado como ultimo argumento")
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--compare", metavar="DIR", help="diretorio de goldens")
+    mode.add_argument("--record", metavar="DIR", help="grava goldens (exige a tupla de referencia)")
+    parser.add_argument("--class", dest="classes", help="globs de id de classe separados por virgula, ex.: 'fingerprint.sin,litmus.*'")
+    parser.add_argument("--stability", type=int, help="execucoes por script (compare: 1; record: 5)")
+    parser.add_argument("--allow-any-tuple", action="store_true", help="so para --record de controles e testes")
+    parser.add_argument("--engine-env", action="append", default=[], metavar="K=V")
+    return parser.parse_args(argv)
+
+
+def main(argv):
+    args = parse_args(argv)
+    extra_env = dict(item.split("=", 1) for item in args.engine_env)
+    patterns = args.classes.split(",") if args.classes else None
+    try:
+        if args.record:
+            summary = record(args.engine_cmd, args.record, args.allow_any_tuple, args.stability or DEFAULT_RECORD_STABILITY, extra_env)
+            print(json.dumps(summary, sort_keys=True))
+            return EXIT_SAME
+        goldens_dir = args.compare
+        golden = {**load_json(os.path.join(goldens_dir, "golden.json")), "tuple": load_json(os.path.join(goldens_dir, "meta.json"))["tuple"]}
+        wanted = {c for c in golden["classes"] if matches(c, patterns)} if patterns else None
+        tuple_info, actual, failed, outputs, index = collect(args.engine_cmd, wanted, golden["classes"], args.stability or 1, extra_env)
+        unexpected = sorted(set(actual) - set(golden["classes"]))
+        if unexpected:
+            raise HarnessError(f"goldens desatualizados, classes sem golden: {unexpected}")
+    except (HarnessError, OSError, ValueError, KeyError) as error:
+        print(f"ERRO DO HARNESS: {error}", file=sys.stderr)
+        return EXIT_USAGE
+    report = build_report(args.engine_cmd, golden, Measurement(tuple_info, actual, failed), patterns)
+    report["sections"] = section_rollup(report, index)
+    report["failure_diffs"] = failure_diffs(report, goldens_dir, outputs)
+    print(json.dumps(report, sort_keys=True, indent=1))
+    return EXIT_DIFF if report["diff_classes"] else EXIT_SAME
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

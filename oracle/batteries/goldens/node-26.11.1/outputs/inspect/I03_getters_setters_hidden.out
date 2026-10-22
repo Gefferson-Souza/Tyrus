@@ -1,0 +1,20 @@
+{ a: [Getter], b: [Setter], c: [Getter/Setter], d: 4 }
+{ a: [Getter: 1], b: [Setter], c: [Getter/Setter: 2], d: 4 }
+{
+  boom: [Getter: <Inspection threw (Error: x
+      at get boom (/home/gefferson-souza/.local/share/tyrus-wt/orc-conformance-batteries/oracle/batteries/inspect/I03_getters_setters_hidden.js:5:47)
+      at formatProperty (node:internal/util/inspect:2582:21)
+      at formatRaw (node:internal/util/inspect:1441:9)
+      at formatValue (node:internal/util/inspect:1188:19)
+      at Object.inspect (node:internal/util/inspect:407:10)
+      at Object.<anonymous> (/home/gefferson-souza/.local/share/tyrus-wt/orc-conformance-batteries/oracle/batteries/inspect/I03_getters_setters_hidden.js:5:18)
+      at Module._compile (node:internal/modules/cjs/loader:1968:14)
+      at Object..js (node:internal/modules/cjs/loader:2108:10)
+      at Module.load (node:internal/modules/cjs/loader:1690:32)
+      at Module._load (node:internal/modules/cjs/loader:1480:12))>]
+}
+{ shown: 1 }
+{ shown: 1, [secret]: 2 }
+[ 1, 2, [length]: 2 ]
+Map(1) { 1 => 2 }
+[]
