@@ -31,11 +31,18 @@ echo "== árvore de produção =="
 tools/make_prod_tree.sh "$work/prod"
 RUN run --target "node main.js" --cwd "$work/prod/dist-bundle" --out "$work/prod.json" --twice \
     --golden "$GOLDEN" --expect-node "$EXPECT_NODE"
+for pkg in typescript webpack ts-loader; do
+    [ ! -e "$work/prod/node_modules/$pkg" ] || { echo "verify_replica: $pkg presente na árvore de produção" >&2; exit 1; }
+done
 rm -rf "$work/prod"
 
 echo "== Fastify (nível body) =="
 RUN run --target "node dist/bundle/main.js" --adapter fastify --port 18102 --out "$work/fastify.json" \
     --twice --level body --golden "$GOLDEN" --expect-node "$EXPECT_NODE"
+if RUN compare "$work/fastify.json" "$work/bundle.json" --level strict >/dev/null 2>&1; then
+    echo "verify_replica: ADAPTER=fastify respondeu igual ao Express no nível strict (adaptador não selecionado)" >&2
+    exit 1
+fi
 
 echo "== 1000 requisições a E2 sem 429 =="
 RUN burst --target "node dist/bundle/main.js" --path-template "/products/{n}" --count 1000

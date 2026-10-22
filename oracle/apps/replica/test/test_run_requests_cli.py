@@ -94,6 +94,18 @@ class RunRequestsCliTest(unittest.TestCase):
                                   str(self.tmp / "other.json")], capture_output=True)
         self.assertEqual((same.returncode, changed.returncode), (0, 1))
 
+    def test_reports_differing_only_in_headers_pass_at_body_level_and_fail_at_strict(self):
+        self.assertEqual(self.run_cli("ok").returncode, 0)
+        other = json.loads((self.tmp / "out.json").read_text(encoding="utf-8"))
+        other["results"][0]["headers"] = [["x-powered-by", "Express"]]
+        (self.tmp / "other.json").write_text(json.dumps(other), encoding="utf-8")
+
+        def compare(level: str) -> int:
+            return subprocess.run([sys.executable, "-I", "-B", str(RUNNER), "compare", str(self.tmp / "out.json"),
+                                   str(self.tmp / "other.json"), "--level", level], capture_output=True).returncode
+
+        self.assertEqual((compare("body"), compare("strict")), (0, 1))
+
 
 if __name__ == "__main__":
     unittest.main()

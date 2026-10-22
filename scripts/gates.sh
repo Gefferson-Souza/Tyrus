@@ -246,7 +246,7 @@ gate_replica() {
     fi
     if command -v shellcheck >/dev/null 2>&1; then
         find oracle/apps/replica/db oracle/apps/replica/tools -name '*.sh' -print0 \
-            | xargs -0 shellcheck -x scripts/check_replica_parity.sh
+            | xargs -0 shellcheck -x -P SCRIPTDIR scripts/check_replica_parity.sh
     elif [ "${TYRUS_REQUIRE_SHELLCHECK:-0}" = "1" ]; then
         echo "ERROR: shellcheck ausente e TYRUS_REQUIRE_SHELLCHECK=1"
         return 1
