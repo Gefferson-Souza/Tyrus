@@ -80,7 +80,7 @@ fn verify_fails_with_e5001_when_the_binary_has_another_tuple() {
     );
     assert_eq!(run.code, EXIT_ORACLE_ERROR);
     assert!(run.stderr.starts_with("TYRUS-E5001: "), "{}", run.stderr);
-    assert!(run.stdout.is_empty());
+    assert_eq!(run.stdout, "");
 }
 
 #[test]

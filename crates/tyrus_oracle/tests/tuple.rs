@@ -15,7 +15,7 @@ fn reference_tuple() -> NodeTuple {
 
 #[test]
 fn identical_tuples_have_no_diff() {
-    assert!(reference_tuple().diff(&reference_tuple()).is_empty());
+    assert_eq!(reference_tuple().diff(&reference_tuple()), Vec::new());
 }
 
 #[test]

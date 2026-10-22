@@ -67,7 +67,7 @@ fn committed_lock_pins_the_reference_and_seed_tuples() {
             "47.0"
         )
     );
-    assert!(lock.host_crates.is_empty());
+    assert_eq!(lock.host_crates, std::collections::BTreeMap::new());
 }
 
 #[test]
