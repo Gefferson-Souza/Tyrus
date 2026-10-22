@@ -11,6 +11,7 @@ use crate::tuple::NodeRole;
 pub const EXIT_OK: u8 = 0;
 pub const EXIT_ORACLE_ERROR: u8 = 2;
 pub const EXIT_USAGE: u8 = 64;
+pub const EXIT_IO: u8 = 74;
 
 const DEFAULT_LOCK_PATH: &str = "oracle/oracle.lock";
 const USAGE: &str = "uso: tyrus-oracle lock verify [--lock <caminho>] [--role reference|seed|all]";

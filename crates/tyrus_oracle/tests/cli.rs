@@ -1,10 +1,11 @@
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
 use std::ffi::OsString;
+use std::os::unix::ffi::OsStringExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
-use tyrus_oracle::cli::{run, EXIT_ORACLE_ERROR, EXIT_USAGE};
+use tyrus_oracle::cli::{run, EXIT_IO, EXIT_ORACLE_ERROR, EXIT_USAGE};
 
 fn lock_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../oracle/oracle.lock")
@@ -153,4 +154,22 @@ fn binary_maps_results_to_exit_codes() {
 #[test]
 fn exit_codes_are_part_of_the_contract() {
     assert_eq!((EXIT_ORACLE_ERROR, EXIT_USAGE), (2, 64));
+}
+
+#[test]
+fn binary_rejects_a_non_utf8_argument_with_the_usage_code() {
+    let invalid = OsString::from_vec(b"/tmp/\xff\xfe".to_vec());
+    let output = Command::new(env!("CARGO_BIN_EXE_tyrus-oracle"))
+        .args(["lock", "verify", "--lock"])
+        .arg(invalid)
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(i32::from(EXIT_USAGE)));
+    assert!(!String::from_utf8_lossy(&output.stderr).contains("panicked"));
+}
+
+#[test]
+fn io_failure_code_is_distinct_from_oracle_errors() {
+    assert_eq!(EXIT_IO, 74);
+    assert_ne!(EXIT_IO, EXIT_ORACLE_ERROR);
 }

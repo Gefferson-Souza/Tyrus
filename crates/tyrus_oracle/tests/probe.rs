@@ -3,6 +3,7 @@
 use std::ffi::OsString;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
+use std::sync::{Mutex, MutexGuard};
 use std::time::Duration;
 
 use tyrus_oracle::error::OracleError;
@@ -11,6 +12,15 @@ use tyrus_oracle::probe::{
     parse_probe_output, probe_node, probe_node_with_timeout, resolve_binary, verify_tuple,
 };
 use tyrus_oracle::tuple::{NodeRole, ENV_NODE_REFERENCE, ENV_NODE_SEED};
+
+// Serializa escrita+exec dos scripts falsos: evita ETXTBSY sob `cargo test` (threads paralelas).
+static SPAWN_LOCK: Mutex<()> = Mutex::new(());
+
+fn serial() -> MutexGuard<'static, ()> {
+    SPAWN_LOCK
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
 
 fn committed_lock() -> OracleLock {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../oracle/oracle.lock");
@@ -36,6 +46,7 @@ fn fake_node(name: &str, script_body: &str) -> PathBuf {
 
 #[test]
 fn lock_probe_matches_reference() {
+    let _serial = serial();
     let lock = committed_lock();
     let measured = verify_tuple(
         &lock,
@@ -47,6 +58,7 @@ fn lock_probe_matches_reference() {
 
 #[test]
 fn lock_probe_matches_seed() {
+    let _serial = serial();
     let lock = committed_lock();
     let measured = verify_tuple(&lock, NodeRole::Seed, &pinned_binary(NodeRole::Seed));
     assert_eq!(measured.unwrap(), lock.seed);
@@ -54,6 +66,7 @@ fn lock_probe_matches_seed() {
 
 #[test]
 fn lock_probe_rejects_wrong_tuple() {
+    let _serial = serial();
     let lock = committed_lock();
     let seed_binary = pinned_binary(NodeRole::Seed);
     let error = verify_tuple(&lock, NodeRole::Reference, &seed_binary).unwrap_err();
@@ -68,6 +81,7 @@ fn lock_probe_rejects_wrong_tuple() {
 
 #[test]
 fn probe_runs_with_a_cleared_environment() {
+    let _serial = serial();
     assert!(
         std::env::var_os("HOME").is_some(),
         "o teste precisa de HOME no ambiente do processo"
@@ -80,6 +94,7 @@ echo '{"node":"26.11.1","v8":"14.6.202.34-node.37","icu":"78.3","unicode":"17.0"
 
 #[test]
 fn resolve_binary_reads_the_role_env_var() {
+    let _serial = serial();
     let env = |name: &str| (name == ENV_NODE_SEED).then(|| OsString::from("/opt/node22/bin/node"));
     assert_eq!(
         resolve_binary(NodeRole::Seed, env).unwrap(),
@@ -92,12 +107,14 @@ fn resolve_binary_reads_the_role_env_var() {
 
 #[test]
 fn resolve_binary_treats_an_empty_value_as_unset() {
+    let _serial = serial();
     let error = resolve_binary(NodeRole::Reference, |_| Some(OsString::new())).unwrap_err();
     assert_eq!(error.stable_code(), "TYRUS-E5002");
 }
 
 #[test]
 fn probe_rejects_relative_missing_and_failing_binaries() {
+    let _serial = serial();
     let relative = probe_node(Path::new("node")).unwrap_err();
     assert_eq!(relative.stable_code(), "TYRUS-E5003");
     let missing = probe_node(Path::new("/nao/existe/node")).unwrap_err();
@@ -108,6 +125,7 @@ fn probe_rejects_relative_missing_and_failing_binaries() {
 
 #[test]
 fn probe_kills_a_binary_that_exceeds_the_timeout() {
+    let _serial = serial();
     let slow = fake_node("slow", "exec sleep 30");
     let started = std::time::Instant::now();
     let error = probe_node_with_timeout(&slow, Duration::from_millis(300)).unwrap_err();
@@ -118,6 +136,7 @@ fn probe_kills_a_binary_that_exceeds_the_timeout() {
 
 #[test]
 fn probe_output_must_be_the_exact_tuple_json() {
+    let _serial = serial();
     let garbage = probe_node(&fake_node("garbage", "echo nao-e-json")).unwrap_err();
     assert_eq!(garbage.stable_code(), "TYRUS-E5004");
     let partial = parse_probe_output(r#"{"node":"26.11.1"}"#).unwrap_err();
