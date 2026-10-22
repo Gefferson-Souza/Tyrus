@@ -1,0 +1,7 @@
+before-require
+eval-esm-plain
+after-require-plain-[object Module]
+same-instance-true
+sync-end
+tick
+promise

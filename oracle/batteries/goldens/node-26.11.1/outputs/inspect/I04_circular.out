@@ -1,0 +1,12 @@
+<ref *1> { name: 'a', self: [Circular *1] }
+<ref *1> {
+  n: 'b',
+  child: { n: 'c', parent: [Circular *1] },
+  list: [ [Circular *1], { n: 'c', parent: [Circular *1] } ]
+}
+<ref *1> Map(1) { 'me' => [Circular *1] }
+[
+  <ref *1> { y: { x: [Circular *1] } },
+  <ref *2> { x: <ref *1> { y: [Circular *2] } }
+]
+<ref *1> [ 1, [Circular *1] ]

@@ -1,0 +1,9 @@
+A { x: 1 } B { x: 1, z: [ 1 ] }
+[class A] { s: 3 } [class B extends A] [class (anonymous)] [class (anonymous) extends A]
+[Object: null prototype] {} [Object: null prototype] { a: 1 }
+{}
+Tagged [Custom] {} A {}
+[Function: f] [Function (anonymous)] [AsyncFunction: g] [GeneratorFunction: h] [AsyncGeneratorFunction: i] [AsyncFunction (anonymous)]
+[Function: withProps] { extra: 1 } [Function: max] [class Z] { a: 1 }
+MyArr(2) [ 1, 2 ] MyMap(1) [Map] { 1 => 2 }
+[Object: null prototype] { a: 1 } Error

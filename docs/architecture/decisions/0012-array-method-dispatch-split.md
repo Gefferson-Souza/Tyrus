@@ -1,7 +1,7 @@
 # 12. Array Method Dispatch — Ownership Boundary
 
 Date: 2026-05-07
-Status: Accepted
+Status: Accepted. Legacy-scoped by [ADR 0016](0016-ppr-foundation-and-constitution.md), effective when ADR 0016 is accepted; deleted with the legacy code.
 
 ## Context
 

@@ -3,6 +3,8 @@
 > **Strict rules for Tyrus development.** Inspired by the NASA/JPL "Power of Ten Rules for Developing Safety-Critical Code" (Holzmann, 2006), adapted to Rust + transpiler context.
 >
 > **Status:** Accepted (ADR 0008 / 2026-05-03). Amended to 14 rules by ADR 0013 (2026-08-04). Binding for all contributions to `main`.
+>
+> **Scope (proposed by ADR 0016, effective when accepted):** binding for the **legacy crates** only (the prototypes listed in `gates.toml [legacy] crates`, once that file exists). New crates follow the [Constitution](CONSTITUTION.md). R13 is amended by ADR 0016: a closed allowlist of crates may use `unsafe`.
 
 ---
 

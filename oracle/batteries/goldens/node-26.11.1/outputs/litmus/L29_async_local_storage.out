@@ -1,0 +1,10 @@
+sync {"id":"ctx"}
+tick {"id":"ctx"}
+promise {"id":"ctx"}
+microtask {"id":"ctx"}
+await {"id":"ctx"}
+immediate {"id":"ctx"}
+outside null
+readFile {"id":"ctx"}
+timeout {"id":"ctx"}
+emitter-listener {"id":"ctx"}

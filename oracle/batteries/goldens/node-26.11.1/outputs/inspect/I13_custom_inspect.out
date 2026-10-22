@@ -1,0 +1,8 @@
+Money<5> depth=2 stylize=function true
+{ wallet: Money<1> depth=1 stylize=function true } [ Money<2> depth=1 stylize=function true ]
+Money<3> depth=0 stylize=function true
+{ replaced: true, n: [ 1, 2 ] } [ { replaced: true, n: [ 1, 2 ] } ]
+{ x: { y: Deep { a: [Object] } } }
+by-symbol-for
+{ toJSON: [Function: toJSON], toString: [Function: toString] }
+42

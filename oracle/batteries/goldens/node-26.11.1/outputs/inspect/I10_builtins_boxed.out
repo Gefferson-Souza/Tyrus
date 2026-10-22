@@ -1,0 +1,26 @@
+2020-01-02T03:04:05.006Z [ 2020-01-02T03:04:05.006Z ] Invalid Date 1970-01-01T00:00:00.000Z { extra: 1 }
+/re/gi /x/ { extra: 1 } [ /a/y ]
+Promise { 1 } Promise { <pending> } caught
+Promise { <rejected> 7 } Promise { { a: [ 1 ] } }
+[Number: 1] [String: 's'] [Boolean: true] [Symbol: Symbol(q)] [BigInt: 2n] [String: 'ab']
+[Number: 3] { extra: 1 }
+{ a: 1 } [ 1 ] true
+[Arguments] { '0': 1, '1': 'a' }
+Foo {
+  date: 1970-01-01T00:00:00.000Z,
+  re: /x/,
+  fn: [Function (anonymous)]
+}
+[
+  undefined,
+  null,
+  true,
+  'str',
+  1,
+  [Function (anonymous)],
+  Symbol(Symbol.iterator)
+]
+{ u: undefined, n: null } [ undefined, <1 empty item>, null ]
+Intl.NumberFormat Intl.NumberFormat {} Intl.DateTimeFormat {}
+Object [Generator] {} Object [AsyncGenerator] {} Object [Array Iterator] {} Object [String Iterator] {} Object [RegExp String Iterator] {}
+WeakRef {} function FinalizationRegistry {}

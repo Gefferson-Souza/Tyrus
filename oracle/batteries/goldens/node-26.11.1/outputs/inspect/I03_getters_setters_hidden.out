@@ -1,0 +1,11 @@
+{ a: [Getter], b: [Setter], c: [Getter/Setter], d: 4 }
+{ a: [Getter: 1], b: [Setter], c: [Getter/Setter: 2], d: 4 }
+{
+  boom: [Getter: <Inspection threw (Error: x
+      at boom (/virtual/file.js:1:1))>]
+}
+{ shown: 1 }
+{ shown: 1, [secret]: 2 }
+[ 1, 2, [length]: 2 ]
+Map(1) { 1 => 2 }
+[]

@@ -1,0 +1,10 @@
+listening
+server-request GET /p
+server-res-finish
+server-req-end
+client-response 200
+client-data ok
+client-end
+client-res-close
+server-close
+client-req-close

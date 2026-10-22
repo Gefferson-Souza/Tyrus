@@ -1,0 +1,44 @@
+-0 [ -0 ] 0 NaN Infinity -Infinity 1e+21 1e-7 0.30000000000000004
+10n [ 10n ] -5n 1208925819614629174706176n [BigInt: 1n]
+1_234_567.891 123_456_789n
+[ 1, <1 empty item>, 3 ] [ <2 empty items> ] [ <5 empty items> ] [ 1, 2, <3 empty items>, 6 ]
+[ 1, 2, tag: 'x' ]
+Uint8Array(3) [ 1, 2, 3 ] Float64Array(2) [ 0.5, -0 ] BigInt64Array(1) [ 1n ] Uint8Array(0) []
+ArrayBuffer { [Uint8Contents]: <00 00 00 00>, [byteLength]: 4 } SharedArrayBuffer { [Uint8Contents]: <00 00>, [byteLength]: 2 }
+DataView {
+  [byteLength]: 2,
+  [byteOffset]: 0,
+  [buffer]: ArrayBuffer { [Uint8Contents]: <00 00>, [byteLength]: 2 }
+}
+<Buffer 68 c3 a9 6c 6c 6f> <Buffer 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 ... 10 more bytes>
+[
+   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11,
+  12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+  24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+  36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+  48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+  60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
+  72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83,
+  84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+  96, 97, 98, 99,
+  ... 20 more items
+]
+[
+     0, 1000, 2000,
+  3000, 4000, 5000,
+  6000
+]
+[
+  'item0',  'item1',  'item2',
+  'item3',  'item4',  'item5',
+  'item6',  'item7',  'item8',
+  'item9',  'item10', 'item11',
+  'item12', 'item13', 'item14',
+  'item15', 'item16', 'item17',
+  'item18', 'item19', 'item20',
+  'item21', 'item22', 'item23',
+  'item24', 'item25', 'item26',
+  'item27', 'item28', 'item29'
+]
+[ 1.5, 22.25, 333.125, 4, 5, 6, 7, 8, 9, 10 ]
+[ [ 1, 2, [ 3, 4, [Array] ] ], { a: { b: [Object] } } ]

@@ -1,0 +1,15 @@
+newListener x
+newListener x
+newListener x
+newListener x
+prepended
+first
+second
+once
+emit1 true
+prepended
+first
+emit2 true
+threw no-listener
+threw Unhandled error. ('plain') code=ERR_UNHANDLED_ERROR
+counts 2 newListener,x
