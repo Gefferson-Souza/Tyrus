@@ -21,6 +21,7 @@
 #   ./scripts/gates.sh audit       # cargo audit --deny warnings
 #   ./scripts/gates.sh machete     # cargo machete (unused dependencies)
 #   ./scripts/gates.sh unsafe      # Rule 13: forbid(unsafe_code) in every crate root
+#   ./scripts/gates.sh replica     # oracle/apps/replica: parity, request set, tooling tests (no Docker)
 #
 # Environment variables:
 #   TYRUS_SKIP_DENY=1      Skip cargo deny check (use only when tool unavailable).
@@ -234,6 +235,26 @@ gate_audit() {
         --deny warnings
 }
 
+gate_replica() {
+    echo "=== gate: replica ==="
+    sh scripts/check_replica_parity.sh
+    python3 -B -I oracle/apps/replica/make_requests.py --check
+    python3 -B -I -m unittest discover -s oracle/apps/replica/test -p 'test_*.py'
+    if git ls-files oracle/apps/replica | grep -q 'node_modules/'; then
+        echo "FAIL: node_modules versionado em oracle/apps/replica"
+        return 1
+    fi
+    if command -v shellcheck >/dev/null 2>&1; then
+        find oracle/apps/replica/db oracle/apps/replica/tools -name '*.sh' -print0 \
+            | xargs -0 shellcheck -x scripts/check_replica_parity.sh
+    elif [ "${TYRUS_REQUIRE_SHELLCHECK:-0}" = "1" ]; then
+        echo "ERROR: shellcheck ausente e TYRUS_REQUIRE_SHELLCHECK=1"
+        return 1
+    else
+        echo "WARN: shellcheck ausente; etapa ignorada (o CI a exige)"
+    fi
+}
+
 # --- Dispatcher --------------------------------------------------------------
 
 cmd="${1:-all}"
@@ -247,11 +268,13 @@ case "$cmd" in
     audit)    gate_audit ;;
     machete)  gate_machete ;;
     unsafe)   gate_unsafe ;;
+    replica)  gate_replica ;;
     all)
         gate_fmt
         gate_clippy
         gate_filesize
         gate_unsafe
+        gate_replica
         gate_test
         gate_coverage
         gate_deny
