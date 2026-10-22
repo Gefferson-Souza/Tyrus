@@ -286,5 +286,39 @@ class InspectTest(unittest.TestCase):
         self.assertEqual([c for c, v in classes.items() if v.get("unstable")], [])
 
 
+class FingerprintTest(unittest.TestCase):
+    def test_seed_probe_is_preserved_verbatim(self):
+        with open(os.path.join(ROOT, "fingerprint", "core.js"), "rb") as handle:
+            self.assertEqual(hashlib.sha256(handle.read()).hexdigest(), SEED_PROBE_SHA256)
+
+    def test_tuple_probe_reports_the_reference_tuple(self):
+        reference = require_env("TYRUS_NODE_REFERENCE")
+        env = RUN.engine_env("UTC", {}, tempfile.gettempdir())
+        self.assertEqual(RUN.probe_tuple(reference, env), RUN.reference_tuple(load_index()))
+
+    def test_probes_emit_the_expected_classes(self):
+        reference = require_env("TYRUS_NODE_REFERENCE")
+        index = load_index()
+        classes, failed = RUN.fingerprint_classes(reference, index, lambda zone: RUN.engine_env(zone, {}, tempfile.gettempdir()), None)
+        self.assertEqual(failed, {})
+        per_probe = {}
+        for data in classes.values():
+            per_probe[data["probe"]] = per_probe.get(data["probe"], 0) + 1
+        for probe, count in FINGERPRINT_PROBE_COUNTS.items():
+            self.assertEqual(per_probe[probe], count, probe)
+        for zone in index["fingerprint"]["local_time_zones"]:
+            self.assertEqual(per_probe[f"tzlocal@{zone}"], 4, zone)
+        for name, size in CORE_CLASS_SIZES.items():
+            self.assertEqual(classes[f"fingerprint.{name}"]["n"], size, name)
+
+    def test_probes_are_reproducible_on_the_reference(self):
+        reference = require_env("TYRUS_NODE_REFERENCE")
+        index = load_index()
+        env_for = lambda zone: RUN.engine_env(zone, {}, tempfile.gettempdir())  # noqa: E731
+        first, _ = RUN.fingerprint_classes(reference, index, env_for, {"intl", "unicode", "tz", "runtime"})
+        second, _ = RUN.fingerprint_classes(reference, index, env_for, {"intl", "unicode", "tz", "runtime"})
+        self.assertEqual(first, second)
+
+
 if __name__ == "__main__":
     unittest.main()
