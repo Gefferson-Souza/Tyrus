@@ -8,7 +8,7 @@
 
 ## Why a constitution
 
-The prototypes are rule-heavy and still failed silently: 143 of 145 probes exited 0 on wrong output, unknown decorators were dropped, claims of equivalence were made against 13.8% of the evidence. The lesson recorded in the foundation decision is that rules without a mechanical gate are wishes. This document therefore states each rule together with the mechanism that enforces it and the phase in which that mechanism becomes active. **A rule whose gate does not exist yet prints `SKIPPED(<phase>)`, never `PASS`.**
+The prototypes are rule-heavy and still failed silently: the prototype exited 0 on 143 of 145 probes (it refused 2) and only 20 matched the Node output (audit section 8), unknown decorators were dropped, claims of equivalence were made against 13.8% of the evidence. The lesson recorded in the foundation decision is that rules without a mechanical gate are wishes. This document therefore states each rule together with the mechanism that enforces it and the phase in which that mechanism becomes active. **A rule whose gate does not exist yet prints `SKIPPED(<phase>)`, never `PASS`.**
 
 ## The method in three words
 
@@ -52,8 +52,29 @@ Activation phases follow the program RFC (section 7): **F-1** spikes, **F0** ora
 
 No iteration is named by a version-style number. What exists today is "the prototypes" (two exploratory iterations) and "Tyrus" (the third iteration, this foundation). Tool versions (`v8`, `v22`, `v26`, `v147`, `deno_core 0.4xx`) are an allowlisted exception. `rules-lint` (unit `gov-rules-lint`) enforces the closed list; until it ships the rule is a review item.
 
+## Power of Ten rules for new crates
+
+A new crate is not under the Power of Ten, so each of its 14 rules has a stated destination. `PoT Rn` is the Power of Ten; `Rn` is the Constitution. Only mechanisms that exist or are owned by a named unit are cited.
+
+| PoT rule | Destination for a new crate | Through |
+|---|---|---|
+| PoT R1 bounded control flow | replaced | Constitution R10 (depth counter yielding `RangeError`, M2); until then a review item |
+| PoT R2 bounded loops | not inherited as a gate | review item under F5 (no mechanical gate exists, even in the legacy regime) |
+| PoT R3 minimal scope | inherited | `[workspace.lints]` (`clippy::needless_pass_by_value`), applied to every member |
+| PoT R4 function and file size, parameters, nesting | inherited | `[workspace.lints]` (`too_many_lines`, `too_many_arguments`) and the `filesize` gate with thresholds in `gates.toml` |
+| PoT R5 equivalence test density | replaced | Constitution R8 and R9 (oracle, ledger) and R5 (promotion by gate) |
+| PoT R6 total error handling | replaced | Constitution R10 (`unwrap`/`panic` deny) |
+| PoT R7 `quote!` only | replaced | Constitution R6 (single emission boundary, `tyrus_emit`) |
+| PoT R8 two-layer architecture | replaced | Constitution R2 (zero decisions by name) and R3 (platform by spec identity) |
+| PoT R9 local/CI parity | inherited | Development Flow F4 (`gates.sh all`) and Constitution R11 (single aggregator gate) |
+| R10 ADR for architecture | replaced | Constitution R12 (mechanical trigger) |
+| PoT R11 one branch, one concern | inherited | Development Flow F1 and the commit format; unchanged |
+| PoT R12 warnings-clean, audited | inherited | `--all-targets`, `--locked` and `clippy -D warnings` through `gates.sh`; `cargo deny` and `cargo audit` policy owned by `gov-supply-chain-policy` |
+| PoT R13 forbid unsafe | amended | Constitution R10 and the allowlist of ADR 0016 |
+| PoT R14 stable error codes `TYRUS-EXXXX` | inherited | applies to user-facing diagnostics of the CLI; the unit `cli-tyrus-build` carries it. No gate yet beyond the legacy exhaustiveness tests, so for new crates it is a review item until that unit ships |
+
 ## Relation to the other standards
 
-- [Power of Ten](POWER_OF_TEN.md): binding for the legacy regime. Its R13 is amended by ADR 0016 (allowlist for `unsafe`); its limits on function and file size, no `unwrap`/`panic`, gate parity and warnings-clean continue to apply to new crates through `gates.toml` thresholds and Constitution R10 and R11.
+- [Power of Ten](POWER_OF_TEN.md): binding for the legacy regime. Its R13 is amended by ADR 0016 (allowlist for `unsafe`). What reaches new crates is the table below.
 - [Development Flow](DEVELOPMENT_FLOW.md): unchanged; F1 to F10 govern the process in both regimes.
 - Foundation record and program RFC live in `.claude/plan/` (not versioned). Numbers in this file are inherited from them with provenance; nothing here is a new measurement.

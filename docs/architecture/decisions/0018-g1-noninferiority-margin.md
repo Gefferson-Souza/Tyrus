@@ -15,10 +15,10 @@ Gate G1 feeds the M1 exit criterion E5 (RFC `program-rfc.md`, section 2.1) and t
 
 ## Decision
 
-1. **G1 is amended** from "IC95 upper <= 1.0" to "IC95 upper <= `thresholds.g1_margin`" against the same Node line (Node 26.11.1, same Express app), on the database routes E2, E3, E4 and E6. Estimator unchanged: ratio of paired medians, ABAB rounds, >= 15 rounds, disjoint CPUs, CPU per request = utime + stime, paired bootstrap with 10000 resamples and fixed seed 20261020.
+1. **G1 is amended** from "IC95 upper <= 1.0" to "IC95 upper <= `thresholds.g1_margin`" against the same Node line (Node 26.11.1, same Express app), on the database routes E2, E3, E4 and E6, which are the blocking scope. The foundation record also lists the `perf-ts` loads in pure hosted mode under G1; this ADR does not narrow that silently: following the recommendation of RFC Q-C, those loads are measured and listed (a load above the margin is a `FAIL` that restricts the claim and does not block M1), and that scope depends on the owner's confirmation of Q-C (see Perguntas ao dono). Estimator unchanged: ratio of paired medians, ABAB rounds, >= 15 rounds, disjoint CPUs, CPU per request = utime + stime, paired bootstrap with 10000 resamples and fixed seed 20261020.
 2. **Provisional value: `g1_margin = 1.05`.** Allowed range for the A/A-validated choice: 1.03 to 1.10. A value outside the range needs a superseding ADR citing the A/A evidence.
 3. **A/A acceptance is mandatory.** `bench-g1-parity-harness` must run Node 26.11.1 Express against itself for >= 15 ABAB rounds on the adopted rig, and the IC95 upper of that run must be <= `g1_margin`. If it is not, the margin is unreachable by noise: the rig or the number of rounds does not serve the gate, and the delivery loop stops for the owner with the observed IC95 (it does not widen the margin on its own).
-4. **Immutability.** `g1_margin` and the number of rounds are fixed by a commit that precedes the first hosted measurement (the first `raw.jsonl` whose target is the hosted artifact; A/A runs of Node against Node do not count). `m1-g1-parity` fails if the hash of `gates.toml` changed after the `raw.jsonl` it judges. After the first hosted measurement the only way to change the value is a superseding ADR, and the hosted measurement is repeated from scratch.
+4. **Immutability.** `g1_margin` and the number of rounds are fixed by a commit that precedes the first hosted measurement (the first `raw.jsonl` whose target is the hosted artifact; A/A runs of Node against Node do not count). The measurement header of each `raw.jsonl` records `g1_margin`, `g1b_upper`, the number of rounds, the seed and the number of resamples, and `m1-g1-parity` fails if those values, read from `gates.toml` at judgement time, differ from the header. The hash of the whole `gates.toml` is deliberately not the criterion: the file also carries `[legacy]`, the `state` and `activates_in` of every gate, `[claims]` and the M2 ratios, which other units edit between the first measurement and `m1-g1-parity`. After the first hosted measurement the only way to change the value is a superseding ADR, and the hosted measurement is repeated from scratch.
 5. **G1b stays literal at 1.0.** G1b (IC95 upper <= 1.0 against the lowest of Node 24 and 26 x Express and Fastify) remains a report of gain, does not block M1, and without a green G1b any speed claim for the floor stays forbidden. The margin never becomes a claim: a pass at `g1_margin` supports "no worse than the margin", never "faster" or "equal".
 6. **Consequence of a miss.** A database route or load with IC95 upper above `g1_margin` is listed as `FAIL` in the ledger and opens the 15-day adjustment window of K1; after it, the loop stops for the owner (stop, or downgrade to "oracle + receipts" without a speed claim). libnode is not a remedy (about 1.0x by construction).
 
@@ -63,6 +63,11 @@ What the illustration says, and no more: (a) the literal 1.0 fails A/A in practi
 - The A/A run on the real rig fails at `g1_margin`: stop, report the observed IC95, owner decides (rig, rounds, or superseding ADR).
 - The owner replaces the provisional `1.05` before the first hosted measurement: update this ADR (or supersede it) and `gates.toml` in the same PR.
 - The estimator or the node-line reference changes (`oracle.lock` event): re-validate the A/A acceptance.
+
+## Perguntas ao dono (owner questions)
+
+1. Q-B: accept `g1_margin = 1.05` as the value to freeze before the first hosted measurement (currently provisional), or fix another value in 1.03 to 1.10?
+2. Q-C: confirm that only the database routes E2, E3, E4 and E6 block M1, with the `perf-ts` loads (35 programs in about 17 families, no file enumerates 14) measured and listed, or require them to block as the foundation record wrote?
 
 ## References
 

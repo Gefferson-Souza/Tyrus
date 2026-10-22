@@ -7,7 +7,7 @@ Status: Proposto — awaiting owner acceptance. Not in force until accepted. Ame
 
 The 2026-10-13 audit concluded that the prototype compiler cannot be repaired bug by bug and that the foundation must be rebuilt as a third iteration in the same repository (foundation decision record, local plan, sha256 `128b55c16df803204c7257992cc3129cd89bce5b7d5a741169cbbb16e3e271ae`). The audit measured defects that the existing standards (Power of Ten, ADR 0008/0013, and Development Flow, ADR 0014) did not prevent:
 
-- 143 of 145 probes exited 0 while producing wrong or no output; decorators outside a closed list were dropped by `from_name(...).map(...)` without a verdict.
+- The prototype exited 0 on 143 of 145 probes (it refused 2) and only 20 of the 145 produced the Node output (audit section 8, `oracle-seed/probe-results/`); decorators outside a closed list were dropped by `from_name(...).map(...)` without a verdict.
 - Generated Rust was assembled by string in six files; 83 of 145 outputs did not compile; eight builds produced seven different `main.rs`.
 - "All equal" was stated against 13.8% of the evidence; documentation carried five different test counts.
 - Roughly 26 thousand words of governance coexisted with checkboxes that did not exist and 3 of 70 PRs merged with a red check.
@@ -24,7 +24,7 @@ Two parts of the existing standards cannot survive that direction unchanged:
 
 ### 1. Adopt Piso–Promoção–Recibo (PPR) as the foundation
 
-PPR is defined in [`docs/standards/CONSTITUTION.md`](../../standards/CONSTITUTION.md): the floor (pinned embedded V8, Rust platform, output proven identical to the reference Node), promotion (native Rust only with certificate, obligation and measured gate, revocable) and receipt (no number or "equal" without a CI-written ledger entry). The invariants I1 to I9 of the foundation record (total verdicts, zero decisions by name, optimization never necessary for correctness, hypothesis versus guard versus proof, empirical revocable promotion, verdict as artifact, pinned reference and engine with fingerprint, deterministic emitted project, value-only boundary) are carried by Constitution R1 to R12.
+PPR is defined in [`docs/standards/CONSTITUTION.md`](../../standards/CONSTITUTION.md): the floor (pinned embedded V8, Rust platform, output proven identical to the reference Node), promotion (native Rust only with certificate, obligation and measured gate, revocable) and receipt (no number or "equal" without a CI-written ledger entry). The invariants I1 to I9 of the foundation record (total verdicts, zero decisions by name, optimization never necessary for correctness, hypothesis versus guard versus proof, empirical revocable promotion, verdict as artifact, pinned reference and engine with fingerprint, deterministic emitted project, value-only boundary). I1 to I8 are carried by Constitution R1 to R12. I9 (value-only boundary: `tyrus_host` exposes only the codec, no handle type; provisional until K5) has no Constitution rule: it is a requirement of the unit `host-v8-embed-offline` (`cargo-deny` plus grep, `crossings/req` ratchet), and a rule for it enters the Constitution only with its gate (Constitution R11: a rule without a gate is deleted).
 
 ### 2. Adopt the Constitution R1 to R12
 
@@ -32,7 +32,7 @@ PPR is defined in [`docs/standards/CONSTITUTION.md`](../../standards/CONSTITUTIO
 
 ### 3. Dual regime
 
-New crates fall under the Constitution; the prototype crates stay under the Power of Ten until they are deleted (see Regime de transição). The PoT header is limited to "legacy crates".
+New crates fall under the Constitution; the prototype crates stay under the Power of Ten until they are deleted (see Regime de transição). The PoT header is limited to "legacy crates". Which Power of Ten rules a new crate still meets, and through what, is the inheritance table in the Constitution (section "Power of Ten rules for new crates"): each of the 14 is inherited through `gates.toml`, replaced by a named Constitution rule, or deliberately not inherited.
 
 ### 4. Amend PoT R13: a closed allowlist for `unsafe`
 
