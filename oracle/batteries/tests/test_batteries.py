@@ -308,6 +308,7 @@ class FingerprintTest(unittest.TestCase):
             self.assertEqual(per_probe[probe], count, probe)
         for zone in index["fingerprint"]["local_time_zones"]:
             self.assertEqual(per_probe[f"tzlocal@{zone}"], 4, zone)
+            self.assertIn(f"fingerprint.tzLocalName@{zone}", classes)
         for name, size in CORE_CLASS_SIZES.items():
             self.assertEqual(classes[f"fingerprint.{name}"]["n"], size, name)
 
@@ -350,10 +351,14 @@ class ReferenceEngineTest(unittest.TestCase):
             clone = os.path.join(temp, "batteries")
             shutil.copytree(ROOT, clone, ignore=shutil.ignore_patterns("goldens", "__pycache__"))
             shutil.copy(os.path.join(ROOT, "perturbation", "P01_hrtime_noise.js"), os.path.join(clone, "litmus"))
+            lock = os.path.normpath(os.path.join(ROOT, load_index()["reference_lock"]))
+            shutil.copy(lock, os.path.join(temp, "oracle.lock"))
             runner = load_runner(os.path.join(clone, "run.py"))
-            with contextlib.redirect_stderr(io.StringIO()):
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
                 code = runner.main(["--engine-cmd", self.reference, "--record", os.path.join(temp, "g"), "--stability", "3"])
             self.assertEqual(code, 2)
+            self.assertIn("instaveis", err.getvalue())
             self.assertFalse(os.path.exists(os.path.join(temp, "g", "golden.json")))
 
     def test_missing_engine_is_a_harness_error(self):
