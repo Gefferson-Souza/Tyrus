@@ -1,7 +1,7 @@
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
-use std::collections::BTreeSet;
-use std::path::PathBuf;
+use std::collections::{BTreeMap, BTreeSet};
+use std::path::{Path, PathBuf};
 
 use tyrus_oracle::error::OracleError;
 use tyrus_oracle::tuple::{FieldDiff, NodeRole};
@@ -71,5 +71,74 @@ fn tuple_mismatch_is_e5001_and_names_the_field() {
     assert!(
         message.contains("tz: esperado `2026e`, obtido `2025b`"),
         "{message}"
+    );
+}
+
+fn collect_rust_files(dir: &Path, files: &mut Vec<PathBuf>) {
+    for entry in std::fs::read_dir(dir).unwrap() {
+        let path = entry.unwrap().path();
+        if path.is_dir() {
+            collect_rust_files(&path, files);
+        } else if path.extension().is_some_and(|ext| ext == "rs") {
+            files.push(path);
+        }
+    }
+}
+
+fn error_codes_in(text: &str) -> BTreeSet<String> {
+    let marker = "TYRUS-E";
+    text.match_indices(marker)
+        .filter_map(|(start, _)| {
+            let digits = text.get(start + marker.len()..start + marker.len() + 4)?;
+            digits
+                .bytes()
+                .all(|b| b.is_ascii_digit())
+                .then(|| format!("{marker}{digits}"))
+        })
+        .collect()
+}
+
+fn codes_declared_by(member_dir: &Path) -> BTreeSet<String> {
+    let mut files = Vec::new();
+    if member_dir.join("src").is_dir() {
+        collect_rust_files(&member_dir.join("src"), &mut files);
+    }
+    files
+        .iter()
+        .flat_map(|file| error_codes_in(&std::fs::read_to_string(file).unwrap()))
+        .collect()
+}
+
+#[test]
+fn no_oracle_code_is_reused_by_another_crate() {
+    let workspace_crates = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    let mut other_owners: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut oracle_codes = BTreeSet::new();
+    for entry in std::fs::read_dir(&workspace_crates).unwrap() {
+        let member_dir = entry.unwrap().path();
+        let name = member_dir
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .into_owned();
+        if name == "tyrus_oracle" {
+            oracle_codes = codes_declared_by(&member_dir);
+            continue;
+        }
+        for code in codes_declared_by(&member_dir) {
+            other_owners.entry(code).or_default().insert(name.clone());
+        }
+    }
+    assert!(
+        oracle_codes.contains("TYRUS-E5001"),
+        "a varredura não enxergou o próprio crate"
+    );
+    let reused: Vec<_> = oracle_codes
+        .iter()
+        .filter(|c| other_owners.contains_key(*c))
+        .collect();
+    assert!(
+        reused.is_empty(),
+        "código do oráculo reaproveitado por outro crate (R14): {reused:?}"
     );
 }
