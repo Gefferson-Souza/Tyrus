@@ -119,5 +119,49 @@ class CompareLogicTest(unittest.TestCase):
         self.assertNotEqual(RUN.canonical_sha256(base), RUN.canonical_sha256(changed))
 
 
+class ExecutionTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.reference = require_env("TYRUS_NODE_REFERENCE")
+
+    def test_engine_env_is_hermetic(self):
+        os.environ["NODE_OPTIONS"] = "--no-warnings"
+        try:
+            env = RUN.engine_env("America/Sao_Paulo", {"EXTRA": "1"}, "/home-x")
+        finally:
+            del os.environ["NODE_OPTIONS"]
+        self.assertEqual(sorted(env), ["EXTRA", "HOME", "LANG", "LC_ALL", "NO_COLOR", "PATH", "TZ"])
+        self.assertEqual((env["TZ"], env["HOME"], env["LC_ALL"]), ("America/Sao_Paulo", "/home-x", "en_US.UTF-8"))
+
+    def test_run_script_captures_stdout_and_exit_code(self):
+        with tempfile.TemporaryDirectory() as temp:
+            script = os.path.join(temp, "s.js")
+            with open(script, "w", encoding="utf-8") as handle:
+                handle.write("process.stdout.write('hello'); process.exitCode = 3;")
+            result = RUN.run_script(self.reference, script, RUN.engine_env("UTC", {}, temp))
+        self.assertEqual(result, {"exit": 3, "stdout": b"hello"})
+
+    def test_run_script_reports_timeout_instead_of_hanging(self):
+        with tempfile.TemporaryDirectory() as temp:
+            script = os.path.join(temp, "s.js")
+            with open(script, "w", encoding="utf-8") as handle:
+                handle.write("setInterval(() => {}, 1000);")
+            result = RUN.run_script(self.reference, script, RUN.engine_env("UTC", {}, temp), timeout=1)
+        self.assertEqual(result["exit"], "timeout")
+
+    def test_missing_engine_raises_harness_error(self):
+        with self.assertRaises(RUN.HarnessError):
+            RUN.run_script("/nonexistent/engine", "/tmp/x.js", RUN.engine_env("UTC", {}, "/tmp"))
+
+    def test_missing_script_raises_harness_error(self):
+        with self.assertRaises(RUN.HarnessError):
+            RUN.run_script(self.reference, "/nonexistent/script.js", RUN.engine_env("UTC", {}, "/tmp"))
+
+    def test_unstable_script_is_detected(self):
+        env = RUN.engine_env("UTC", {}, tempfile.gettempdir())
+        classes, _ = RUN.script_classes(self.reference, os.path.join(ROOT, "perturbation"), "litmus", env, RUN.Selection(5, None))
+        self.assertTrue(classes["litmus.P01_hrtime_noise"]["unstable"])
+
+
 if __name__ == "__main__":
     unittest.main()
