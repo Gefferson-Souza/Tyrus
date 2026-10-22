@@ -19,10 +19,21 @@ else
 fi
 
 python3 -I -c "
-import json
-m = json.load(open('docs/evidence/gate0/MANIFEST.json'))
-assert all({'file', 'sha256', 'bytes'} <= set(e) for e in m['files'])
-assert len(m['files']) == 12
+import json, os, re
+d = 'docs/evidence/gate0'
+m = json.load(open(d + '/MANIFEST.json'))
+files = m['files']
+assert len(files) == 12, 'esperadas 12 entradas'
+assert all({'file', 'sha256', 'bytes'} <= set(e) for e in files), 'chaves ausentes'
+lines = [l.split('  ', 1) for l in open(d + '/MANIFEST.sha256').read().splitlines() if l]
+assert {(f, h) for h, f in lines} == {(e['file'], e['sha256']) for e in files}, 'MANIFEST.json diverge de MANIFEST.sha256'
+for e in files:
+    assert os.path.isfile(d + '/' + e['file']), 'arquivo listado ausente: ' + e['file']
+    assert e['bytes'] == os.stat(d + '/' + e['file']).st_size, 'bytes diverge: ' + e['file']
+extra = set(os.listdir(d)) - {e['file'] for e in files} - {'README.md', 'MANIFEST.json', 'MANIFEST.sha256'}
+assert not extra, 'arquivos extras: ' + str(extra)
+bins = m['rust_ceiling_binaries']
+assert len(bins) == 2 and all(re.fullmatch('[0-9a-f]{64}', b['sha256_declared']) for b in bins), 'rust_ceiling_binaries invalido'
 " || { echo "FAIL 3: estrutura do MANIFEST.json"; exit 1; }
 
 grep -q 'v26.11.1' "$DIR/MANIFEST.json" && grep -q '14.6.202.34-node.37' "$DIR/MANIFEST.json" \
