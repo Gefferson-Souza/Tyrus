@@ -1,0 +1,18 @@
+{
+  "m01_nexttick_as_microtask": {"preload": "m01_nexttick_as_microtask.js", "must_diff": ["litmus.L01_tick_vs_promise_main", "litmus.L02_tick_promise_interleave", "litmus.L09_readfile_tick_vs_promise"]},
+  "m02_immediate_as_timeout": {"preload": "m02_immediate_as_timeout.js", "must_diff": ["fingerprint.timersApi", "litmus.L04_io_timeout_vs_immediate"]},
+  "m03_microtask_as_immediate": {"preload": "m03_microtask_as_immediate.js", "must_diff": ["litmus.L03_queue_microtask_order"]},
+  "m04_emit_deferred": {"preload": "m04_emit_deferred.js", "must_diff": ["litmus.L17_emitter_semantics", "litmus.L19_readable_events"]},
+  "m05_extra_promise_hop": {"preload": "m05_extra_promise_hop.js", "must_diff": ["litmus.L11_async_await_basic", "litmus.L12_thenable_ticks", "litmus.L13_return_await"]},
+  "m06_inspect_double_quotes": {"preload": "m06_inspect_double_quotes.js", "must_diff": ["inspect.I01_map_set", "inspect.I05_strings_quotes", "fingerprint.inspectRandom"]},
+  "m07_math_sin_ulp": {"preload": "m07_math_sin_ulp.js", "must_diff": ["fingerprint.sin"]},
+  "m08_sort_calls_reversed": {"preload": "m08_sort_calls_reversed.js", "must_diff": ["fingerprint.sortCalls"]},
+  "m09_intl_number_suffix": {"preload": "m09_intl_number_suffix.js", "must_diff": ["fingerprint.intlNumber"]},
+  "m10_timezone_offset_plus_one": {"preload": "m10_timezone_offset_plus_one.js", "must_diff": ["fingerprint.tzLocalString@UTC", "fingerprint.tzLocalConstruct@UTC"]},
+  "m11_buffer_hex_upper": {"preload": "m11_buffer_hex_upper.js", "must_diff": ["fingerprint.bufferEncodings"]},
+  "m12_normalize_identity": {"preload": "m12_normalize_identity.js", "must_diff": ["fingerprint.unicodeNormalize"]},
+  "m13_readfile_callback_in_microtask": {"preload": "m13_readfile_callback_in_microtask.js", "must_diff": ["litmus.L09_readfile_tick_vs_promise"]},
+  "m14_net_server_socket_close_deferred": {"preload": "m14_net_server_socket_close_deferred.js", "must_diff": ["litmus.L23_net_close_order"]},
+  "m15_require_esm_tla_swallowed": {"preload": "m15_require_esm_tla_swallowed.js", "must_diff": ["litmus.L35_require_esm_tla_error"]},
+  "m16_require_esm_plain_object": {"preload": "m16_require_esm_plain_object.js", "must_diff": ["litmus.L34_require_esm_sync"]}
+}

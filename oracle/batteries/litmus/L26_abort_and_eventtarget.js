@@ -1,0 +1,15 @@
+'use strict';
+const fs = require('fs');
+const L = (s) => fs.writeSync(1, s + '\n');
+const ac = new AbortController();
+ac.signal.addEventListener('abort', () => L('abort-1'));
+ac.signal.addEventListener('abort', () => L('abort-2'), { once: true });
+ac.signal.onabort = () => L('onabort');
+Promise.resolve().then(() => L('promise'));
+ac.abort();
+L('after-abort ' + ac.signal.aborted + ' ' + ac.signal.reason.name);
+const et = new EventTarget();
+et.addEventListener('x', () => { L('x-1'); et.dispatchEvent(new Event('y')); });
+et.addEventListener('y', () => L('y'));
+et.addEventListener('x', () => L('x-2'));
+et.dispatchEvent(new Event('x'));

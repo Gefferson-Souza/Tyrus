@@ -1,0 +1,5 @@
+before-require
+caught-ERR_REQUIRE_ASYNC_MODULE
+is-error-true
+after-require
+promise

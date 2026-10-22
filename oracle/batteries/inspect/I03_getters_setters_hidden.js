@@ -1,0 +1,11 @@
+const util = require('util');
+const o = { get a() { return 1; }, set b(v) {}, get c() { return 2; }, set c(v) {}, d: 4 };
+console.log(o);
+console.log(util.inspect(o, { getters: true }));
+console.log(util.inspect({ get boom() { const e = new Error('x'); e.stack = 'Error: x\n    at boom (/virtual/file.js:1:1)'; throw e; } }, { getters: true }));
+const hidden = Object.defineProperty({ shown: 1 }, 'secret', { value: 2, enumerable: false });
+console.log(hidden);
+console.log(util.inspect(hidden, { showHidden: true }));
+console.log(util.inspect([1, 2], { showHidden: true }));
+console.log(util.inspect(new Map([[1, 2]]), { showHidden: true }));
+console.log(Object.defineProperty([], 'length', { writable: false }));

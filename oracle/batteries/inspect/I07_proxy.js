@@ -1,0 +1,15 @@
+const util = require('util');
+const traps = [];
+const handler = new Proxy({}, { get(_, trap) { traps.push(trap); return undefined; } });
+const p = new Proxy({ a: 1, nested: { b: 2 } }, handler);
+console.log(p);
+console.log(util.inspect(p, { showProxy: true }));
+console.log(util.inspect(new Proxy([1, 2, 3], {}), { showProxy: true }));
+console.log(new Proxy([1, 2, 3], {}));
+console.log(new Proxy(function fn() {}, {}));
+console.log(new Proxy(new Map([[1, 2]]), {}));
+const { proxy, revoke } = Proxy.revocable({}, {});
+revoke();
+console.log(util.inspect(proxy, { showProxy: true }));
+console.log(util.inspect(new Proxy({}, { get() { throw new Error('must not run'); }, ownKeys() { throw new Error('must not run'); } })));
+console.log('trapsTouchedByInspect', traps.length);

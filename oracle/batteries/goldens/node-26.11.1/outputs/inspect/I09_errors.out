@@ -1,0 +1,49 @@
+Error: plain
+    at fake (/virtual/file.js:1:1)
+    at main (/virtual/file.js:2:2)
+Error [TypeError]: with props
+    at fake (/virtual/file.js:1:1)
+    at main (/virtual/file.js:2:2) {
+  code: 'E_CODE',
+  status: 500
+}
+{
+  nested: Error [RangeError]: inside object
+      at fake (/virtual/file.js:1:1)
+      at main (/virtual/file.js:2:2)
+}
+[
+  Error: inside array
+      at fake (/virtual/file.js:1:1)
+      at main (/virtual/file.js:2:2)
+]
+Error: outer
+    at fake (/virtual/file.js:1:1)
+    at main (/virtual/file.js:2:2) {
+  cause: Error: inner
+      at fake (/virtual/file.js:1:1)
+      at main (/virtual/file.js:2:2)
+}
+AggregateError: agg
+    at fake (/virtual/file.js:3:3) {
+  [errors]: [
+    Error: e1
+        at fake (/virtual/file.js:1:1)
+        at main (/virtual/file.js:2:2)
+  ]
+}
+[Error: no stack]
+Error: renamed
+    at fake (/virtual/file.js:1:1)
+    at main (/virtual/file.js:2:2) {
+  name: 'Custom'
+}
+HttpError: missing
+    at fake (/virtual/file.js:4:4) {
+  status: 404
+}
+Error: x
+    at fake (/virtual/file.js:1:1)
+    at main (/virtual/file.js:2:2)
+[Error: not a real error]
+Error: tostring true
