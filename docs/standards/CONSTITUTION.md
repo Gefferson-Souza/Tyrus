@@ -67,7 +67,7 @@ A new crate is not under the Power of Ten, so each of its 14 rules has a stated 
 | PoT R7 `quote!` only | replaced | Constitution R6 (single emission boundary, `tyrus_emit`) |
 | PoT R8 two-layer architecture | replaced | Constitution R2 (zero decisions by name) and R3 (platform by spec identity) |
 | PoT R9 local/CI parity | inherited | Development Flow F4 (`gates.sh all`) and Constitution R11 (single aggregator gate) |
-| R10 ADR for architecture | replaced | Constitution R12 (mechanical trigger) |
+| PoT R10 ADR for architecture | replaced | Constitution R12 (mechanical trigger) |
 | PoT R11 one branch, one concern | inherited | Development Flow F1 and the commit format; unchanged |
 | PoT R12 warnings-clean, audited | inherited | `--all-targets`, `--locked` and `clippy -D warnings` through `gates.sh`; `cargo deny` and `cargo audit` policy owned by `gov-supply-chain-policy` |
 | PoT R13 forbid unsafe | amended | Constitution R10 and the allowlist of ADR 0016 |
