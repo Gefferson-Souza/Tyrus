@@ -1,7 +1,7 @@
 # 15. Tooling Evaluated and Rejected
 
 Date: 2026-08-04
-Status: Accepted
+Status: Accepted. Miri, sanitizers and cargo-careful reopened for allowlisted crates by [ADR 0016](0016-ppr-foundation-and-constitution.md), effective when ADR 0016 is accepted.
 
 ## Context
 
