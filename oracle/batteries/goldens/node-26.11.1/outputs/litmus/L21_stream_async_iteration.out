@@ -1,0 +1,7 @@
+sync
+transform x
+transform y
+tick
+sink X
+sink Y
+done XY

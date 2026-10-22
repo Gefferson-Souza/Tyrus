@@ -1,0 +1,10 @@
+const util = require('util');
+console.log(["it's", 'say "hi"', 'both \' and "', 'back`tick \' "', 'plain']);
+console.log({ s: 'line1\nline2', t: 'tab\there', u: '\u0000\u001f\u007f' });
+console.log(['\ud83d', 'ok\ud83d\ude00', '\ud83d\ude00'.slice(0, 1), 'é', '\u2028']);
+console.log(util.inspect('x'.repeat(30), { maxStringLength: 10 }));
+console.log({ long: 'word '.repeat(30) });
+console.log(['a\nb'.repeat(5)]);
+console.log('top-level string is raw', ["nested's"]);
+console.log(util.inspect("single'only"), util.inspect('dq"only'), util.inspect('`'), util.inspect('\\'));
+console.log({ 'key with space': 1, valid_id: 2, 3: 3, 'dash-key': 4, '': 5, [Symbol('s')]: 6 });

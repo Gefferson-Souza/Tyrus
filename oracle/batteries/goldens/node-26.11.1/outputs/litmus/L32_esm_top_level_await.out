@@ -1,0 +1,9 @@
+before-await
+promise-1
+after-await-null
+promise-2
+tick
+tick-2
+after-await-immediate
+timeout-0
+after-await-timeout

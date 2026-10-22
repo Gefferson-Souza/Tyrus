@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+const L = (s) => fs.writeSync(1, s + '\n');
+process.nextTick(() => L('tick'));
+Promise.resolve().then(() => L('promise-1'));
+L('before-await');
+await null;
+L('after-await-null');
+Promise.resolve().then(() => L('promise-2'));
+process.nextTick(() => L('tick-2'));
+await new Promise((resolve) => setImmediate(resolve));
+L('after-await-immediate');
+setTimeout(() => L('timeout-0'), 0);
+await new Promise((resolve) => setTimeout(resolve, 1));
+L('after-await-timeout');

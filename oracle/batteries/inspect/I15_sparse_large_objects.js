@@ -1,0 +1,14 @@
+const o = {};
+for (let i = 0; i < 30; i++) o['key' + i] = i;
+console.log(o);
+const big = {};
+for (let i = 0; i < 1100; i++) big[i] = i;
+console.log(Object.keys(big).length, require('util').inspect(big).split('\n').length);
+console.log({ a: [{ b: 1, c: [1, 2, { d: 3 }] }], e: 'x'.repeat(75) });
+console.log({ short: 1, arr: ['a', 'b'], obj: { c: 1 } });
+console.log({ a: 'x'.repeat(60), b: 'y'.repeat(60) });
+console.log([['a', 1], ['b', 2], ['c', 3]], [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }]);
+console.log(['x'.repeat(20), 'y'.repeat(20), 'z'.repeat(20), 'w'.repeat(20)]);
+console.log(Array.from({ length: 10 }, (_, i) => ({ i })));
+console.log(Array.from({ length: 101 }, () => 'ab'));
+console.log(Object.fromEntries(Array.from({ length: 5 }, (_, i) => ['k' + i, { n: i, tags: ['t' + i] }])));

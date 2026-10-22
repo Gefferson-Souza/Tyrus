@@ -1,0 +1,5 @@
+uncaught from-tick origin=uncaughtException
+uncaught from-immediate origin=uncaughtException
+immediate-after
+uncaught from-microtask origin=uncaughtException
+promise-after

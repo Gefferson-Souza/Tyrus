@@ -1,0 +1,15 @@
+const a = { name: 'a' };
+a.self = a;
+console.log(a);
+const b = { n: 'b', child: { n: 'c' } };
+b.child.parent = b;
+b.list = [b, b.child];
+console.log(b);
+const m = new Map();
+m.set('me', m);
+console.log(m);
+const x = {}; const y = { x }; x.y = y;
+console.log([x, y]);
+const arr = [1];
+arr.push(arr);
+console.log(arr);

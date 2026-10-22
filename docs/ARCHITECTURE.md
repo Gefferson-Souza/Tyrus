@@ -197,6 +197,7 @@ The project enforces strict correctness via:
 
 Numbered ADRs under [`docs/architecture/decisions/`](architecture/decisions/) are the binding record of architectural choices. Most-recent-first:
 
+- [ADR 0019 — Oracle and Harness Tooling](architecture/decisions/0019-oracle-and-harness-tooling.md) — Proposto: pinned Node tuple, Python `-I` stdlib harnesses, `cargo-mutants`, `jsonschema` dev-dependency and its `Cargo.lock` bumps, npm/Docker pinning.
 - [ADR 0018 — G1 Non-Inferiority Margin](architecture/decisions/0018-g1-noninferiority-margin.md) — `g1_margin` (provisional 1.05), A/A acceptance, immutable after the first hosted measurement. *Proposto.*
 - [ADR 0016 — PPR Foundation, Constitution R1–R12, R13 Amendment](architecture/decisions/0016-ppr-foundation-and-constitution.md) — floor/promotion/receipt, the twelve-rule [Constitution](standards/CONSTITUTION.md), closed `unsafe` allowlist, Miri/sanitizers decision reopening ADR 0015. *Proposto.*
 - [ADR 0015 — Tooling Evaluated and Rejected](architecture/decisions/0015-rejected-tooling.md) — Ferrocene, Miri, sanitizers, cargo-vet/crev, restriction-as-group: why not, and what would reopen each.

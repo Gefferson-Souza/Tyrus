@@ -1,0 +1,6 @@
+tick
+microtask
+unhandledRejection boom
+immediate
+late-catch
+rejectionHandled

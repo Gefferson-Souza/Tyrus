@@ -1,0 +1,17 @@
+const util = require('util');
+const deep = { l1: { l2: { l3: { l4: { l5: 1 } } } }, arr: [[[[['deep']]]]] };
+console.log(deep);
+console.log(util.inspect(deep, { depth: 0 }), util.inspect(deep, { depth: null }));
+console.log(util.inspect(deep, { compact: false }));
+console.log(util.inspect(deep, { compact: true, breakLength: 40 }));
+console.log(util.inspect(deep, { compact: 1, breakLength: Infinity }));
+console.log(util.inspect({ b: 2, a: 1, c: { z: 1, y: 2 } }, { sorted: true }));
+console.log(util.inspect({ b: 2, a: 1 }, { sorted: (x, y) => y.localeCompare(x) }));
+console.log(util.inspect(Array.from({ length: 20 }, (_, i) => i), { maxArrayLength: 3 }));
+console.log(util.inspect(new Set([1, 2, 3, 4]), { maxArrayLength: 2 }));
+console.log(util.inspect({ a: 'x'.repeat(100) }, { breakLength: 20 }));
+console.log(util.inspect({ a: 1, b: { c: 2 } }, { breakLength: 1 }));
+console.log(util.inspect('x', { colors: true }), util.inspect([1, 'a', null, undefined, true, 1n, Symbol('s'), new Date(0), /r/], { colors: true }));
+console.log(util.inspect({ a: { b: 1 } }, false, 0, true));
+console.log(util.inspect.defaultOptions.depth, util.inspect.defaultOptions.breakLength, util.inspect.defaultOptions.compact);
+console.log(util.inspect({ a: 1 }, { customInspect: false }), util.isDeepStrictEqual({ a: [1] }, { a: [1] }));
