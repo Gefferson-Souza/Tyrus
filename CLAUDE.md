@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-**Tyrus** (TypeRust) is an academic TypeScript-to-Rust transpiler. It converts a strict subset of TypeScript ("Oxidizable Standard") into memory-safe Rust code. No `any`, `var`, or `eval` allowed. Cargo workspace with 11 crates under `crates/` plus the `tests` member.
+**Tyrus** (TypeRust) is an academic TypeScript-to-Rust transpiler. It converts a strict subset of TypeScript ("Oxidizable Standard") into memory-safe Rust code. No `any`, `var`, or `eval` allowed. Cargo workspace with 12 crates under `crates/` plus the `tests` member.
 
 ## STRICT RULES (NEVER VIOLATE)
 
@@ -65,6 +65,11 @@ cargo insta review                     # Review snapshot changes
 cargo bench --bench transpiler         # Transpilation speed (criterion)
 cargo bench --bench runtime_comparison # Node.js vs Rust runtime comparison
 
+# Oracle pins (required by `cargo nextest run --workspace` and gates.sh test/coverage)
+export TYRUS_NODE_REFERENCE=/abs/path/to/node-v26.11.1/bin/node   # tuple in oracle/oracle.lock
+export TYRUS_NODE_SEED=/abs/path/to/node-v22.21.1/bin/node
+cargo run -p tyrus_oracle --bin tyrus-oracle -- lock verify --role all
+
 # Git hooks (run once after cloning)
 ./scripts/setup-hooks.sh               # Install pre-commit (fmt + clippy)
 ```
@@ -97,6 +102,7 @@ cargo bench --bench runtime_comparison # Node.js vs Rust runtime comparison
 | `tyrus_diagnostics` | ~69 | `TyrusError` + miette |
 | `tyrus_common` | ~70 | `FilePath`, `to_snake_case()`, config |
 | `tyrus_test_utils` | ~195 | `assert_rust_compiles()`, `compile_and_run_rust()`, `run_node()` |
+| `tyrus_oracle` | ~970 | Oracle root of trust: pinned Node tuples (`oracle/oracle.lock`), closed `Verdict` algebra with `Shares`, `tyrus-oracle lock verify`. Errors `TYRUS-E5xxx`. Depends on no legacy crate. |
 
 ### Codegen Module Structure (Current)
 

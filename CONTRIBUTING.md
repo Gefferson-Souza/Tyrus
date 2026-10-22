@@ -90,6 +90,7 @@ tests/src/
 ### Running specific test types
 
 ```bash
+# The oracle tests run the real pinned Node: export TYRUS_NODE_REFERENCE and TYRUS_NODE_SEED first (see CLAUDE.md)
 # All tests (preferred: uses nextest)
 cargo nextest run --workspace
 

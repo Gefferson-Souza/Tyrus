@@ -22,6 +22,7 @@
 #   ./scripts/gates.sh machete     # cargo machete (unused dependencies)
 #   ./scripts/gates.sh unsafe      # Rule 13: forbid(unsafe_code) in every crate root
 #   ./scripts/gates.sh replica     # oracle/apps/replica: parity, request set, tooling tests (no Docker)
+#   ./scripts/gates.sh node-pins   # TYRUS_NODE_REFERENCE/TYRUS_NODE_SEED apontam para o Node do oracle.lock
 #
 # Environment variables:
 #   TYRUS_SKIP_DENY=1      Skip cargo deny check (use only when tool unavailable).
@@ -56,8 +57,27 @@ gate_clippy() {
     cargo clippy --workspace --all-targets --locked -- -D warnings
 }
 
+gate_node_pins() {
+    echo "=== gate: node-pins ==="
+    # Os testes do tyrus_oracle rodam o Node real; sem os pins eles seriam
+    # vazios, então a ausência é erro (nunca skip).
+    fail=0
+    for var in TYRUS_NODE_REFERENCE TYRUS_NODE_SEED; do
+        eval "value=\${$var:-}"
+        if [ -z "$value" ]; then
+            echo "ERROR: $var is not set (absolute path of the Node binary pinned in oracle/oracle.lock)"
+            fail=1
+        elif [ ! -x "$value" ]; then
+            echo "ERROR: $var=$value is not an executable file"
+            fail=1
+        fi
+    done
+    return "$fail"
+}
+
 gate_test() {
     echo "=== gate: test ==="
+    gate_node_pins
     # nextest by default runs lib tests, integration tests, and doctests.
     # We deliberately do NOT pass --all-targets here: it would try to run
     # benchmarks as test binaries, but bench/runtime_comparison emits a
@@ -73,6 +93,7 @@ gate_coverage() {
         return 0
     fi
     echo "=== gate: coverage ==="
+    gate_node_pins
     if ! command -v cargo-llvm-cov >/dev/null 2>&1; then
         echo "ERROR: cargo-llvm-cov is not installed."
         echo "Install with: cargo install cargo-llvm-cov"
@@ -269,6 +290,7 @@ case "$cmd" in
     machete)  gate_machete ;;
     unsafe)   gate_unsafe ;;
     replica)  gate_replica ;;
+    node-pins) gate_node_pins ;;
     all)
         gate_fmt
         gate_clippy

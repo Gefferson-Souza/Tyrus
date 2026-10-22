@@ -1,0 +1,11 @@
+'use strict';
+const fs = require('fs');
+const L = (s) => fs.writeSync(1, s + '\n');
+const { Readable } = require('stream');
+const r = Readable.from(['a', 'b', 'c']);
+r.on('data', (c) => L('data ' + c));
+r.on('end', () => L('end'));
+r.on('close', () => L('close'));
+process.nextTick(() => L('tick'));
+Promise.resolve().then(() => L('promise'));
+setImmediate(() => L('immediate'));

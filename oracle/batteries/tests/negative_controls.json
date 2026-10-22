@@ -1,0 +1,17 @@
+{
+  "node-22.21.1": {
+    "env": "TYRUS_NODE_SEED",
+    "must_diff": ["fingerprint.sortCalls", "fingerprint.pow", "fingerprint.powOperator", "fingerprint.powIntExp", "fingerprint.unicodeProps", "fingerprint.tzOffsets", "fingerprint.tzFuture", "inspect.I05_strings_quotes", "litmus.L21_stream_async_iteration"],
+    "must_not_diff": ["fingerprint.sin", "fingerprint.cos", "fingerprint.errorMessages", "litmus.L31_esm_entry_order", "litmus.L35_require_esm_tla_error"]
+  },
+  "node-24.21.0": {
+    "env": "TYRUS_NODE_24",
+    "must_diff": ["fingerprint.sortCalls", "fingerprint.tzOffsets", "fingerprint.intlDateParts", "litmus.L28_uncaught_exception_order"],
+    "must_not_diff": ["fingerprint.pow", "fingerprint.powOperator", "fingerprint.powIntExp", "fingerprint.unicodeProps", "fingerprint.sin", "litmus.L31_esm_entry_order", "litmus.L35_require_esm_tla_error"]
+  },
+  "bun-1.2.22": {
+    "env": "TYRUS_BUN",
+    "must_diff": ["fingerprint.sin", "fingerprint.cos", "fingerprint.sortCalls", "fingerprint.errorMessages", "inspect.I01_map_set", "litmus.L23_net_close_order", "litmus.L33_esm_dynamic_import_order", "litmus.L35_require_esm_tla_error"],
+    "must_not_diff": ["fingerprint.pow", "fingerprint.powOperator", "fingerprint.log1p", "litmus.L31_esm_entry_order", "litmus.L36_esm_import_cjs"]
+  }
+}

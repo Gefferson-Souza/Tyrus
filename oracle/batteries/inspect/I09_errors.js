@@ -1,0 +1,26 @@
+const util = require('util');
+const mk = (name, message, extra) => { const e = new Error(message); e.name = name; e.stack = name + ': ' + message + '\n    at fake (/virtual/file.js:1:1)\n    at main (/virtual/file.js:2:2)'; return Object.assign(e, extra); };
+console.log(mk('Error', 'plain'));
+console.log(mk('TypeError', 'with props', { code: 'E_CODE', status: 500 }));
+console.log({ nested: mk('RangeError', 'inside object') });
+console.log([mk('Error', 'inside array')]);
+const withCause = mk('Error', 'outer');
+withCause.cause = mk('Error', 'inner');
+console.log(withCause);
+const agg = new AggregateError([mk('Error', 'e1')], 'agg');
+agg.stack = 'AggregateError: agg\n    at fake (/virtual/file.js:3:3)';
+console.log(agg);
+const noStack = new Error('no stack');
+delete noStack.stack;
+noStack.stack = undefined;
+console.log(util.inspect(noStack));
+const renamed = mk('Error', 'renamed');
+renamed.name = 'Custom';
+console.log(renamed);
+class HttpError extends Error { constructor(m) { super(m); this.name = 'HttpError'; this.status = 404; } }
+const he = new HttpError('missing');
+he.stack = 'HttpError: missing\n    at fake (/virtual/file.js:4:4)';
+console.log(he);
+console.log(util.inspect(mk('Error', 'x'), { compact: true }));
+console.log(Object.assign(Object.create(Error.prototype), { message: 'not a real error' }));
+console.log(String(mk('Error', 'tostring')), mk('Error', 'a') instanceof Error);

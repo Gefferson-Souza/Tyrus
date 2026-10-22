@@ -1,7 +1,7 @@
 # 13. Power of Ten v2 — Rules 13–14 and Amendments
 
 Date: 2026-08-04
-Status: Accepted (amends ADR 0008)
+Status: Accepted (amends ADR 0008). Scope narrowed to the legacy crates and R13 amended (closed allowlist for `unsafe`) by [ADR 0016](0016-ppr-foundation-and-constitution.md), effective when ADR 0016 is accepted.
 
 ## Context
 

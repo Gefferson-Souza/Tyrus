@@ -1,0 +1,17 @@
+const d = new Date(Date.UTC(2020, 0, 2, 3, 4, 5, 6));
+console.log(d, [d], new Date(NaN), Object.assign(new Date(0), { extra: 1 }));
+console.log(/re/gi, Object.assign(/x/, { extra: 1 }), [/a/y]);
+console.log(Promise.resolve(1), new Promise(() => {}), Promise.reject(new Error('r')).catch(() => {}) && 'caught');
+const rejected = Promise.reject(7);
+rejected.catch(() => {});
+console.log(rejected, Promise.resolve({ a: [1] }));
+console.log(Object(1), Object('s'), Object(true), Object(Symbol('q')), Object(2n), new String('ab'));
+console.log(Object.assign(new Number(3), { extra: 1 }));
+console.log(Object.freeze({ a: 1 }), Object.seal([1]), globalThis === global);
+console.log(function () { return arguments; }(1, 'a'));
+console.log(new (class Foo { constructor() { this.date = new Date(0); this.re = /x/; this.fn = () => 1; } })());
+console.log([undefined, null, true, 'str', 1, () => {}, Symbol.iterator]);
+console.log({ u: undefined, n: null }, [undefined, , null]);
+console.log(Intl.NumberFormat.prototype[Symbol.toStringTag], new Intl.NumberFormat('en'), new Intl.DateTimeFormat('en'));
+console.log((function* () { yield 1; })(), (async function* () {})(), [][Symbol.iterator](), 'ab'[Symbol.iterator](), /a/g[Symbol.matchAll]('a'));
+console.log(new WeakRef({}), typeof FinalizationRegistry, new FinalizationRegistry(() => {}));

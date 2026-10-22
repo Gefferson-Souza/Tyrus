@@ -1,0 +1,6 @@
+Symbol(desc) Symbol() Symbol(reg) Symbol(Symbol.iterator)
+{ regular: 2, Symbol(desc): 1, Symbol(k): [ 3 ] }
+[ Symbol(desc) ] Map(1) { Symbol(desc) => Symbol(desc) }
+[Symbol: Symbol(desc)] [Symbol: Symbol(boxed)]
+{ v: 1, Symbol(Symbol.toStringTag): 'Tagged' } [object Tagged]
+{ Symbol(a b): 1, Symbol(): 2 }

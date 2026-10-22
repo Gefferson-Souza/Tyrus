@@ -1,0 +1,10 @@
+'use strict';
+const fs = require('fs');
+const L = (s) => fs.writeSync(1, s + '\n');
+const thenable = { then(resolve) { L('then-called'); resolve('v'); } };
+(async () => { await thenable; L('after-thenable'); })();
+(async () => { await Promise.resolve(); L('after-native'); })();
+let n = 0;
+const step = () => { n += 1; L('chain-' + n); if (n < 4) Promise.resolve().then(step); };
+Promise.resolve().then(step);
+L('sync');

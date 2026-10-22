@@ -1,0 +1,41 @@
+str|42.5|42|1.5|{"j":1}|[ 1, [length]: 1 ]|{ o: { p: 1 } }|%||end
+null undefined 1n Symbol(s) -0 { a: 1 } [ 1, [ 2 ] ] [Function (anonymous)] [class K]
+1n %d {} %i 2n
+custom %s [Object: null prototype] {}
+in-format P {}
+"viaToJSON" %j <ref *1> { c: [Circular *1] }
+extra args 1 { a: 1 } [ 2 ]
+only-one:%s
+<ref *1> [Function: fn] {
+  [length]: 0,
+  [name]: 'fn',
+  [prototype]: { [constructor]: [Circular *1] }
+}
+1 2 3 a b 
+┌─────────┬───┬─────┬──────┐
+│ (index) │ a │ b   │ c    │
+├─────────┼───┼─────┼──────┤
+│ 0       │ 1 │ 'x' │      │
+│ 1       │ 2 │     │ true │
+└─────────┴───┴─────┴──────┘
+┌───────────────────┬─────┬──────────┐
+│ (iteration index) │ Key │ Values   │
+├───────────────────┼─────┼──────────┤
+│ 0                 │ 'k' │ { v: 1 } │
+└───────────────────┴─────┴──────────┘
+┌─────────┬───┐
+│ (index) │ 0 │
+├─────────┼───┤
+│ 0       │ 1 │
+│ 1       │ 3 │
+└─────────┴───┘
+outer
+  inside
+    { a: 1, b: [ 1, 2 ] }
+{ a: [Object] }
+default: 1
+x: 1
+default: 2
+default: 1
+true true
+Map(0) {} a�

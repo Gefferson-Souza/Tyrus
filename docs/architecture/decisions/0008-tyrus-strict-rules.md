@@ -1,7 +1,7 @@
 # 8. Tyrus Strict Rules (Power of Ten)
 
 Date: 2026-05-03
-Status: Accepted
+Status: Accepted. Scope narrowed to the legacy crates by [ADR 0016](0016-ppr-foundation-and-constitution.md), effective when ADR 0016 is accepted.
 
 ## Context
 

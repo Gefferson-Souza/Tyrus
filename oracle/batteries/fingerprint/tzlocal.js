@@ -1,0 +1,11 @@
+'use strict';
+const { unit, int, safe } = require('./prng.js');
+const emit = require('./emit.js');
+const out = {};
+const T0 = Date.UTC(1950, 0, 1);
+const span = Date.UTC(2045, 0, 1) - T0;
+out.tzLocalString = Array.from({ length: 2000 }, () => { const d = new Date(Math.floor(T0 + unit() * span)); return [d.toString(), d.getTimezoneOffset(), d.toTimeString(), d.toLocaleString(), d.toLocaleString('en-GB'), d.toLocaleDateString('pt-BR'), d.toLocaleTimeString('de-DE'), d.getHours(), d.getDay()].join('|'); });
+out.tzLocalConstruct = Array.from({ length: 2000 }, () => { const d = new Date(1950 + int(95), int(12), 1 + int(28), int(24), int(60)); return [d.getTime(), d.getHours(), d.getTimezoneOffset()].join(','); });
+out.tzLocalTransitions = Array.from({ length: 800 }, (_, i) => { const base = Date.UTC(1990 + (i >> 5), (i % 12), 1 + int(28)); return [0, 3600000, 7200000, 10800000].map((o) => new Date(base + o).toString()).join('|'); });
+out.tzLocalName = [safe(() => new Date(0).toString()), safe(() => new Date(Date.UTC(2024, 6, 1)).toString()), safe(() => Intl.DateTimeFormat().resolvedOptions().timeZone), safe(() => process.env.TZ)];
+emit(out);

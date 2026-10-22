@@ -1,0 +1,53 @@
+EventEmitter {
+  _events: [Object: null prototype] {},
+  _eventsCount: 0,
+  _maxListeners: undefined,
+  Symbol(shapeMode): false,
+  Symbol(kCapture): false
+}
+EventEmitter function EventEmitter,EventEmitterAsyncResource,addAbortListener,captureRejectionSymbol,captureRejections,defaultMaxListeners,errorMonitor,getEventListeners,getMaxListeners,init,listenerCount,on,once,setMaxListeners,usingDomains
+URL {
+  href: 'http://user:pw@example.com:8080/p/a?x=1&y=2#h',
+  origin: 'http://example.com:8080',
+  protocol: 'http:',
+  username: 'user',
+  password: 'pw',
+  host: 'example.com:8080',
+  hostname: 'example.com',
+  port: '8080',
+  pathname: '/p/a',
+  search: '?x=1&y=2',
+  searchParams: URLSearchParams { 'x' => '1', 'y' => '2' },
+  hash: '#h'
+}
+URLSearchParams { 'a' => '1', 'b' => '2', 'a' => '3' } URLSearchParams Iterator { [ 'a', '1' ] }
+Event {
+  type: 'e',
+  defaultPrevented: false,
+  cancelable: false,
+  timeStamp: <t>
+} AbortSignal { aborted: false }
+[Function: nextTick] [Function: setTimeout] {
+  Symbol(nodejs.util.promisify.custom): [Getter]
+} [Function: Buffer] {
+  poolSize: 65536,
+  from: [Function: from],
+  copyBytesFrom: [Function: copyBytesFrom],
+  of: [Function: of],
+  alloc: [Function: alloc],
+  allocUnsafe: [Function: allocUnsafe],
+  allocUnsafeSlow: [Function: allocUnsafeSlow],
+  isBuffer: [Function: isBuffer],
+  compare: [Function: compare],
+  isEncoding: [Function: isEncoding],
+  concat: [Function: concat],
+  byteLength: [Function: byteLength],
+  stringLength: [Function: stringLength],
+  Symbol(kIsEncodingSymbol): [Function: isEncoding]
+} [Function: from] [Function: readFile]
+{ encoding: 'utf-8' } TextDecoder { encoding: 'utf-8', fatal: true, ignoreBOM: false }
+Timeout object _destroyed,_idleNext,_idlePrev,_idleStart,_idleTimeout,_onTimeout,_repeat,_timerArgs
+{ root: '/', dir: '/a', base: 'b.c', ext: '.c', name: 'b' } true
+null true
+Map(1) { 1 => { a: 1 } }
+Blob { size: 3, type: 'text/plain' } Headers { 'X-A': '1' }
