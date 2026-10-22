@@ -2,7 +2,7 @@
 members = ["crates/*", "tests"]
 resolver = "2"
 
-# Shared package metadata. Each of the 12 workspace members inherits these via
+# Shared package metadata. Each of the 13 workspace members inherits these via
 # `field.workspace = true` so the license and edition stay in sync across
 # `field.workspace = true` (cargo-deny enforces that an SPDX license is set).
 [workspace.package]

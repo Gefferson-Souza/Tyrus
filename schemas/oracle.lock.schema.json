@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gefferson-Souza/Tyrus/schemas/oracle.lock.schema.json",
+  "title": "oracle.lock",
+  "description": "Pin por tupla exata da referência (Node) e da semente do oráculo (D14).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "reference", "seed", "host_crates"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "reference": { "$ref": "#/$defs/nodeTuple" },
+    "seed": { "$ref": "#/$defs/nodeTuple" },
+    "host_crates": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "nodeTuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "v8", "icu", "unicode", "tz", "cldr"],
+      "properties": {
+        "node": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "v8": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+-node\\.[0-9]+$" },
+        "icu": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "unicode": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "tz": { "type": "string", "pattern": "^[0-9]{4}[a-z]$" },
+        "cldr": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" }
+      }
+    }
+  }
+}
