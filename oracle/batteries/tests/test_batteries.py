@@ -163,5 +163,39 @@ class ExecutionTest(unittest.TestCase):
         self.assertTrue(classes["litmus.P01_hrtime_noise"]["unstable"])
 
 
+class LitmusTest(unittest.TestCase):
+    """Traces derivadas da semantica documentada do Node, independentes dos goldens."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.reference = require_env("TYRUS_NODE_REFERENCE")
+        cls.env = RUN.engine_env("UTC", {}, tempfile.gettempdir())
+        cls.litmus = litmus_names()
+
+    def test_traces_match_documented_node_semantics(self):
+        for name, expected in LITMUS_TRACES.items():
+            with self.subTest(litmus=name):
+                result = RUN.run_script(self.reference, litmus_path(name), self.env)
+                self.assertEqual(result["exit"], 0)
+                self.assertEqual(result["stdout"].decode("utf-8").split(), expected.split())
+
+    def test_no_litmus_uses_nondeterministic_sources(self):
+        banned = re.compile(r"Math\.random|Date\.now|hrtime|performance\.now|randomBytes|randomUUID")
+        for name in self.litmus:
+            with open(litmus_path(name), encoding="utf-8") as handle:
+                self.assertIsNone(banned.search(handle.read()), name)
+
+    def test_no_litmus_depends_on_a_long_wait(self):
+        for name in self.litmus:
+            with open(litmus_path(name), encoding="utf-8") as handle:
+                delays = [int(d) for d in re.findall(r"set(?:Timeout|Interval)\([^;]*?,\s*(\d+)\)", handle.read())]
+            self.assertTrue(all(d < 10 for d in delays), f"{name}: {delays}")
+
+    def test_no_litmus_flutters_in_five_runs(self):
+        classes, _ = RUN.script_classes(self.reference, os.path.join(ROOT, "litmus"), "litmus", self.env, RUN.Selection(5, None))
+        self.assertEqual([c for c, v in classes.items() if v.get("unstable")], [])
+        self.assertEqual(len(classes), len(self.litmus))
+
+
 if __name__ == "__main__":
     unittest.main()
