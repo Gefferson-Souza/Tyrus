@@ -1,0 +1,102 @@
+{
+  "kind": "external_evidence",
+  "gate": "M0 Gate 0",
+  "closed_on": "2026-10-20",
+  "runtime_tuple": {
+    "node": "v26.11.1",
+    "v8": "14.6.202.34-node.37",
+    "icu": "78.3",
+    "source": "summary.md, tabela de runtimes (linha node26)"
+  },
+  "rust_ceiling_binaries": [
+    {
+      "name": "rust-ceiling",
+      "path": "/home/gefferson-souza/.local/share/tyrus-ceiling/rust-ceiling/target/release/ceiling",
+      "bytes": 1820048,
+      "sha256_declared": "cf6ed9d6b7570170425f9a2da2147083019fa913984ec8def5675baf397c9985",
+      "local_check": "match"
+    },
+    {
+      "name": "rust-ceiling-full",
+      "path": "/home/gefferson-souza/.local/share/tyrus-ceiling/rust-ceiling/target-fullhydration/release/ceiling",
+      "bytes": 1822624,
+      "sha256_declared": "1ba0809abfb1f4ce9f1d8dad88933ba7bc7ab8f4a9f14e496fbc60f45c976094",
+      "local_check": "match"
+    }
+  ],
+  "ceiling_work_area": "/home/gefferson-souza/.local/share/tyrus-ceiling",
+  "files": [
+    {
+      "file": "summary.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/summary.md",
+      "bytes": 44746,
+      "sha256": "3ff6dce3da603885954d605ee23e3c52c50ff2031883f23039df027933e31e76"
+    },
+    {
+      "file": "equivalence.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/equivalence.md",
+      "bytes": 13481,
+      "sha256": "4636e2305023134bdb1580f0637c685a1784dcf88c48b72cb54fef2171588280"
+    },
+    {
+      "file": "raw.jsonl",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/raw.jsonl",
+      "bytes": 466905,
+      "sha256": "d5f779b02ca2f5525e7468fe7e6163b1b154bb82491d559d1c7b809f1b08ecae"
+    },
+    {
+      "file": "sql-equiv-bun-express.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-bun-express.md",
+      "bytes": 594,
+      "sha256": "d3c2616d902af7da4bd17da495fe083b18270da24546d24dac6bfda32e0a69a3"
+    },
+    {
+      "file": "sql-equiv-node-express.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-node-express.md",
+      "bytes": 451,
+      "sha256": "0304dfb073817cdef5e22b2f3d6647faf4b60b4c300d21d63a44599a1e4cd6a0"
+    },
+    {
+      "file": "sql-equiv-node-fastify.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-node-fastify.md",
+      "bytes": 384,
+      "sha256": "c74f1767be1b93695895f0ffcbfff8adb64da48caaa7b1d57c0ffaf1cf43bc60"
+    },
+    {
+      "file": "sql-equiv-node24-express.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-node24-express.md",
+      "bytes": 453,
+      "sha256": "8f6329033d8214a9535c2befbaa558ee9f8d0a59cb4848c30d93bc15e5e2c3d3"
+    },
+    {
+      "file": "sql-equiv-node24-fastify.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-node24-fastify.md",
+      "bytes": 453,
+      "sha256": "ead84f3b6981d4e2c8d615f62985da5a544d0bf02407ae492842df472a710b90"
+    },
+    {
+      "file": "sql-equiv-node26-express.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-node26-express.md",
+      "bytes": 453,
+      "sha256": "737675363c49beb6d9ec3eba786ca7c8768dd4e33d1dcf1f30e90bc09bb9e673"
+    },
+    {
+      "file": "sql-equiv-node26-fastify.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-node26-fastify.md",
+      "bytes": 453,
+      "sha256": "623a33b0d7efdf2a98e3424a2c85e0aedb4ab6cb18b33dc1098c3582849c82db"
+    },
+    {
+      "file": "sql-equiv-rust-ceiling-full.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-rust-ceiling-full.md",
+      "bytes": 458,
+      "sha256": "41674c585667a063ba0fc21a9cc1e2beceaa3916cd0d2f6d1cbd984306c6d888"
+    },
+    {
+      "file": "sql-equiv-rust-ceiling.md",
+      "origin": "/home/gefferson-souza/Desktop/personal-projects/TypeRust/.claude/plan/oracle-seed/ceiling/results-2026-10-20/sql-equiv-rust-ceiling.md",
+      "bytes": 453,
+      "sha256": "06c922d2a95303b457fce4a810ed7dd55f724ed6577911839f4f1284aa8331c7"
+    }
+  ]
+}
