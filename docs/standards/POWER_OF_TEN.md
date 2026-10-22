@@ -145,6 +145,7 @@ coverage  # cargo llvm-cov, --fail-under-lines at the enforced threshold
 deny      # cargo deny check
 audit     # cargo audit --deny warnings
 machete   # cargo machete (unused dependencies, Rule 12)
+replica   # oracle/apps/replica static checks, no Docker
 ```
 
 When the monolithic `gates.sh all` run is impractical on a dev machine (resource limits), gates may be run staged — but all of them must pass on the exact tree being pushed, documented in the commit body (see DEVELOPMENT_FLOW.md Rule F4).

@@ -1,0 +1,2212 @@
+{
+ "meta": {
+  "target": "node dist/bundle/main.js",
+  "node": "v26.11.1",
+  "adapter": "express",
+  "requests": 86
+ },
+ "results": [
+  {
+   "id": "01-health",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "15"
+    ],
+    [
+     "etag",
+     "W/\"f-VaSQ4oDUiZblZNAEkkN+sX+q3Sg\""
+    ]
+   ],
+   "body": "{\"status\":\"ok\"}",
+   "body_sha256": "a29ee2b15c494311c52521766e44af56a3ad2248e7a8ab465e5206463c13d288",
+   "problems": []
+  },
+  {
+   "id": "02-product-1",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "318"
+    ],
+    [
+     "etag",
+     "W/\"13e-d2KAPpyfw2BOwG1JFJn+IexDdTU\""
+    ]
+   ],
+   "body": "{\"id\":1,\"sku\":\"PRD-000001\",\"name\":\"Cremoso Óleo de Soja 900g\",\"description\":null,\"price\":\"367.56\",\"stock\":218,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-01T00:02:07.706Z\",\"updatedAt\":\"2025-03-01T13:18:08.748Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}}",
+   "body_sha256": "60f017b6662790ee8c49f38bb2be129b569a1138f63694f819adc0675050aceb",
+   "problems": []
+  },
+  {
+   "id": "03-product-2",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "311"
+    ],
+    [
+     "etag",
+     "W/\"137-DuYYz4HZ4aifCZKj4z0PUYcZ12M\""
+    ]
+   ],
+   "body": "{\"id\":2,\"sku\":\"PRD-000002\",\"name\":\"Caseiro Café Torrado 1,5L\",\"description\":null,\"price\":\"120.44\",\"stock\":168,\"active\":true,\"categoryId\":5,\"createdAt\":\"2025-03-01T00:04:15.354Z\",\"updatedAt\":\"2025-03-01T07:35:43.437Z\",\"category\":{\"id\":5,\"name\":\"Bebidas\",\"slug\":\"bebidas\",\"createdAt\":\"2025-01-06T18:15:22.835Z\"}}",
+   "body_sha256": "42995d9a1a4404c7c6feefa53aac817a20c2cb301c8a250f61d7c5ddd8ccc226",
+   "problems": []
+  },
+  {
+   "id": "04-product-17",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "359"
+    ],
+    [
+     "etag",
+     "W/\"167-fq/dPZA33NJlCXpHEQ9lN5duuCM\""
+    ]
+   ],
+   "body": "{\"id\":17,\"sku\":\"PRD-000017\",\"name\":\"Super Leite Integral 900g\",\"description\":\"Produto de alta qualidade.\",\"price\":\"883.18\",\"stock\":324,\"active\":true,\"categoryId\":18,\"createdAt\":\"2025-03-01T00:36:04.852Z\",\"updatedAt\":\"2025-03-01T14:37:55.882Z\",\"category\":{\"id\":18,\"name\":\"Doces e Chocolates\",\"slug\":\"doces-e-chocolates\",\"createdAt\":\"2025-01-20T20:55:22.206Z\"}}",
+   "body_sha256": "b50134c7cc8c5594c3127905723794bbc2b043d0be1580a7ec2fa6bc3b0a3455",
+   "problems": []
+  },
+  {
+   "id": "05-product-9999",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "391"
+    ],
+    [
+     "etag",
+     "W/\"187-vxVIfzA3TqQCjczeKrxeCkSX9zI\""
+    ]
+   ],
+   "body": "{\"id\":9999,\"sku\":\"PRD-009999\",\"name\":\"Tradicional Refrigerante Guaraná 200g\",\"description\":\"Sem conservantes; açúcar & sal reduzidos <light>. Ação: 3 por 2.\",\"price\":\"48.72\",\"stock\":214,\"active\":true,\"categoryId\":5,\"createdAt\":\"2025-03-15T17:38:02.820Z\",\"updatedAt\":\"2025-03-16T04:52:27.394Z\",\"category\":{\"id\":5,\"name\":\"Bebidas\",\"slug\":\"bebidas\",\"createdAt\":\"2025-01-06T18:15:22.835Z\"}}",
+   "body_sha256": "9f014ce2176cb878cc74e0147d6b53d27f15cf5a9d42705716ad3285bdf75f27",
+   "problems": []
+  },
+  {
+   "id": "06-product-10000",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "350"
+    ],
+    [
+     "etag",
+     "W/\"15e-CHf9pdNwtSiZJDnoR0ZZmAyrK7s\""
+    ]
+   ],
+   "body": "{\"id\":10000,\"sku\":\"PRD-010000\",\"name\":\"Super Sabão em Pó 750ml\",\"description\":null,\"price\":\"245.57\",\"stock\":498,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-15T17:40:10.167Z\",\"updatedAt\":\"2025-03-15T21:23:38.346Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}}",
+   "body_sha256": "9c4e1c090083b51727db1c723d7d9f07ff6138bdbbc49380c40449bc0c0ab43e",
+   "problems": []
+  },
+  {
+   "id": "07-product-3",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "381"
+    ],
+    [
+     "etag",
+     "W/\"17d-QHeDxyKnG7dqO7lfxo0xvSXhbCc\""
+    ]
+   ],
+   "body": "{\"id\":3,\"sku\":\"PRD-000003\",\"name\":\"Caseiro Queijo Mussarela 500g\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"382.69\",\"stock\":466,\"active\":true,\"categoryId\":11,\"createdAt\":\"2025-03-01T00:06:22.074Z\",\"updatedAt\":\"2025-03-01T13:36:46.840Z\",\"category\":{\"id\":11,\"name\":\"Biscoitos e Salgadinhos\",\"slug\":\"biscoitos-e-salgadinhos\",\"createdAt\":\"2025-01-13T06:33:50.237Z\"}}",
+   "body_sha256": "4cb01936b8eed8a912ae06d6654c6c898ed06962e7cb09da5e826b5813885991",
+   "problems": []
+  },
+  {
+   "id": "08-product-4",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "364"
+    ],
+    [
+     "etag",
+     "W/\"16c-kCH/vUGnrtOt53gfuAcZblcZ0Eg\""
+    ]
+   ],
+   "body": "{\"id\":4,\"sku\":\"PRD-000004\",\"name\":\"Tradicional Iogurte Natural 1,5L\",\"description\":\"Produto de alta qualidade.\",\"price\":\"198.05\",\"stock\":265,\"active\":false,\"categoryId\":10,\"createdAt\":\"2025-03-01T00:08:29.974Z\",\"updatedAt\":\"2025-03-01T20:30:56.591Z\",\"category\":{\"id\":10,\"name\":\"Frios e Embutidos\",\"slug\":\"frios-e-embutidos\",\"createdAt\":\"2025-01-12T04:30:45.670Z\"}}",
+   "body_sha256": "1eaf86b7760784c3276f50f5552f5d2f8746cb66bc3119e5857a79d75afd12ab",
+   "problems": []
+  },
+  {
+   "id": "09-product-6",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "337"
+    ],
+    [
+     "etag",
+     "W/\"151-00JmY9QN/htBhTCNR0erKQySuDc\""
+    ]
+   ],
+   "body": "{\"id\":6,\"sku\":\"PRD-000006\",\"name\":\"Especial Azeite Extra Virgem 500g\",\"description\":\"Coluna A\\tColuna B\",\"price\":\"42.32\",\"stock\":460,\"active\":true,\"categoryId\":6,\"createdAt\":\"2025-03-01T00:12:44.128Z\",\"updatedAt\":\"2025-03-01T13:28:23.575Z\",\"category\":{\"id\":6,\"name\":\"Mercearia\",\"slug\":\"mercearia\",\"createdAt\":\"2025-01-07T20:18:27.402Z\"}}",
+   "body_sha256": "d24cff7de79e77ae778c2eb057fdd3a8bc209c95e7adce051f82014160bca6f8",
+   "problems": []
+  },
+  {
+   "id": "10-product-7",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "362"
+    ],
+    [
+     "etag",
+     "W/\"16a-6fDOmZg88yMpm+Au0kEsIt1fXrI\""
+    ]
+   ],
+   "body": "{\"id\":7,\"sku\":\"PRD-000007\",\"name\":\"Light Pão de Queijo 500g\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"36.46\",\"stock\":141,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-01T00:14:51.988Z\",\"updatedAt\":\"2025-03-01T07:52:43.615Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}}",
+   "body_sha256": "c7fda7c22797cef9fd21d0b33c6337d66ad5b9086ff050b00654bbc2ba5a0dff",
+   "problems": []
+  },
+  {
+   "id": "11-product-10",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "393"
+    ],
+    [
+     "etag",
+     "W/\"189-YGgrEupTMwuoAnXTvsm+zjqA0YU\""
+    ]
+   ],
+   "body": "{\"id\":10,\"sku\":\"PRD-000010\",\"name\":\"Fresco Sorvete de Chocolate 200g\",\"description\":\"Armazenar em local seco\\ne arejado. Importado.\",\"price\":\"376.31\",\"stock\":450,\"active\":true,\"categoryId\":16,\"createdAt\":\"2025-03-01T00:21:13.802Z\",\"updatedAt\":\"2025-03-01T20:17:18.666Z\",\"category\":{\"id\":16,\"name\":\"Utilidades Domésticas\",\"slug\":\"utilidades-domesticas\",\"createdAt\":\"2025-01-18T16:49:13.072Z\"}}",
+   "body_sha256": "172eb75a0f71bbe6cdf2d623b238b65385a56107cbeaaee242795fc5f53a4a8f",
+   "problems": []
+  },
+  {
+   "id": "12-product-16",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "374"
+    ],
+    [
+     "etag",
+     "W/\"176-hgBjPOqIVu/ZBUNqzC3oJwa13og\""
+    ]
+   ],
+   "body": "{\"id\":16,\"sku\":\"PRD-000016\",\"name\":\"Caseiro Chocolate ao Leite 750ml\",\"description\":\"Linha \\\"Gourmet\\\" — edição limitada. Importado.\",\"price\":\"822.96\",\"stock\":375,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-01T00:33:57.633Z\",\"updatedAt\":\"2025-03-01T04:19:14.455Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}}",
+   "body_sha256": "fe82c48ceeca8c9ee59d080b5bb62b3d2fac3d4dbb273eb1ad3533ee7bbea116",
+   "problems": []
+  },
+  {
+   "id": "13-product-35",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "384"
+    ],
+    [
+     "etag",
+     "W/\"180-x4oFhlrkAqF5vI/HubureEe1qvg\""
+    ]
+   ],
+   "body": "{\"id\":35,\"sku\":\"PRD-000035\",\"name\":\"Light Pimentão Verde 750ml\",\"description\":\"Sem conservantes; açúcar & sal reduzidos <light>.\",\"price\":\"152.32\",\"stock\":447,\"active\":true,\"categoryId\":10,\"createdAt\":\"2025-03-01T01:14:16.891Z\",\"updatedAt\":\"2025-03-01T20:54:27.646Z\",\"category\":{\"id\":10,\"name\":\"Frios e Embutidos\",\"slug\":\"frios-e-embutidos\",\"createdAt\":\"2025-01-12T04:30:45.670Z\"}}",
+   "body_sha256": "03b7574250413de4bef2f2b165fa6ec0fe2edd8be21a45b2ae4d22d3011d7626",
+   "problems": []
+  },
+  {
+   "id": "14-product-165",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "382"
+    ],
+    [
+     "etag",
+     "W/\"17e-nMuwNj+m7tvhLC63aierg2o7nts\""
+    ]
+   ],
+   "body": "{\"id\":165,\"sku\":\"PRD-000165\",\"name\":\"Orgânico Feijão Carioca 1kg 🍫\",\"description\":\"Sem conservantes; açúcar & sal reduzidos <light>. Importado.\",\"price\":\"634.67\",\"stock\":350,\"active\":true,\"categoryId\":1,\"createdAt\":\"2025-03-01T05:50:08.654Z\",\"updatedAt\":\"2025-03-01T22:01:40.999Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}}",
+   "body_sha256": "eeb68e9c34e70d5313b0b3c3f0302f88cee2742f6d5eca785ae79f78f03ee7a1",
+   "problems": []
+  },
+  {
+   "id": "15-product-007",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "362"
+    ],
+    [
+     "etag",
+     "W/\"16a-6fDOmZg88yMpm+Au0kEsIt1fXrI\""
+    ]
+   ],
+   "body": "{\"id\":7,\"sku\":\"PRD-000007\",\"name\":\"Light Pão de Queijo 500g\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"36.46\",\"stock\":141,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-01T00:14:51.988Z\",\"updatedAt\":\"2025-03-01T07:52:43.615Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}}",
+   "body_sha256": "c7fda7c22797cef9fd21d0b33c6337d66ad5b9086ff050b00654bbc2ba5a0dff",
+   "problems": []
+  },
+  {
+   "id": "16-product-1.5",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "99"
+    ],
+    [
+     "etag",
+     "W/\"63-fbYqGzam3W3FhpKYGVugOXQk+/M\""
+    ]
+   ],
+   "body": "{\"message\":\"Validation failed (numeric string is expected)\",\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "f597e621e5c0e8e065fa2bad0d875c20f0558225b2bc7419155be741c6f6d80e",
+   "problems": []
+  },
+  {
+   "id": "17-product-10001",
+   "status": 404,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "74"
+    ],
+    [
+     "etag",
+     "W/\"4a-qieyTcQ8nNlDtiUsTQ1a29c/Kkg\""
+    ]
+   ],
+   "body": "{\"message\":\"Product 10001 not found\",\"error\":\"Not Found\",\"statusCode\":404}",
+   "body_sha256": "f4a10dc403f66b7cd9aa595c6b77c48d537346f1d95aae3c4f0899a0340b5e1d",
+   "problems": []
+  },
+  {
+   "id": "18-product-minus5",
+   "status": 404,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "71"
+    ],
+    [
+     "etag",
+     "W/\"47-HvRHfrlZ4gw0MkO5WCOs5eu6Qys\""
+    ]
+   ],
+   "body": "{\"message\":\"Product -5 not found\",\"error\":\"Not Found\",\"statusCode\":404}",
+   "body_sha256": "9558a534a3c67edc4ce825879da017b87fcba3b615ddf4972fccfccf882ea50b",
+   "problems": []
+  },
+  {
+   "id": "19-product-abc",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "99"
+    ],
+    [
+     "etag",
+     "W/\"63-fbYqGzam3W3FhpKYGVugOXQk+/M\""
+    ]
+   ],
+   "body": "{\"message\":\"Validation failed (numeric string is expected)\",\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "f597e621e5c0e8e065fa2bad0d875c20f0558225b2bc7419155be741c6f6d80e",
+   "problems": []
+  },
+  {
+   "id": "20-list-defaults",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "7088"
+    ],
+    [
+     "etag",
+     "W/\"1bb0-fhIGxZ2x/9ApHpbSGaXYYZ8sXmw\""
+    ]
+   ],
+   "body": "{\"items\":[{\"id\":1,\"sku\":\"PRD-000001\",\"name\":\"Cremoso Óleo de Soja 900g\",\"description\":null,\"price\":\"367.56\",\"stock\":218,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-01T00:02:07.706Z\",\"updatedAt\":\"2025-03-01T13:18:08.748Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":2,\"sku\":\"PRD-000002\",\"name\":\"Caseiro Café Torrado 1,5L\",\"description\":null,\"price\":\"120.44\",\"stock\":168,\"active\":true,\"categoryId\":5,\"createdAt\":\"2025-03-01T00:04:15.354Z\",\"updatedAt\":\"2025-03-01T07:35:43.437Z\",\"category\":{\"id\":5,\"name\":\"Bebidas\",\"slug\":\"bebidas\",\"createdAt\":\"2025-01-06T18:15:22.835Z\"}},{\"id\":3,\"sku\":\"PRD-000003\",\"name\":\"Caseiro Queijo Mussarela 500g\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"382.69\",\"stock\":466,\"active\":true,\"categoryId\":11,\"createdAt\":\"2025-03-01T00:06:22.074Z\",\"updatedAt\":\"2025-03-01T13:36:46.840Z\",\"category\":{\"id\":11,\"name\":\"Biscoitos e Salgadinhos\",\"slug\":\"biscoitos-e-salgadinhos\",\"createdAt\":\"2025-01-13T06:33:50.237Z\"}},{\"id\":4,\"sku\":\"PRD-000004\",\"name\":\"Tradicional Iogurte Natural 1,5L\",\"description\":\"Produto de alta qualidade.\",\"price\":\"198.05\",\"stock\":265,\"active\":false,\"categoryId\":10,\"createdAt\":\"2025-03-01T00:08:29.974Z\",\"updatedAt\":\"2025-03-01T20:30:56.591Z\",\"category\":{\"id\":10,\"name\":\"Frios e Embutidos\",\"slug\":\"frios-e-embutidos\",\"createdAt\":\"2025-01-12T04:30:45.670Z\"}},{\"id\":5,\"sku\":\"PRD-000005\",\"name\":\"Natural Açúcar Refinado 750ml\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"988.09\",\"stock\":463,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-01T00:10:37.402Z\",\"updatedAt\":\"2025-03-01T22:19:17.428Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}},{\"id\":6,\"sku\":\"PRD-000006\",\"name\":\"Especial Azeite Extra Virgem 500g\",\"description\":\"Coluna A\\tColuna B\",\"price\":\"42.32\",\"stock\":460,\"active\":true,\"categoryId\":6,\"createdAt\":\"2025-03-01T00:12:44.128Z\",\"updatedAt\":\"2025-03-01T13:28:23.575Z\",\"category\":{\"id\":6,\"name\":\"Mercearia\",\"slug\":\"mercearia\",\"createdAt\":\"2025-01-07T20:18:27.402Z\"}},{\"id\":7,\"sku\":\"PRD-000007\",\"name\":\"Light Pão de Queijo 500g\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"36.46\",\"stock\":141,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-01T00:14:51.988Z\",\"updatedAt\":\"2025-03-01T07:52:43.615Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}},{\"id\":8,\"sku\":\"PRD-000008\",\"name\":\"Natural Linguiça Calabresa 500g\",\"description\":null,\"price\":\"115.17\",\"stock\":338,\"active\":true,\"categoryId\":19,\"createdAt\":\"2025-03-01T00:16:59.374Z\",\"updatedAt\":\"2025-03-01T02:52:04.534Z\",\"category\":{\"id\":19,\"name\":\"Adega e Vinhos\",\"slug\":\"adega-e-vinhos\",\"createdAt\":\"2025-01-21T22:58:26.773Z\"}},{\"id\":9,\"sku\":\"PRD-000009\",\"name\":\"Integral Pão de Queijo 200g\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"123.35\",\"stock\":329,\"active\":true,\"categoryId\":6,\"createdAt\":\"2025-03-01T00:19:05.936Z\",\"updatedAt\":\"2025-03-01T08:24:55.388Z\",\"category\":{\"id\":6,\"name\":\"Mercearia\",\"slug\":\"mercearia\",\"createdAt\":\"2025-01-07T20:18:27.402Z\"}},{\"id\":10,\"sku\":\"PRD-000010\",\"name\":\"Fresco Sorvete de Chocolate 200g\",\"description\":\"Armazenar em local seco\\ne arejado. Importado.\",\"price\":\"376.31\",\"stock\":450,\"active\":true,\"categoryId\":16,\"createdAt\":\"2025-03-01T00:21:13.802Z\",\"updatedAt\":\"2025-03-01T20:17:18.666Z\",\"category\":{\"id\":16,\"name\":\"Utilidades Domésticas\",\"slug\":\"utilidades-domesticas\",\"createdAt\":\"2025-01-18T16:49:13.072Z\"}},{\"id\":11,\"sku\":\"PRD-000011\",\"name\":\"Natural Pão Francês 1kg\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado). Fabricação própria.\",\"price\":\"321.07\",\"stock\":143,\"active\":true,\"categoryId\":2,\"createdAt\":\"2025-03-01T00:23:21.013Z\",\"updatedAt\":\"2025-03-01T02:05:40.426Z\",\"category\":{\"id\":2,\"name\":\"Hortifrúti\",\"slug\":\"hortifruti\",\"createdAt\":\"2025-01-03T12:06:09.134Z\"}},{\"id\":12,\"sku\":\"PRD-000012\",\"name\":\"Cremoso Linguiça Calabresa 5kg\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"435.38\",\"stock\":414,\"active\":true,\"categoryId\":5,\"createdAt\":\"2025-03-01T00:25:27.903Z\",\"updatedAt\":\"2025-03-01T06:38:16.850Z\",\"category\":{\"id\":5,\"name\":\"Bebidas\",\"slug\":\"bebidas\",\"createdAt\":\"2025-01-06T18:15:22.835Z\"}},{\"id\":13,\"sku\":\"PRD-000013\",\"name\":\"Integral Açúcar Refinado 750ml\",\"description\":\"Validade: 6 meses após a abertura.\",\"price\":\"51.15\",\"stock\":132,\"active\":true,\"categoryId\":19,\"createdAt\":\"2025-03-01T00:27:36.138Z\",\"updatedAt\":\"2025-03-01T11:23:18.623Z\",\"category\":{\"id\":19,\"name\":\"Adega e Vinhos\",\"slug\":\"adega-e-vinhos\",\"createdAt\":\"2025-01-21T22:58:26.773Z\"}},{\"id\":14,\"sku\":\"PRD-000014\",\"name\":\"Light Chocolate ao Leite 12un\",\"description\":\"Contém glúten.\",\"price\":\"36.53\",\"stock\":62,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-01T00:29:43.033Z\",\"updatedAt\":\"2025-03-01T19:26:18.110Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}},{\"id\":15,\"sku\":\"PRD-000015\",\"name\":\"Orgânico Sorvete de Chocolate 350ml\",\"description\":null,\"price\":\"602.45\",\"stock\":437,\"active\":true,\"categoryId\":1,\"createdAt\":\"2025-03-01T00:31:50.603Z\",\"updatedAt\":\"2025-03-01T04:51:43.751Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":16,\"sku\":\"PRD-000016\",\"name\":\"Caseiro Chocolate ao Leite 750ml\",\"description\":\"Linha \\\"Gourmet\\\" — edição limitada. Importado.\",\"price\":\"822.96\",\"stock\":375,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-01T00:33:57.633Z\",\"updatedAt\":\"2025-03-01T04:19:14.455Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":17,\"sku\":\"PRD-000017\",\"name\":\"Super Leite Integral 900g\",\"description\":\"Produto de alta qualidade.\",\"price\":\"883.18\",\"stock\":324,\"active\":true,\"categoryId\":18,\"createdAt\":\"2025-03-01T00:36:04.852Z\",\"updatedAt\":\"2025-03-01T14:37:55.882Z\",\"category\":{\"id\":18,\"name\":\"Doces e Chocolates\",\"slug\":\"doces-e-chocolates\",\"createdAt\":\"2025-01-20T20:55:22.206Z\"}},{\"id\":18,\"sku\":\"PRD-000018\",\"name\":\"Artesanal Molho de Tomate 12un\",\"description\":\"Contém glúten. Fabricação própria.\",\"price\":\"77.65\",\"stock\":286,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-01T00:38:11.976Z\",\"updatedAt\":\"2025-03-01T06:19:53.547Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}},{\"id\":19,\"sku\":\"PRD-000019\",\"name\":\"Caseiro Leite Integral 2L\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"645.39\",\"stock\":172,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-01T00:40:19.150Z\",\"updatedAt\":\"2025-03-01T15:05:49.660Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}},{\"id\":20,\"sku\":\"PRD-000020\",\"name\":\"Natural Leite Integral 900g\",\"description\":null,\"price\":\"95.85\",\"stock\":181,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-01T00:42:26.458Z\",\"updatedAt\":\"2025-03-01T14:03:21.559Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}}],\"limit\":20,\"offset\":0}",
+   "body_sha256": "72853c585d1200f00079fb6aa9e4c1520bbe678a67d1175dec518d6ce0843dc5",
+   "problems": []
+  },
+  {
+   "id": "21-list-5-37",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "1873"
+    ],
+    [
+     "etag",
+     "W/\"751-w5S3r9xuHoURw+0BBtGRBLGT0Dw\""
+    ]
+   ],
+   "body": "{\"items\":[{\"id\":38,\"sku\":\"PRD-000038\",\"name\":\"Artesanal Queijo Mussarela 200g\",\"description\":\"Coluna A\\tColuna B Fabricação própria.\",\"price\":\"607.06\",\"stock\":64,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-01T01:20:38.564Z\",\"updatedAt\":\"2025-03-01T02:55:54.882Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":39,\"sku\":\"PRD-000039\",\"name\":\"Premium Detergente Neutro 200g\",\"description\":\"Sem conservantes; açúcar & sal reduzidos <light>. Ação: 3 por 2.\",\"price\":\"50.34\",\"stock\":380,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-01T01:22:46.234Z\",\"updatedAt\":\"2025-03-01T23:21:44.839Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}},{\"id\":40,\"sku\":\"PRD-000040\",\"name\":\"Light Farinha de Trigo 200g\",\"description\":null,\"price\":\"389.55\",\"stock\":283,\"active\":true,\"categoryId\":17,\"createdAt\":\"2025-03-01T01:24:52.951Z\",\"updatedAt\":\"2025-03-01T18:42:06.751Z\",\"category\":{\"id\":17,\"name\":\"Papelaria\",\"slug\":\"papelaria\",\"createdAt\":\"2025-01-19T18:52:17.639Z\"}},{\"id\":41,\"sku\":\"PRD-000041\",\"name\":\"Caseiro Sabão em Pó 12un\",\"description\":\"Validade: 6 meses após a abertura.\",\"price\":\"800.70\",\"stock\":45,\"active\":true,\"categoryId\":16,\"createdAt\":\"2025-03-01T01:27:00.211Z\",\"updatedAt\":\"2025-03-01T02:18:28.713Z\",\"category\":{\"id\":16,\"name\":\"Utilidades Domésticas\",\"slug\":\"utilidades-domesticas\",\"createdAt\":\"2025-01-18T16:49:13.072Z\"}},{\"id\":42,\"sku\":\"PRD-000042\",\"name\":\"Fresco Pão Francês 350ml\",\"description\":\"Validade: 6 meses após a abertura.\",\"price\":\"545.68\",\"stock\":400,\"active\":false,\"categoryId\":11,\"createdAt\":\"2025-03-01T01:29:08.208Z\",\"updatedAt\":\"2025-03-01T05:02:25.545Z\",\"category\":{\"id\":11,\"name\":\"Biscoitos e Salgadinhos\",\"slug\":\"biscoitos-e-salgadinhos\",\"createdAt\":\"2025-01-13T06:33:50.237Z\"}}],\"limit\":5,\"offset\":37}",
+   "body_sha256": "b8afc93d677cbc8bbbe960baaa160340b05f1d1d43e19a9b450e8441c1d88ea2",
+   "problems": []
+  },
+  {
+   "id": "22-list-100-9950",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "17918"
+    ],
+    [
+     "etag",
+     "W/\"45fe-3T4A/fOXPwgFv0TGYL0Ndm10PEM\""
+    ]
+   ],
+   "body": "{\"items\":[{\"id\":9951,\"sku\":\"PRD-009951\",\"name\":\"Crocante Macarrão Espaguete 12un\",\"description\":null,\"price\":\"144.60\",\"stock\":479,\"active\":false,\"categoryId\":4,\"createdAt\":\"2025-03-15T15:56:11.655Z\",\"updatedAt\":\"2025-03-16T08:58:52.520Z\",\"category\":{\"id\":4,\"name\":\"Padaria\",\"slug\":\"padaria\",\"createdAt\":\"2025-01-05T16:12:18.268Z\"}},{\"id\":9952,\"sku\":\"PRD-009952\",\"name\":\"Zero Iogurte Natural 200g\",\"description\":\"Linha \\\"Gourmet\\\" — edição limitada.\",\"price\":\"927.14\",\"stock\":222,\"active\":true,\"categoryId\":11,\"createdAt\":\"2025-03-15T15:58:19.007Z\",\"updatedAt\":\"2025-03-16T00:22:10.247Z\",\"category\":{\"id\":11,\"name\":\"Biscoitos e Salgadinhos\",\"slug\":\"biscoitos-e-salgadinhos\",\"createdAt\":\"2025-01-13T06:33:50.237Z\"}},{\"id\":9953,\"sku\":\"PRD-009953\",\"name\":\"Defumado Presunto Cozido 350ml\",\"description\":\"Validade: 6 meses após a abertura.\",\"price\":\"453.02\",\"stock\":400,\"active\":true,\"categoryId\":4,\"createdAt\":\"2025-03-15T16:00:26.515Z\",\"updatedAt\":\"2025-03-16T00:25:54.804Z\",\"category\":{\"id\":4,\"name\":\"Padaria\",\"slug\":\"padaria\",\"createdAt\":\"2025-01-05T16:12:18.268Z\"}},{\"id\":9954,\"sku\":\"PRD-009954\",\"name\":\"Cremoso Refrigerante Guaraná 5kg\",\"description\":\"Validade: 6 meses após a abertura. Conservar refrigerado.\",\"price\":\"100.05\",\"stock\":200,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-15T16:02:34.016Z\",\"updatedAt\":\"2025-03-15T22:54:43.563Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}},{\"id\":9955,\"sku\":\"PRD-009955\",\"name\":\"Extra Farinha de Trigo 350ml\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"186.33\",\"stock\":47,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-15T16:04:41.112Z\",\"updatedAt\":\"2025-03-15T23:24:25.074Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}},{\"id\":9956,\"sku\":\"PRD-009956\",\"name\":\"Premium Sorvete de Chocolate 350ml\",\"description\":null,\"price\":\"928.80\",\"stock\":83,\"active\":true,\"categoryId\":5,\"createdAt\":\"2025-03-15T16:06:48.244Z\",\"updatedAt\":\"2025-03-15T18:26:27.043Z\",\"category\":{\"id\":5,\"name\":\"Bebidas\",\"slug\":\"bebidas\",\"createdAt\":\"2025-01-06T18:15:22.835Z\"}},{\"id\":9957,\"sku\":\"PRD-009957\",\"name\":\"Natural Café Torrado 2L\",\"description\":\"Produto de alta qualidade.\",\"price\":\"98.00\",\"stock\":142,\"active\":true,\"categoryId\":19,\"createdAt\":\"2025-03-15T16:08:55.860Z\",\"updatedAt\":\"2025-03-16T03:14:42.637Z\",\"category\":{\"id\":19,\"name\":\"Adega e Vinhos\",\"slug\":\"adega-e-vinhos\",\"createdAt\":\"2025-01-21T22:58:26.773Z\"}},{\"id\":9958,\"sku\":\"PRD-009958\",\"name\":\"Fresco Presunto Cozido 2L\",\"description\":\"Contém glúten. Importado.\",\"price\":\"655.14\",\"stock\":396,\"active\":true,\"categoryId\":11,\"createdAt\":\"2025-03-15T16:11:03.459Z\",\"updatedAt\":\"2025-03-16T13:53:23.407Z\",\"category\":{\"id\":11,\"name\":\"Biscoitos e Salgadinhos\",\"slug\":\"biscoitos-e-salgadinhos\",\"createdAt\":\"2025-01-13T06:33:50.237Z\"}},{\"id\":9959,\"sku\":\"PRD-009959\",\"name\":\"Super Chocolate ao Leite 500g\",\"description\":null,\"price\":\"320.86\",\"stock\":486,\"active\":true,\"categoryId\":4,\"createdAt\":\"2025-03-15T16:13:10.144Z\",\"updatedAt\":\"2025-03-16T06:57:20.610Z\",\"category\":{\"id\":4,\"name\":\"Padaria\",\"slug\":\"padaria\",\"createdAt\":\"2025-01-05T16:12:18.268Z\"}},{\"id\":9960,\"sku\":\"PRD-009960\",\"name\":\"Tradicional Sabão em Pó 500g\",\"description\":\"Linha \\\"Gourmet\\\" — edição limitada.\",\"price\":\"705.75\",\"stock\":18,\"active\":true,\"categoryId\":6,\"createdAt\":\"2025-03-15T16:15:17.289Z\",\"updatedAt\":\"2025-03-16T07:47:44.055Z\",\"category\":{\"id\":6,\"name\":\"Mercearia\",\"slug\":\"mercearia\",\"createdAt\":\"2025-01-07T20:18:27.402Z\"}},{\"id\":9961,\"sku\":\"PRD-009961\",\"name\":\"Light Arroz Branco 1,5L\",\"description\":\"Produto de alta qualidade.\",\"price\":\"79.65\",\"stock\":223,\"active\":true,\"categoryId\":15,\"createdAt\":\"2025-03-15T16:17:25.338Z\",\"updatedAt\":\"2025-03-15T20:50:11.482Z\",\"category\":{\"id\":15,\"name\":\"Pet Shop\",\"slug\":\"pet-shop\",\"createdAt\":\"2025-01-17T14:46:08.505Z\"}},{\"id\":9962,\"sku\":\"PRD-009962\",\"name\":\"Artesanal Maçã Fuji 500g\",\"description\":null,\"price\":\"21.37\",\"stock\":408,\"active\":true,\"categoryId\":10,\"createdAt\":\"2025-03-15T16:19:32.327Z\",\"updatedAt\":\"2025-03-15T17:19:16.972Z\",\"category\":{\"id\":10,\"name\":\"Frios e Embutidos\",\"slug\":\"frios-e-embutidos\",\"createdAt\":\"2025-01-12T04:30:45.670Z\"}},{\"id\":9963,\"sku\":\"PRD-009963\",\"name\":\"Artesanal Queijo Mussarela 750ml\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"664.48\",\"stock\":337,\"active\":false,\"categoryId\":17,\"createdAt\":\"2025-03-15T16:21:39.207Z\",\"updatedAt\":\"2025-03-16T01:09:09.876Z\",\"category\":{\"id\":17,\"name\":\"Papelaria\",\"slug\":\"papelaria\",\"createdAt\":\"2025-01-19T18:52:17.639Z\"}},{\"id\":9964,\"sku\":\"PRD-009964\",\"name\":\"Especial Sabão em Pó 500g\",\"description\":\"Armazenar em local seco\\ne arejado. Importado.\",\"price\":\"550.87\",\"stock\":30,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-15T16:23:46.559Z\",\"updatedAt\":\"2025-03-16T13:33:58.232Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":9965,\"sku\":\"PRD-009965\",\"name\":\"Cremoso Açúcar Refinado 1,5L\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"78.93\",\"stock\":115,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-15T16:25:54.552Z\",\"updatedAt\":\"2025-03-15T23:49:47.568Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":9966,\"sku\":\"PRD-009966\",\"name\":\"Caseiro Água Mineral 350ml\",\"description\":\"Produto de alta qualidade.\",\"price\":\"326.38\",\"stock\":112,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-15T16:28:01.213Z\",\"updatedAt\":\"2025-03-16T03:38:06.832Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}},{\"id\":9967,\"sku\":\"PRD-009967\",\"name\":\"Tradicional Presunto Cozido 1,5L\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"381.33\",\"stock\":353,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-15T16:30:08.419Z\",\"updatedAt\":\"2025-03-16T11:49:25.412Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":9968,\"sku\":\"PRD-009968\",\"name\":\"Tradicional Óleo de Soja 500g\",\"description\":\"Contém glúten.\",\"price\":\"204.02\",\"stock\":194,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-15T16:32:15.865Z\",\"updatedAt\":\"2025-03-16T15:32:52.986Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":9969,\"sku\":\"PRD-009969\",\"name\":\"Crocante Pão de Queijo 350ml\",\"description\":null,\"price\":\"591.01\",\"stock\":74,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-15T16:34:23.295Z\",\"updatedAt\":\"2025-03-16T05:14:42.580Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}},{\"id\":9970,\"sku\":\"PRD-009970\",\"name\":\"Zero Pão de Queijo 1kg\",\"description\":\"Ótimo para crianças 🍼 e adultos. Não congelar.\",\"price\":\"331.73\",\"stock\":318,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-15T16:36:30.621Z\",\"updatedAt\":\"2025-03-15T23:42:01.511Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}},{\"id\":9971,\"sku\":\"PRD-009971\",\"name\":\"Artesanal Pimentão Verde 750ml\",\"description\":\"Origem: São Paulo/SP. Preço promocional até o fim do mês!\",\"price\":\"843.80\",\"stock\":49,\"active\":true,\"categoryId\":19,\"createdAt\":\"2025-03-15T16:38:37.872Z\",\"updatedAt\":\"2025-03-16T01:56:59.721Z\",\"category\":{\"id\":19,\"name\":\"Adega e Vinhos\",\"slug\":\"adega-e-vinhos\",\"createdAt\":\"2025-01-21T22:58:26.773Z\"}},{\"id\":9972,\"sku\":\"PRD-009972\",\"name\":\"Fresco Iogurte Natural 12un\",\"description\":\"Linha \\\"Gourmet\\\" — edição limitada. Não congelar.\",\"price\":\"522.91\",\"stock\":338,\"active\":true,\"categoryId\":5,\"createdAt\":\"2025-03-15T16:40:45.435Z\",\"updatedAt\":\"2025-03-16T00:34:46.631Z\",\"category\":{\"id\":5,\"name\":\"Bebidas\",\"slug\":\"bebidas\",\"createdAt\":\"2025-01-06T18:15:22.835Z\"}},{\"id\":9973,\"sku\":\"PRD-009973\",\"name\":\"Especial Feijão Carioca 2L\",\"description\":null,\"price\":\"121.97\",\"stock\":45,\"active\":true,\"categoryId\":4,\"createdAt\":\"2025-03-15T16:42:53.118Z\",\"updatedAt\":\"2025-03-16T15:31:59.690Z\",\"category\":{\"id\":4,\"name\":\"Padaria\",\"slug\":\"padaria\",\"createdAt\":\"2025-01-05T16:12:18.268Z\"}},{\"id\":9974,\"sku\":\"PRD-009974\",\"name\":\"Natural Banana Prata 500g\",\"description\":null,\"price\":\"637.19\",\"stock\":243,\"active\":true,\"categoryId\":6,\"createdAt\":\"2025-03-15T16:44:59.833Z\",\"updatedAt\":\"2025-03-16T06:04:51.738Z\",\"category\":{\"id\":6,\"name\":\"Mercearia\",\"slug\":\"mercearia\",\"createdAt\":\"2025-01-07T20:18:27.402Z\"}},{\"id\":9975,\"sku\":\"PRD-009975\",\"name\":\"Artesanal Farinha de Trigo 12un\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"667.42\",\"stock\":247,\"active\":true,\"categoryId\":8,\"createdAt\":\"2025-03-15T16:47:07.156Z\",\"updatedAt\":\"2025-03-15T18:31:05.711Z\",\"category\":{\"id\":8,\"name\":\"Higiene e Beleza\",\"slug\":\"higiene-e-beleza\",\"createdAt\":\"2025-01-10T00:24:36.536Z\"}},{\"id\":9976,\"sku\":\"PRD-009976\",\"name\":\"Especial Pimentão Verde 1,5L\",\"description\":null,\"price\":\"80.92\",\"stock\":396,\"active\":true,\"categoryId\":1,\"createdAt\":\"2025-03-15T16:49:14.319Z\",\"updatedAt\":\"2025-03-16T09:37:06.791Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":9977,\"sku\":\"PRD-009977\",\"name\":\"Fresco Detergente Neutro 350ml\",\"description\":null,\"price\":\"207.80\",\"stock\":12,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-15T16:51:22.201Z\",\"updatedAt\":\"2025-03-16T04:42:54.230Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":9978,\"sku\":\"PRD-009978\",\"name\":\"Especial Leite Integral 500g\",\"description\":\"Ótimo para crianças 🍼 e adultos. Conservar refrigerado.\",\"price\":\"182.52\",\"stock\":444,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-15T16:53:29.533Z\",\"updatedAt\":\"2025-03-15T20:21:10.822Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}},{\"id\":9979,\"sku\":\"PRD-009979\",\"name\":\"Light Molho de Tomate 500g\",\"description\":null,\"price\":\"474.69\",\"stock\":443,\"active\":true,\"categoryId\":3,\"createdAt\":\"2025-03-15T16:55:36.375Z\",\"updatedAt\":\"2025-03-16T08:11:11.485Z\",\"category\":{\"id\":3,\"name\":\"Laticínios\",\"slug\":\"laticinios\",\"createdAt\":\"2025-01-04T14:09:13.701Z\"}},{\"id\":9980,\"sku\":\"PRD-009980\",\"name\":\"Fresco Maçã Fuji 2L\",\"description\":\"Linha \\\"Gourmet\\\" — edição limitada. Não congelar.\",\"price\":\"560.81\",\"stock\":154,\"active\":true,\"categoryId\":18,\"createdAt\":\"2025-03-15T16:57:44.175Z\",\"updatedAt\":\"2025-03-15T20:52:46.977Z\",\"category\":{\"id\":18,\"name\":\"Doces e Chocolates\",\"slug\":\"doces-e-chocolates\",\"createdAt\":\"2025-01-20T20:55:22.206Z\"}},{\"id\":9981,\"sku\":\"PRD-009981\",\"name\":\"Cremoso Queijo Mussarela 2L\",\"description\":null,\"price\":\"404.45\",\"stock\":399,\"active\":true,\"categoryId\":11,\"createdAt\":\"2025-03-15T16:59:51.644Z\",\"updatedAt\":\"2025-03-15T19:06:07.322Z\",\"category\":{\"id\":11,\"name\":\"Biscoitos e Salgadinhos\",\"slug\":\"biscoitos-e-salgadinhos\",\"createdAt\":\"2025-01-13T06:33:50.237Z\"}},{\"id\":9982,\"sku\":\"PRD-009982\",\"name\":\"Orgânico Leite Integral 1kg\",\"description\":\"Validade: 6 meses após a abertura. Fabricação própria.\",\"price\":\"296.93\",\"stock\":457,\"active\":true,\"categoryId\":16,\"createdAt\":\"2025-03-15T17:01:58.383Z\",\"updatedAt\":\"2025-03-15T19:04:38.863Z\",\"category\":{\"id\":16,\"name\":\"Utilidades Domésticas\",\"slug\":\"utilidades-domesticas\",\"createdAt\":\"2025-01-18T16:49:13.072Z\"}},{\"id\":9983,\"sku\":\"PRD-009983\",\"name\":\"Especial Macarrão Espaguete 900g\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"717.24\",\"stock\":406,\"active\":true,\"categoryId\":18,\"createdAt\":\"2025-03-15T17:04:05.619Z\",\"updatedAt\":\"2025-03-16T07:14:53.112Z\",\"category\":{\"id\":18,\"name\":\"Doces e Chocolates\",\"slug\":\"doces-e-chocolates\",\"createdAt\":\"2025-01-20T20:55:22.206Z\"}},{\"id\":9984,\"sku\":\"PRD-009984\",\"name\":\"Tradicional Café Torrado 500g\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado). Conservar refrigerado.\",\"price\":\"314.58\",\"stock\":150,\"active\":true,\"categoryId\":13,\"createdAt\":\"2025-03-15T17:06:13.576Z\",\"updatedAt\":\"2025-03-16T15:30:05.308Z\",\"category\":{\"id\":13,\"name\":\"Enlatados e Conservas\",\"slug\":\"enlatados-e-conservas\",\"createdAt\":\"2025-01-15T10:39:59.371Z\"}},{\"id\":9985,\"sku\":\"PRD-009985\",\"name\":\"Defumado Molho de Tomate 900g\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"202.25\",\"stock\":260,\"active\":false,\"categoryId\":19,\"createdAt\":\"2025-03-15T17:08:21.078Z\",\"updatedAt\":\"2025-03-16T11:54:49.007Z\",\"category\":{\"id\":19,\"name\":\"Adega e Vinhos\",\"slug\":\"adega-e-vinhos\",\"createdAt\":\"2025-01-21T22:58:26.773Z\"}},{\"id\":9986,\"sku\":\"PRD-009986\",\"name\":\"Especial Iogurte Natural 200g\",\"description\":\"Coluna A\\tColuna B Importado.\",\"price\":\"646.28\",\"stock\":123,\"active\":true,\"categoryId\":2,\"createdAt\":\"2025-03-15T17:10:28.327Z\",\"updatedAt\":\"2025-03-16T15:52:39.618Z\",\"category\":{\"id\":2,\"name\":\"Hortifrúti\",\"slug\":\"hortifruti\",\"createdAt\":\"2025-01-03T12:06:09.134Z\"}},{\"id\":9987,\"sku\":\"PRD-009987\",\"name\":\"Integral Azeite Extra Virgem 1kg\",\"description\":\"Origem: São Paulo/SP. Preço promocional até o fim do mês! Fabricação própria.\",\"price\":\"736.46\",\"stock\":15,\"active\":true,\"categoryId\":6,\"createdAt\":\"2025-03-15T17:12:35.227Z\",\"updatedAt\":\"2025-03-16T12:47:47.850Z\",\"category\":{\"id\":6,\"name\":\"Mercearia\",\"slug\":\"mercearia\",\"createdAt\":\"2025-01-07T20:18:27.402Z\"}},{\"id\":9988,\"sku\":\"PRD-009988\",\"name\":\"Defumado Shampoo Hidratante 350ml\",\"description\":\"Validade: 6 meses após a abertura. Conservar refrigerado.\",\"price\":\"346.32\",\"stock\":97,\"active\":true,\"categoryId\":1,\"createdAt\":\"2025-03-15T17:14:42.516Z\",\"updatedAt\":\"2025-03-16T00:48:35.325Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":9989,\"sku\":\"PRD-009989\",\"name\":\"Zero Farinha de Trigo 12un\",\"description\":null,\"price\":\"743.90\",\"stock\":400,\"active\":true,\"categoryId\":10,\"createdAt\":\"2025-03-15T17:16:50.248Z\",\"updatedAt\":\"2025-03-16T01:17:50.122Z\",\"category\":{\"id\":10,\"name\":\"Frios e Embutidos\",\"slug\":\"frios-e-embutidos\",\"createdAt\":\"2025-01-12T04:30:45.670Z\"}},{\"id\":9990,\"sku\":\"PRD-009990\",\"name\":\"Orgânico Chocolate ao Leite 750ml\",\"description\":\"Coluna A\\tColuna B Fabricação própria.\",\"price\":\"518.23\",\"stock\":44,\"active\":true,\"categoryId\":19,\"createdAt\":\"2025-03-15T17:18:57.388Z\",\"updatedAt\":\"2025-03-16T06:04:15.396Z\",\"category\":{\"id\":19,\"name\":\"Adega e Vinhos\",\"slug\":\"adega-e-vinhos\",\"createdAt\":\"2025-01-21T22:58:26.773Z\"}},{\"id\":9991,\"sku\":\"PRD-009991\",\"name\":\"Zero Farinha de Trigo 2L\",\"description\":\"Contém glúten.\",\"price\":\"980.74\",\"stock\":139,\"active\":false,\"categoryId\":1,\"createdAt\":\"2025-03-15T17:21:04.636Z\",\"updatedAt\":\"2025-03-16T10:54:14.445Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":9992,\"sku\":\"PRD-009992\",\"name\":\"Artesanal Iogurte Natural 750ml\",\"description\":null,\"price\":\"77.57\",\"stock\":485,\"active\":true,\"categoryId\":15,\"createdAt\":\"2025-03-15T17:23:11.509Z\",\"updatedAt\":\"2025-03-16T11:21:21.258Z\",\"category\":{\"id\":15,\"name\":\"Pet Shop\",\"slug\":\"pet-shop\",\"createdAt\":\"2025-01-17T14:46:08.505Z\"}},{\"id\":9993,\"sku\":\"PRD-009993\",\"name\":\"Integral Feijão Carioca 1,5L\",\"description\":null,\"price\":\"209.88\",\"stock\":276,\"active\":true,\"categoryId\":8,\"createdAt\":\"2025-03-15T17:25:19.169Z\",\"updatedAt\":\"2025-03-16T06:47:21.524Z\",\"category\":{\"id\":8,\"name\":\"Higiene e Beleza\",\"slug\":\"higiene-e-beleza\",\"createdAt\":\"2025-01-10T00:24:36.536Z\"}},{\"id\":9994,\"sku\":\"PRD-009994\",\"name\":\"Tradicional Mamão Papaya 750ml\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"123.80\",\"stock\":211,\"active\":true,\"categoryId\":14,\"createdAt\":\"2025-03-15T17:27:26.390Z\",\"updatedAt\":\"2025-03-16T08:03:24.771Z\",\"category\":{\"id\":14,\"name\":\"Cereais e Matinais\",\"slug\":\"cereais-e-matinais\",\"createdAt\":\"2025-01-16T12:43:03.938Z\"}},{\"id\":9995,\"sku\":\"PRD-009995\",\"name\":\"Cremoso Molho de Tomate 200g\",\"description\":null,\"price\":\"940.52\",\"stock\":350,\"active\":false,\"categoryId\":16,\"createdAt\":\"2025-03-15T17:29:33.985Z\",\"updatedAt\":\"2025-03-16T09:35:00.599Z\",\"category\":{\"id\":16,\"name\":\"Utilidades Domésticas\",\"slug\":\"utilidades-domesticas\",\"createdAt\":\"2025-01-18T16:49:13.072Z\"}},{\"id\":9996,\"sku\":\"PRD-009996\",\"name\":\"Cremoso Pão Francês 900g\",\"description\":null,\"price\":\"665.12\",\"stock\":20,\"active\":true,\"categoryId\":6,\"createdAt\":\"2025-03-15T17:31:41.453Z\",\"updatedAt\":\"2025-03-16T09:50:36.334Z\",\"category\":{\"id\":6,\"name\":\"Mercearia\",\"slug\":\"mercearia\",\"createdAt\":\"2025-01-07T20:18:27.402Z\"}},{\"id\":9997,\"sku\":\"PRD-009997\",\"name\":\"Defumado Presunto Cozido 2L\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"478.33\",\"stock\":215,\"active\":true,\"categoryId\":1,\"createdAt\":\"2025-03-15T17:33:48.329Z\",\"updatedAt\":\"2025-03-16T00:51:49.654Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":9998,\"sku\":\"PRD-009998\",\"name\":\"Tradicional Manteiga com Sal 900g\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"274.16\",\"stock\":452,\"active\":true,\"categoryId\":12,\"createdAt\":\"2025-03-15T17:35:55.384Z\",\"updatedAt\":\"2025-03-16T10:31:14.345Z\",\"category\":{\"id\":12,\"name\":\"Massas e Molhos\",\"slug\":\"massas-e-molhos\",\"createdAt\":\"2025-01-14T08:36:54.804Z\"}},{\"id\":9999,\"sku\":\"PRD-009999\",\"name\":\"Tradicional Refrigerante Guaraná 200g\",\"description\":\"Sem conservantes; açúcar & sal reduzidos <light>. Ação: 3 por 2.\",\"price\":\"48.72\",\"stock\":214,\"active\":true,\"categoryId\":5,\"createdAt\":\"2025-03-15T17:38:02.820Z\",\"updatedAt\":\"2025-03-16T04:52:27.394Z\",\"category\":{\"id\":5,\"name\":\"Bebidas\",\"slug\":\"bebidas\",\"createdAt\":\"2025-01-06T18:15:22.835Z\"}},{\"id\":10000,\"sku\":\"PRD-010000\",\"name\":\"Super Sabão em Pó 750ml\",\"description\":null,\"price\":\"245.57\",\"stock\":498,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-15T17:40:10.167Z\",\"updatedAt\":\"2025-03-15T21:23:38.346Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}}],\"limit\":100,\"offset\":9950}",
+   "body_sha256": "658e2deb976f410c55b06adb19b5dffac0aeabe1fe173978631ca5df5e275c63",
+   "problems": []
+  },
+  {
+   "id": "23-list-20-20000",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "38"
+    ],
+    [
+     "etag",
+     "W/\"26-p7PgXUzaoJMsb2xZ1J7E8w3uqxY\""
+    ]
+   ],
+   "body": "{\"items\":[],\"limit\":20,\"offset\":20000}",
+   "body_sha256": "b5f199568281ad7877b9f0bb8d3c9b789614620cce9ae4d4e7bbd009ff7c216b",
+   "problems": []
+  },
+  {
+   "id": "24-list-offset-only",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "7067"
+    ],
+    [
+     "etag",
+     "W/\"1b9b-AgXPpVFFLVZO1eJdnsrELeS8Xjg\""
+    ]
+   ],
+   "body": "{\"items\":[{\"id\":101,\"sku\":\"PRD-000101\",\"name\":\"Tradicional Detergente Neutro 200g\",\"description\":\"Ótimo para crianças 🍼 e adultos.\",\"price\":\"434.80\",\"stock\":384,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-01T03:34:19.605Z\",\"updatedAt\":\"2025-03-01T03:34:48.150Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}},{\"id\":102,\"sku\":\"PRD-000102\",\"name\":\"Caseiro Feijão Carioca 200g\",\"description\":null,\"price\":\"767.36\",\"stock\":200,\"active\":true,\"categoryId\":18,\"createdAt\":\"2025-03-01T03:36:27.168Z\",\"updatedAt\":\"2025-03-01T16:54:51.045Z\",\"category\":{\"id\":18,\"name\":\"Doces e Chocolates\",\"slug\":\"doces-e-chocolates\",\"createdAt\":\"2025-01-20T20:55:22.206Z\"}},{\"id\":103,\"sku\":\"PRD-000103\",\"name\":\"Fresco Pão de Queijo 1,5L\",\"description\":null,\"price\":\"555.48\",\"stock\":31,\"active\":true,\"categoryId\":18,\"createdAt\":\"2025-03-01T03:38:34.801Z\",\"updatedAt\":\"2025-03-01T10:21:45.172Z\",\"category\":{\"id\":18,\"name\":\"Doces e Chocolates\",\"slug\":\"doces-e-chocolates\",\"createdAt\":\"2025-01-20T20:55:22.206Z\"}},{\"id\":104,\"sku\":\"PRD-000104\",\"name\":\"Zero Molho de Tomate 500g\",\"description\":null,\"price\":\"937.23\",\"stock\":138,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-01T03:40:42.034Z\",\"updatedAt\":\"2025-03-01T04:42:10.050Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}},{\"id\":105,\"sku\":\"PRD-000105\",\"name\":\"Extra Arroz Branco 12un\",\"description\":null,\"price\":\"41.76\",\"stock\":375,\"active\":true,\"categoryId\":17,\"createdAt\":\"2025-03-01T03:42:49.693Z\",\"updatedAt\":\"2025-03-01T10:45:18.335Z\",\"category\":{\"id\":17,\"name\":\"Papelaria\",\"slug\":\"papelaria\",\"createdAt\":\"2025-01-19T18:52:17.639Z\"}},{\"id\":106,\"sku\":\"PRD-000106\",\"name\":\"Tradicional Açúcar Refinado 1kg\",\"description\":null,\"price\":\"44.89\",\"stock\":89,\"active\":true,\"categoryId\":2,\"createdAt\":\"2025-03-01T03:44:56.044Z\",\"updatedAt\":\"2025-03-01T19:15:32.605Z\",\"category\":{\"id\":2,\"name\":\"Hortifrúti\",\"slug\":\"hortifruti\",\"createdAt\":\"2025-01-03T12:06:09.134Z\"}},{\"id\":107,\"sku\":\"PRD-000107\",\"name\":\"Natural Banana Prata 350ml\",\"description\":\"Contém glúten.\",\"price\":\"789.16\",\"stock\":171,\"active\":true,\"categoryId\":8,\"createdAt\":\"2025-03-01T03:47:04.250Z\",\"updatedAt\":\"2025-03-01T16:28:14.405Z\",\"category\":{\"id\":8,\"name\":\"Higiene e Beleza\",\"slug\":\"higiene-e-beleza\",\"createdAt\":\"2025-01-10T00:24:36.536Z\"}},{\"id\":108,\"sku\":\"PRD-000108\",\"name\":\"Natural Detergente Neutro 2L\",\"description\":null,\"price\":\"853.38\",\"stock\":219,\"active\":true,\"categoryId\":9,\"createdAt\":\"2025-03-01T03:49:11.053Z\",\"updatedAt\":\"2025-03-01T12:43:20.784Z\",\"category\":{\"id\":9,\"name\":\"Congelados\",\"slug\":\"congelados\",\"createdAt\":\"2025-01-11T02:27:41.103Z\"}},{\"id\":109,\"sku\":\"PRD-000109\",\"name\":\"Caseiro Manteiga com Sal 900g\",\"description\":\"Coluna A\\tColuna B Não congelar.\",\"price\":\"511.05\",\"stock\":462,\"active\":false,\"categoryId\":16,\"createdAt\":\"2025-03-01T03:51:18.661Z\",\"updatedAt\":\"2025-03-01T04:27:18.362Z\",\"category\":{\"id\":16,\"name\":\"Utilidades Domésticas\",\"slug\":\"utilidades-domesticas\",\"createdAt\":\"2025-01-18T16:49:13.072Z\"}},{\"id\":110,\"sku\":\"PRD-000110\",\"name\":\"Crocante Banana Prata 2L\",\"description\":\"Ótimo para crianças 🍼 e adultos. Não congelar.\",\"price\":\"39.00\",\"stock\":58,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-01T03:53:25.406Z\",\"updatedAt\":\"2025-03-01T18:51:37.853Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}},{\"id\":111,\"sku\":\"PRD-000111\",\"name\":\"Premium Detergente Neutro 2L\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"812.59\",\"stock\":321,\"active\":true,\"categoryId\":18,\"createdAt\":\"2025-03-01T03:55:33.399Z\",\"updatedAt\":\"2025-03-01T18:31:20.039Z\",\"category\":{\"id\":18,\"name\":\"Doces e Chocolates\",\"slug\":\"doces-e-chocolates\",\"createdAt\":\"2025-01-20T20:55:22.206Z\"}},{\"id\":112,\"sku\":\"PRD-000112\",\"name\":\"Defumado Queijo Mussarela 750ml\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado). Conservar refrigerado.\",\"price\":\"26.05\",\"stock\":477,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-01T03:57:40.491Z\",\"updatedAt\":\"2025-03-01T17:57:08.160Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}},{\"id\":113,\"sku\":\"PRD-000113\",\"name\":\"Natural Mamão Papaya 200g\",\"description\":\"Origem: São Paulo/SP. Preço promocional até o fim do mês!\",\"price\":\"446.02\",\"stock\":382,\"active\":true,\"categoryId\":1,\"createdAt\":\"2025-03-01T03:59:48.272Z\",\"updatedAt\":\"2025-03-01T10:37:34.788Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":114,\"sku\":\"PRD-000114\",\"name\":\"Orgânico Maçã Fuji 2L\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado). Conservar refrigerado.\",\"price\":\"653.93\",\"stock\":24,\"active\":false,\"categoryId\":1,\"createdAt\":\"2025-03-01T04:01:55.174Z\",\"updatedAt\":\"2025-03-01T16:21:40.999Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":115,\"sku\":\"PRD-000115\",\"name\":\"Premium Manteiga com Sal 750ml\",\"description\":\"Linha \\\"Gourmet\\\" — edição limitada.\",\"price\":\"976.64\",\"stock\":106,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-01T04:04:02.785Z\",\"updatedAt\":\"2025-03-01T06:37:26.119Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}},{\"id\":116,\"sku\":\"PRD-000116\",\"name\":\"Cremoso Farinha de Trigo 1,5L\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado).\",\"price\":\"26.71\",\"stock\":15,\"active\":true,\"categoryId\":20,\"createdAt\":\"2025-03-01T04:06:09.780Z\",\"updatedAt\":\"2025-03-01T15:41:13.321Z\",\"category\":{\"id\":20,\"name\":\"Pescados e Frutos do Mar\",\"slug\":\"pescados-e-frutos-do-mar\",\"createdAt\":\"2025-01-23T01:01:31.340Z\"}},{\"id\":117,\"sku\":\"PRD-000117\",\"name\":\"Natural Feijão Carioca 12un\",\"description\":\"Caminho C:\\\\estoque\\\\item (legado). Importado.\",\"price\":\"630.81\",\"stock\":371,\"active\":true,\"categoryId\":1,\"createdAt\":\"2025-03-01T04:08:17.181Z\",\"updatedAt\":\"2025-03-01T10:40:15.783Z\",\"category\":{\"id\":1,\"name\":\"Açougue\",\"slug\":\"acougue\",\"createdAt\":\"2025-01-02T10:03:04.567Z\"}},{\"id\":118,\"sku\":\"PRD-000118\",\"name\":\"Integral Açúcar Refinado 500g\",\"description\":null,\"price\":\"57.65\",\"stock\":98,\"active\":true,\"categoryId\":7,\"createdAt\":\"2025-03-01T04:10:23.982Z\",\"updatedAt\":\"2025-03-01T15:26:58.985Z\",\"category\":{\"id\":7,\"name\":\"Limpeza\",\"slug\":\"limpeza\",\"createdAt\":\"2025-01-08T22:21:31.969Z\"}},{\"id\":119,\"sku\":\"PRD-000119\",\"name\":\"Crocante Açúcar Refinado 1kg\",\"description\":null,\"price\":\"23.90\",\"stock\":426,\"active\":true,\"categoryId\":9,\"createdAt\":\"2025-03-01T04:12:31.810Z\",\"updatedAt\":\"2025-03-01T13:42:56.499Z\",\"category\":{\"id\":9,\"name\":\"Congelados\",\"slug\":\"congelados\",\"createdAt\":\"2025-01-11T02:27:41.103Z\"}},{\"id\":120,\"sku\":\"PRD-000120\",\"name\":\"Super Suco de Laranja 750ml\",\"description\":null,\"price\":\"85.25\",\"stock\":199,\"active\":true,\"categoryId\":8,\"createdAt\":\"2025-03-01T04:14:38.988Z\",\"updatedAt\":\"2025-03-01T08:38:12.454Z\",\"category\":{\"id\":8,\"name\":\"Higiene e Beleza\",\"slug\":\"higiene-e-beleza\",\"createdAt\":\"2025-01-10T00:24:36.536Z\"}}],\"limit\":20,\"offset\":100}",
+   "body_sha256": "f089d8c31f19545e89033272b8213f24994f919d33493bc858248dc4371cfd03",
+   "problems": []
+  },
+  {
+   "id": "25-list-limit-0",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "84"
+    ],
+    [
+     "etag",
+     "W/\"54-Kdng7FLE+O91V1FVPOIb5dD7DCk\""
+    ]
+   ],
+   "body": "{\"message\":[\"limit must not be less than 1\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "bad3a81568549646fe0e5737fd51fc8a44d3c24f13721a4899b598bed033b86b",
+   "problems": []
+  },
+  {
+   "id": "26-list-limit-101",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "89"
+    ],
+    [
+     "etag",
+     "W/\"59-vLM8EyuP9Y4RTqssNuXzdfDS934\""
+    ]
+   ],
+   "body": "{\"message\":[\"limit must not be greater than 100\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "29d5b87fdd3bb7c44cbf75968cffbbb4670d4f568d82ff9a9ee85cafd5d46f7c",
+   "problems": []
+  },
+  {
+   "id": "27-list-limit-x",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "155"
+    ],
+    [
+     "etag",
+     "W/\"9b-aRkQp8YFGt6/trjbuKyk7Lsi7sY\""
+    ]
+   ],
+   "body": "{\"message\":[\"limit must not be greater than 100\",\"limit must not be less than 1\",\"limit must be an integer number\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "7561c9c51226a048cb75da264044efcdaf957a8e796152ea714fe45beca05ee1",
+   "problems": []
+  },
+  {
+   "id": "28-list-offset-neg",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "85"
+    ],
+    [
+     "etag",
+     "W/\"55-GUCX7okKf3rIjT4tOBiQflU63C0\""
+    ]
+   ],
+   "body": "{\"message\":[\"offset must not be less than 0\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "9b38e7e8079ede9254d82717e42a95e958cca4fdb5dfd824c2433ad1a6b14b54",
+   "problems": []
+  },
+  {
+   "id": "29-report-7d",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "3157"
+    ],
+    [
+     "etag",
+     "W/\"c55-PCSEelQQP6KZ0Reyr9Fv53SEi70\""
+    ]
+   ],
+   "body": "{\"from\":\"2026-03-01T00:00:00.000Z\",\"to\":\"2026-03-08T00:00:00.000Z\",\"totalItems\":959,\"totalRevenue\":3165066.439999993,\"categories\":[{\"categoryId\":18,\"categoryName\":\"Doces e Chocolates\",\"items\":52,\"units\":355,\"revenue\":206303.21999999997,\"avgTicket\":3967.369615384615},{\"categoryId\":11,\"categoryName\":\"Biscoitos e Salgadinhos\",\"items\":53,\"units\":376,\"revenue\":204296.36999999997,\"avgTicket\":3854.6484905660373},{\"categoryId\":1,\"categoryName\":\"Açougue\",\"items\":56,\"units\":357,\"revenue\":197066.13999999998,\"avgTicket\":3519.038214285714},{\"categoryId\":17,\"categoryName\":\"Papelaria\",\"items\":52,\"units\":346,\"revenue\":193476.28999999998,\"avgTicket\":3720.6978846153843},{\"categoryId\":16,\"categoryName\":\"Utilidades Domésticas\",\"items\":49,\"units\":336,\"revenue\":186731.68,\"avgTicket\":3810.850612244898},{\"categoryId\":19,\"categoryName\":\"Adega e Vinhos\",\"items\":60,\"units\":373,\"revenue\":167271.52000000002,\"avgTicket\":2787.858666666667},{\"categoryId\":20,\"categoryName\":\"Pescados e Frutos do Mar\",\"items\":46,\"units\":321,\"revenue\":165994.47,\"avgTicket\":3608.5754347826087},{\"categoryId\":15,\"categoryName\":\"Pet Shop\",\"items\":53,\"units\":335,\"revenue\":164982.69000000003,\"avgTicket\":3112.880943396227},{\"categoryId\":5,\"categoryName\":\"Bebidas\",\"items\":47,\"units\":324,\"revenue\":156273.52999999997,\"avgTicket\":3324.968723404255},{\"categoryId\":14,\"categoryName\":\"Cereais e Matinais\",\"items\":44,\"units\":310,\"revenue\":155639.54,\"avgTicket\":3537.262272727273},{\"categoryId\":9,\"categoryName\":\"Congelados\",\"items\":59,\"units\":356,\"revenue\":154984.29,\"avgTicket\":2626.852372881356},{\"categoryId\":3,\"categoryName\":\"Laticínios\",\"items\":48,\"units\":283,\"revenue\":153942.44000000003,\"avgTicket\":3207.134166666667},{\"categoryId\":2,\"categoryName\":\"Hortifrúti\",\"items\":46,\"units\":302,\"revenue\":149296.59000000003,\"avgTicket\":3245.5780434782614},{\"categoryId\":12,\"categoryName\":\"Massas e Molhos\",\"items\":46,\"units\":287,\"revenue\":141651.33000000002,\"avgTicket\":3079.376739130435},{\"categoryId\":13,\"categoryName\":\"Enlatados e Conservas\",\"items\":42,\"units\":267,\"revenue\":135525.72999999998,\"avgTicket\":3226.803095238095},{\"categoryId\":7,\"categoryName\":\"Limpeza\",\"items\":40,\"units\":243,\"revenue\":132716.55999999997,\"avgTicket\":3317.9139999999993},{\"categoryId\":4,\"categoryName\":\"Padaria\",\"items\":43,\"units\":285,\"revenue\":131962.93,\"avgTicket\":3068.905348837209},{\"categoryId\":8,\"categoryName\":\"Higiene e Beleza\",\"items\":48,\"units\":295,\"revenue\":124658.74000000002,\"avgTicket\":2597.0570833333336},{\"categoryId\":6,\"categoryName\":\"Mercearia\",\"items\":42,\"units\":278,\"revenue\":122850.55,\"avgTicket\":2925.0130952380955},{\"categoryId\":10,\"categoryName\":\"Frios e Embutidos\",\"items\":33,\"units\":228,\"revenue\":119441.82999999999,\"avgTicket\":3619.4493939393938}],\"topProducts\":[{\"productId\":441,\"name\":\"Caseiro Macarrão Espaguete 5kg\",\"units\":21,\"revenue\":19241.4},{\"productId\":3624,\"name\":\"Super Sabão em Pó 12un\",\"units\":20,\"revenue\":15882.8},{\"productId\":6661,\"name\":\"Orgânico Arroz Branco 12un\",\"units\":15,\"revenue\":15486.66},{\"productId\":9923,\"name\":\"Integral Iogurte Natural 1kg\",\"units\":16,\"revenue\":15004.78},{\"productId\":4721,\"name\":\"Defumado Café Torrado 1,5L\",\"units\":18,\"revenue\":14239.89}]}",
+   "body_sha256": "ed401970ece5c56ac20c85e208587823ec5c9f401eb857451be7df0c5dcb5416",
+   "problems": []
+  },
+  {
+   "id": "30-report-empty",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "132"
+    ],
+    [
+     "etag",
+     "W/\"84-0kMH7X7ZksxPxpw54TedowhgY0I\""
+    ]
+   ],
+   "body": "{\"from\":\"2030-01-01T00:00:00.000Z\",\"to\":\"2030-01-02T00:00:00.000Z\",\"totalItems\":0,\"totalRevenue\":0,\"categories\":[],\"topProducts\":[]}",
+   "body_sha256": "2425feccbaf3fd1caae8410bafcfe784200e20c9abbf468881afdf3e976514fd",
+   "problems": []
+  },
+  {
+   "id": "31-report-1d",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "3036"
+    ],
+    [
+     "etag",
+     "W/\"bdc-zCIIIMRZTEtcggcUoVMN9pPsqXM\""
+    ]
+   ],
+   "body": "{\"from\":\"2026-03-01T00:00:00Z\",\"to\":\"2026-03-02T00:00:00Z\",\"totalItems\":138,\"totalRevenue\":436771.22,\"categories\":[{\"categoryId\":17,\"categoryName\":\"Papelaria\",\"items\":6,\"units\":58,\"revenue\":44111.020000000004,\"avgTicket\":7351.836666666667},{\"categoryId\":11,\"categoryName\":\"Biscoitos e Salgadinhos\",\"items\":11,\"units\":75,\"revenue\":42826.549999999996,\"avgTicket\":3893.3227272727268},{\"categoryId\":10,\"categoryName\":\"Frios e Embutidos\",\"items\":9,\"units\":61,\"revenue\":38069.46,\"avgTicket\":4229.94},{\"categoryId\":1,\"categoryName\":\"Açougue\",\"items\":12,\"units\":66,\"revenue\":36213.88,\"avgTicket\":3017.8233333333333},{\"categoryId\":14,\"categoryName\":\"Cereais e Matinais\",\"items\":9,\"units\":62,\"revenue\":35994.18000000001,\"avgTicket\":3999.3533333333344},{\"categoryId\":13,\"categoryName\":\"Enlatados e Conservas\",\"items\":8,\"units\":46,\"revenue\":28368.41,\"avgTicket\":3546.05125},{\"categoryId\":3,\"categoryName\":\"Laticínios\",\"items\":7,\"units\":46,\"revenue\":26788.120000000003,\"avgTicket\":3826.874285714286},{\"categoryId\":16,\"categoryName\":\"Utilidades Domésticas\",\"items\":6,\"units\":46,\"revenue\":26094.49,\"avgTicket\":4349.081666666667},{\"categoryId\":19,\"categoryName\":\"Adega e Vinhos\",\"items\":7,\"units\":45,\"revenue\":17257.76,\"avgTicket\":2465.3942857142856},{\"categoryId\":7,\"categoryName\":\"Limpeza\",\"items\":7,\"units\":39,\"revenue\":16626.379999999997,\"avgTicket\":2375.1971428571424},{\"categoryId\":6,\"categoryName\":\"Mercearia\",\"items\":8,\"units\":45,\"revenue\":15933.200000000003,\"avgTicket\":1991.6500000000003},{\"categoryId\":18,\"categoryName\":\"Doces e Chocolates\",\"items\":6,\"units\":32,\"revenue\":15801.750000000002,\"avgTicket\":2633.6250000000005},{\"categoryId\":4,\"categoryName\":\"Padaria\",\"items\":7,\"units\":38,\"revenue\":14034.51,\"avgTicket\":2004.93},{\"categoryId\":5,\"categoryName\":\"Bebidas\",\"items\":5,\"units\":28,\"revenue\":13736.690000000002,\"avgTicket\":2747.3380000000006},{\"categoryId\":2,\"categoryName\":\"Hortifrúti\",\"items\":6,\"units\":37,\"revenue\":13602.990000000002,\"avgTicket\":2267.1650000000004},{\"categoryId\":8,\"categoryName\":\"Higiene e Beleza\",\"items\":5,\"units\":32,\"revenue\":13024.5,\"avgTicket\":2604.9},{\"categoryId\":9,\"categoryName\":\"Congelados\",\"items\":5,\"units\":29,\"revenue\":12704.86,\"avgTicket\":2540.972},{\"categoryId\":12,\"categoryName\":\"Massas e Molhos\",\"items\":5,\"units\":22,\"revenue\":12006.079999999998,\"avgTicket\":2401.2159999999994},{\"categoryId\":20,\"categoryName\":\"Pescados e Frutos do Mar\",\"items\":5,\"units\":30,\"revenue\":8119.939999999999,\"avgTicket\":1623.9879999999998},{\"categoryId\":15,\"categoryName\":\"Pet Shop\",\"items\":4,\"units\":9,\"revenue\":5456.45,\"avgTicket\":1364.1125}],\"topProducts\":[{\"productId\":1622,\"name\":\"Tradicional Manteiga com Sal 5kg\",\"units\":12,\"revenue\":12858.36},{\"productId\":2854,\"name\":\"Tradicional Azeite Extra Virgem 5kg\",\"units\":11,\"revenue\":9470.01},{\"productId\":6354,\"name\":\"Tradicional Feijão Carioca 2L\",\"units\":10,\"revenue\":9182},{\"productId\":2357,\"name\":\"Fresco Óleo de Soja 5kg\",\"units\":11,\"revenue\":8728.61},{\"productId\":7525,\"name\":\"Tradicional Azeite Extra Virgem 200g\",\"units\":11,\"revenue\":8625.210000000001}]}",
+   "body_sha256": "2660b9987efbd5b3aeecada154e3f75ffbd2684a13250dd82fa728a2cb078674",
+   "problems": []
+  },
+  {
+   "id": "32-report-date-only",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "2998"
+    ],
+    [
+     "etag",
+     "W/\"bb6-MAtovc6fGMk11zix2aR6CzvTXuU\""
+    ]
+   ],
+   "body": "{\"from\":\"2026-06-10\",\"to\":\"2026-06-11\",\"totalItems\":136,\"totalRevenue\":441738.7599999999,\"categories\":[{\"categoryId\":8,\"categoryName\":\"Higiene e Beleza\",\"items\":16,\"units\":86,\"revenue\":44401.530000000006,\"avgTicket\":2775.0956250000004},{\"categoryId\":10,\"categoryName\":\"Frios e Embutidos\",\"items\":15,\"units\":90,\"revenue\":42454.530000000006,\"avgTicket\":2830.3020000000006},{\"categoryId\":2,\"categoryName\":\"Hortifrúti\",\"items\":9,\"units\":59,\"revenue\":39795.369999999995,\"avgTicket\":4421.707777777778},{\"categoryId\":6,\"categoryName\":\"Mercearia\",\"items\":10,\"units\":68,\"revenue\":34621.439999999995,\"avgTicket\":3462.1439999999993},{\"categoryId\":20,\"categoryName\":\"Pescados e Frutos do Mar\",\"items\":9,\"units\":67,\"revenue\":32628.66,\"avgTicket\":3625.4066666666668},{\"categoryId\":18,\"categoryName\":\"Doces e Chocolates\",\"items\":9,\"units\":51,\"revenue\":30241.11,\"avgTicket\":3360.1233333333334},{\"categoryId\":5,\"categoryName\":\"Bebidas\",\"items\":6,\"units\":36,\"revenue\":22832.290000000005,\"avgTicket\":3805.3816666666676},{\"categoryId\":3,\"categoryName\":\"Laticínios\",\"items\":6,\"units\":46,\"revenue\":21031.76,\"avgTicket\":3505.293333333333},{\"categoryId\":7,\"categoryName\":\"Limpeza\",\"items\":7,\"units\":47,\"revenue\":20735.219999999998,\"avgTicket\":2962.1742857142854},{\"categoryId\":1,\"categoryName\":\"Açougue\",\"items\":5,\"units\":32,\"revenue\":19597.13,\"avgTicket\":3919.4260000000004},{\"categoryId\":9,\"categoryName\":\"Congelados\",\"items\":6,\"units\":30,\"revenue\":19438.160000000003,\"avgTicket\":3239.693333333334},{\"categoryId\":17,\"categoryName\":\"Papelaria\",\"items\":5,\"units\":27,\"revenue\":19110.11,\"avgTicket\":3822.022},{\"categoryId\":19,\"categoryName\":\"Adega e Vinhos\",\"items\":4,\"units\":27,\"revenue\":17363.92,\"avgTicket\":4340.98},{\"categoryId\":13,\"categoryName\":\"Enlatados e Conservas\",\"items\":7,\"units\":32,\"revenue\":14751.960000000001,\"avgTicket\":2107.422857142857},{\"categoryId\":12,\"categoryName\":\"Massas e Molhos\",\"items\":2,\"units\":17,\"revenue\":14488.76,\"avgTicket\":7244.38},{\"categoryId\":16,\"categoryName\":\"Utilidades Domésticas\",\"items\":4,\"units\":18,\"revenue\":12027.420000000002,\"avgTicket\":3006.8550000000005},{\"categoryId\":15,\"categoryName\":\"Pet Shop\",\"items\":5,\"units\":33,\"revenue\":11697.65,\"avgTicket\":2339.5299999999997},{\"categoryId\":14,\"categoryName\":\"Cereais e Matinais\",\"items\":6,\"units\":35,\"revenue\":11292.76,\"avgTicket\":1882.1266666666668},{\"categoryId\":4,\"categoryName\":\"Padaria\",\"items\":3,\"units\":21,\"revenue\":9589.68,\"avgTicket\":3196.56},{\"categoryId\":11,\"categoryName\":\"Biscoitos e Salgadinhos\",\"items\":2,\"units\":15,\"revenue\":3639.3,\"avgTicket\":1819.65}],\"topProducts\":[{\"productId\":2662,\"name\":\"Caseiro Mamão Papaya 1kg\",\"units\":21,\"revenue\":12751.130000000001},{\"productId\":9194,\"name\":\"Cremoso Queijo Mussarela 900g\",\"units\":12,\"revenue\":10973.64},{\"productId\":357,\"name\":\"Especial Sorvete de Chocolate 500g\",\"units\":11,\"revenue\":10540.53},{\"productId\":824,\"name\":\"Extra Pão de Queijo 750ml\",\"units\":11,\"revenue\":10007.47},{\"productId\":943,\"name\":\"Caseiro Pimentão Verde 500g\",\"units\":10,\"revenue\":9784}]}",
+   "body_sha256": "4cf3c4f5d4ea84da6201ddd3a85ab8cf7da7a0e735c825c0af200268df1862f4",
+   "problems": []
+  },
+  {
+   "id": "33-report-invalid-from",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "96"
+    ],
+    [
+     "etag",
+     "W/\"60-S9a17SVv+nmGa8Q3w/EqWhRPljQ\""
+    ]
+   ],
+   "body": "{\"message\":[\"from must be a valid ISO 8601 date string\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "73ba73f79919e791dfda6db46d2425358b6a0bb3d5d872dbd8f74cdbf745526e",
+   "problems": []
+  },
+  {
+   "id": "34-report-both-invalid",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "138"
+    ],
+    [
+     "etag",
+     "W/\"8a-nD1M3vtj1+WlYeFMecLQ9DWEeGc\""
+    ]
+   ],
+   "body": "{\"message\":[\"from must be a valid ISO 8601 date string\",\"to must be a valid ISO 8601 date string\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "600d0d08254290767f9efe6267f9a5af55bbf19216d1a751230d3b2edcc82699",
+   "problems": []
+  },
+  {
+   "id": "35-report-no-params",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "138"
+    ],
+    [
+     "etag",
+     "W/\"8a-nD1M3vtj1+WlYeFMecLQ9DWEeGc\""
+    ]
+   ],
+   "body": "{\"message\":[\"from must be a valid ISO 8601 date string\",\"to must be a valid ISO 8601 date string\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "600d0d08254290767f9efe6267f9a5af55bbf19216d1a751230d3b2edcc82699",
+   "problems": []
+  },
+  {
+   "id": "36-post-invalid-loadtest",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "225"
+    ],
+    [
+     "etag",
+     "W/\"e1-/3VRxkRsPnISEYJsbv0pbWvC1Xg\""
+    ]
+   ],
+   "body": "{\"message\":[\"name must be longer than or equal to 3 characters\",\"sku must match /^[A-Z0-9-]{4,32}$/ regular expression\",\"price must be a number conforming to the specified constraints\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "e061f768fe1eda1e26bd61317c8e7bb0b64de6a9745c0c5de66d9a006a25f706",
+   "problems": []
+  },
+  {
+   "id": "37-post-invalid-missing-fields",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "446"
+    ],
+    [
+     "etag",
+     "W/\"1be-abu1cTK0seLzE6H3g2/NcdN5kH4\""
+    ]
+   ],
+   "body": "{\"message\":[\"name must be longer than or equal to 3 characters\",\"name must be a string\",\"sku must match /^[A-Z0-9-]{4,32}$/ regular expression\",\"sku must be a string\",\"price must not be less than 0\",\"price must be a number conforming to the specified constraints\",\"stock must not be less than 0\",\"stock must be an integer number\",\"categoryId must not be less than 1\",\"categoryId must be an integer number\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "e1a138e7945cf11a943072b85809d6d7bc8e30f66c2220bee5d80d695826231c",
+   "problems": []
+  },
+  {
+   "id": "38-post-invalid-wrong-types",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "606"
+    ],
+    [
+     "etag",
+     "W/\"25e-hmXPo5dNq53wqV89Ek8lnoct/j8\""
+    ]
+   ],
+   "body": "{\"message\":[\"name must be longer than or equal to 3 and shorter than or equal to 120 characters\",\"name must be a string\",\"sku must match /^[A-Z0-9-]{4,32}$/ regular expression\",\"sku must be a string\",\"description must be shorter than or equal to 2000 characters\",\"description must be a string\",\"price must not be less than 0\",\"price must be a number conforming to the specified constraints\",\"stock must not be less than 0\",\"stock must be an integer number\",\"categoryId must not be less than 1\",\"categoryId must be an integer number\",\"active must be a boolean value\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "12428effa2f1b0e2fae77c12cc3f996180b95a8fdef42b135f552e6f631a57fe",
+   "problems": []
+  },
+  {
+   "id": "39-post-invalid-too-short",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "160"
+    ],
+    [
+     "etag",
+     "W/\"a0-qfRg6XtWDNrGftgl6z9izVaBWFw\""
+    ]
+   ],
+   "body": "{\"message\":[\"name must be longer than or equal to 3 characters\",\"sku must match /^[A-Z0-9-]{4,32}$/ regular expression\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "086a72b9d970570e3c97b6af0bc150260385edd535fa1ced5c07fc4df60f0f57",
+   "problems": []
+  },
+  {
+   "id": "40-post-invalid-negatives",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "153"
+    ],
+    [
+     "etag",
+     "W/\"99-q8spa5gc7Hdya/J9BQUycETJw6A\""
+    ]
+   ],
+   "body": "{\"message\":[\"price must not be less than 0\",\"stock must not be less than 0\",\"categoryId must not be less than 1\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "76656e242b6834e3868d52e9aadb7fe0868d21966e16d2067e0525cc61d8dc3e",
+   "problems": []
+  },
+  {
+   "id": "41-post-invalid-extra-field",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "104"
+    ],
+    [
+     "etag",
+     "W/\"68-g/j8vOKq71W13wOTK5FcJV7M9vY\""
+    ]
+   ],
+   "body": "{\"message\":[\"name must be longer than or equal to 3 characters\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "97b2745e719120e27597063d4f46030d79d74d52f815c00467bac199fd81461a",
+   "problems": []
+  },
+  {
+   "id": "42-post-invalid-emoji-length",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "137"
+    ],
+    [
+     "etag",
+     "W/\"89-i/kdw1WGb6p6Ciazqr+aijqnjgc\""
+    ]
+   ],
+   "body": "{\"message\":[\"name must be longer than or equal to 3 and shorter than or equal to 120 characters\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "c89570ae87181842c86843f2f143ad773812500c7db998431d06c031dab16083",
+   "problems": []
+  },
+  {
+   "id": "43-post-invalid-name-121",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "107"
+    ],
+    [
+     "etag",
+     "W/\"6b-9cos4T2PA0aNC8MDBmUvmi0lmRw\""
+    ]
+   ],
+   "body": "{\"message\":[\"name must be shorter than or equal to 120 characters\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "f6be7b7375ed42ff349bbf3384775d3146ec41f90a8b2c224eb10fbf34c620c4",
+   "problems": []
+  },
+  {
+   "id": "44-post-invalid-description-2001",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "115"
+    ],
+    [
+     "etag",
+     "W/\"73-/zoOTQLDJHsLGieCsKfv7PGZOsk\""
+    ]
+   ],
+   "body": "{\"message\":[\"description must be shorter than or equal to 2000 characters\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "02dc7fac988762bdf114f3a2666a714e621f9387611a23c9522fe30cdaaf39cc",
+   "problems": []
+  },
+  {
+   "id": "45-post-valid-loadtest",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "225"
+    ]
+   ],
+   "body": "{\"sku\":\"BANANA-1KG\",\"name\":\"Banana Prata 1kg\",\"description\":\"Penca com 6 unidades\",\"price\":7.9,\"stock\":120,\"categoryId\":2,\"id\":10001,\"active\":true,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "d6275833345660fd9189e7a73e7640a73d618e917a32c325c7396d1c0a0984f0",
+   "problems": []
+  },
+  {
+   "id": "46-post-valid-minimal",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "206"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0001\",\"name\":\"Teste Produto Alfa\",\"price\":12.5,\"stock\":3,\"categoryId\":2,\"description\":null,\"id\":10002,\"active\":true,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "25350f3ea827e18c73f86e161e131421f81565bfecf4589a066a7df437173d10",
+   "problems": []
+  },
+  {
+   "id": "47-post-valid-active-false",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "207"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0004\",\"name\":\"Teste Produto Alfa\",\"price\":12.5,\"stock\":3,\"active\":false,\"categoryId\":2,\"description\":null,\"id\":10003,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "b92918d28476230205634a576d8e3b2d52e9808504929e5b015c9622c2171d83",
+   "problems": []
+  },
+  {
+   "id": "48-post-valid-extra-field",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "206"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0005\",\"name\":\"Teste Produto Alfa\",\"price\":12.5,\"stock\":3,\"categoryId\":2,\"description\":null,\"id\":10004,\"active\":true,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "03491271c749ea5d40dcc79cd0ed9b68d727a360ee0e3821eaa207e81dc1fcef",
+   "problems": []
+  },
+  {
+   "id": "49-post-valid-description-null",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "206"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0006\",\"name\":\"Teste Produto Alfa\",\"description\":null,\"price\":12.5,\"stock\":3,\"categoryId\":2,\"id\":10005,\"active\":true,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "b743d1dfbc9f9b3ea92bedcf5ee7c4164bd5fa85a887f8f450cae63dabe38326",
+   "problems": []
+  },
+  {
+   "id": "50-post-valid-reversed-keys",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "230"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0007\",\"name\":\"Teste Ordem das Chaves\",\"description\":\"Chaves em ordem inversa\",\"price\":0.1,\"stock\":9,\"active\":true,\"categoryId\":3,\"id\":10006,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "b3fd3959b5f6625a6761e5ccf629400eae551dbd65ecce98fe72874621b65edb",
+   "problems": []
+  },
+  {
+   "id": "51-post-valid-emoji-name",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "224"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0008\",\"name\":\"😀😀😀\",\"description\":\"Pão com ç, ã, é e 🍞\",\"price\":12.5,\"stock\":3,\"categoryId\":2,\"id\":10007,\"active\":true,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "6431be88b079e58fb769dafa3ba8b1a1936ba61658d34b90f0d2801d3f23b3fa",
+   "problems": []
+  },
+  {
+   "id": "52-post-valid-lone-surrogate",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "193"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0009\",\"name\":\"a\\ud800b\",\"price\":3,\"stock\":1,\"categoryId\":4,\"description\":null,\"id\":10008,\"active\":true,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "ffb101285c8a8edb1478f76ff11b7fc2624d4b6d10274dded0617861ddbba996",
+   "problems": []
+  },
+  {
+   "id": "53-post-valid-price-100.0",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "207"
+    ]
+   ],
+   "body": "{\"sku\":\"TST-0010\",\"name\":\"Preco com ponto zero\",\"price\":100,\"stock\":1,\"categoryId\":5,\"description\":null,\"id\":10009,\"active\":true,\"createdAt\":\"<TS>\",\"updatedAt\":\"<TS>\"}",
+   "body_sha256": "459d3266078ea1a9487e6fdff4acf53aa6b4fbc83499d7a49888eafdefa081aa",
+   "problems": []
+  },
+  {
+   "id": "54-post-fk-500",
+   "status": 500,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "52"
+    ],
+    [
+     "etag",
+     "W/\"34-rlKccw1E+/fV8niQk4oFitDfPro\""
+    ]
+   ],
+   "body": "{\"statusCode\":500,\"message\":\"Internal server error\"}",
+   "body_sha256": "fcbda2e2660dbbff82ba8df76212f3d4ab9ced3b9b9a8b8700621f45fb5ce006",
+   "problems": []
+  },
+  {
+   "id": "55-not-found-get",
+   "status": 404,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "67"
+    ],
+    [
+     "etag",
+     "W/\"43-73MzLCH8UXOP2MFLIVT5mijAPmQ\""
+    ]
+   ],
+   "body": "{\"message\":\"Cannot GET /nope\",\"error\":\"Not Found\",\"statusCode\":404}",
+   "body_sha256": "76a1be43e540357ac4340df71b8715839d0f66b0def1037e293da41a16d43b2e",
+   "problems": []
+  },
+  {
+   "id": "56-not-found-post",
+   "status": 404,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "68"
+    ],
+    [
+     "etag",
+     "W/\"44-3hS8otDPl3AMHbn7tragRbslwsk\""
+    ]
+   ],
+   "body": "{\"message\":\"Cannot POST /nope\",\"error\":\"Not Found\",\"statusCode\":404}",
+   "body_sha256": "d841dda63eb9bb50e3d1b2395717ee5e214d9058553d03b9969261b91d9cc943",
+   "problems": []
+  },
+  {
+   "id": "57-malformed-json-eof",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "81"
+    ],
+    [
+     "etag",
+     "W/\"51-HUsSNIuzuQnqtSDvAjdQhVEhtD4\""
+    ]
+   ],
+   "body": "{\"message\":\"Unexpected end of JSON input\",\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "3d9491c2ebe90d823ebb6a9eafbc97b10b0768a710872dd15afb30504e37c8d2",
+   "problems": []
+  },
+  {
+   "id": "58-malformed-json-key",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "122"
+    ],
+    [
+     "etag",
+     "W/\"7a-/N2fvWWrahpz7QZkVEFOEuR+u4k\""
+    ]
+   ],
+   "body": "{\"message\":\"Expected property name or '}' in JSON at position 1 (line 1 column 2)\",\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "3fed98cb85d44c7df684cda777d30dba05cba68c56bb288a7b146ad1c2ac6d14",
+   "problems": []
+  },
+  {
+   "id": "59-malformed-json-trailing-comma",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "129"
+    ],
+    [
+     "etag",
+     "W/\"81-D1lFr8DYL6LTF6I9Or+a1q8rT5I\""
+    ]
+   ],
+   "body": "{\"message\":\"Expected double-quoted property name in JSON at position 7 (line 1 column 8)\",\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "5ee99fd9b4452fcde875b71a8f430483ac50bfcfec6c3c3474f09ebcbe64caaf",
+   "problems": []
+  },
+  {
+   "id": "60-extras-no-key",
+   "status": 403,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "66"
+    ],
+    [
+     "etag",
+     "W/\"42-bZEO5zJnQPqQM7I07UJVCJmSICU\""
+    ]
+   ],
+   "body": "{\"message\":\"Invalid API key\",\"error\":\"Forbidden\",\"statusCode\":403}",
+   "body_sha256": "86c5a366711f967fe114da779d44ae21a3149572142baca1a5f6b3fa867498a9",
+   "problems": []
+  },
+  {
+   "id": "61-extras-wrong-key",
+   "status": 403,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "66"
+    ],
+    [
+     "etag",
+     "W/\"42-bZEO5zJnQPqQM7I07UJVCJmSICU\""
+    ]
+   ],
+   "body": "{\"message\":\"Invalid API key\",\"error\":\"Forbidden\",\"statusCode\":403}",
+   "body_sha256": "86c5a366711f967fe114da779d44ae21a3149572142baca1a5f6b3fa867498a9",
+   "problems": []
+  },
+  {
+   "id": "62-extras-whoami-anonymous",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "65"
+    ],
+    [
+     "etag",
+     "W/\"41-H8JefEC4crDqEfQVq5LYoYxBgL8\""
+    ]
+   ],
+   "body": "{\"data\":{\"clientId\":\"anonymous\"},\"meta\":{\"handledBy\":\"envelope\"}}",
+   "body_sha256": "5f3810af94a50bb9fa25fe0e00172cedd2c1ce7ece58950e6128e2c0f03553bf",
+   "problems": []
+  },
+  {
+   "id": "63-extras-whoami-client",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "65"
+    ],
+    [
+     "etag",
+     "W/\"41-+LYI3KTWfiTuB9x8yJhZweP64KU\""
+    ]
+   ],
+   "body": "{\"data\":{\"clientId\":\"client-42\"},\"meta\":{\"handledBy\":\"envelope\"}}",
+   "body_sha256": "3ea009004ff7c90d865cf6bd12e01405274e43b413676f829c3ee424d02733a4",
+   "problems": []
+  },
+  {
+   "id": "64-extras-item-21",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "63"
+    ],
+    [
+     "etag",
+     "W/\"3f-qmmi7Et9Opuvkqi+q4Azm31/Hxk\""
+    ]
+   ],
+   "body": "{\"data\":{\"id\":21,\"doubled\":42},\"meta\":{\"handledBy\":\"envelope\"}}",
+   "body_sha256": "81094eaf2991980996a4d5df2e892a84320e42e55f2f71f8fe0d1e057c0aa069",
+   "problems": []
+  },
+  {
+   "id": "65-extras-item-abc",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "99"
+    ],
+    [
+     "etag",
+     "W/\"63-fbYqGzam3W3FhpKYGVugOXQk+/M\""
+    ]
+   ],
+   "body": "{\"message\":\"Validation failed (numeric string is expected)\",\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "f597e621e5c0e8e065fa2bad0d875c20f0558225b2bc7419155be741c6f6d80e",
+   "problems": []
+  },
+  {
+   "id": "66-extras-domain-error",
+   "status": 422,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "63"
+    ],
+    [
+     "etag",
+     "W/\"3f-9y/sowcXaGmCNtdEmq4G5vSctZs\""
+    ]
+   ],
+   "body": "{\"code\":\"E_DEMO\",\"detail\":\"Domain failure used by the replica\"}",
+   "body_sha256": "21357084874b50ffbe52b7fa7c9d779fe29d44e28834fc961d26350d457d9580",
+   "problems": []
+  },
+  {
+   "id": "67-extras-validate-valid",
+   "status": 201,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "153"
+    ]
+   ],
+   "body": "{\"data\":{\"label\":\"rotulo\",\"priority\":\"high\",\"contact\":\"a@b.co\",\"tags\":[\"x\",\"y\"],\"address\":{\"city\":\"Rio\",\"country\":\"BR\"}},\"meta\":{\"handledBy\":\"envelope\"}}",
+   "body_sha256": "c196533710b065ebac682ab976e2200aba569d0f1f5d06f240b03e99680bb678",
+   "problems": []
+  },
+  {
+   "id": "68-extras-validate-invalid",
+   "status": 400,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "352"
+    ],
+    [
+     "etag",
+     "W/\"160-g5jp+07s50J7sFDcZjNq1/WoSkk\""
+    ]
+   ],
+   "body": "{\"message\":[\"label should not be empty\",\"priority must be one of the following values: low, high\",\"contact must be an email\",\"each value in tags must be a string\",\"tags must contain no more than 3 elements\",\"address.city must be a string\",\"address.country should not be empty\",\"address.country must be a string\"],\"error\":\"Bad Request\",\"statusCode\":400}",
+   "body_sha256": "d887575c5425789dc5f82e01172c36d7f13241ff3e61a01041ffcfdd095edf11",
+   "problems": []
+  },
+  {
+   "id": "69-extras-validate-forbidden-first",
+   "status": 403,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "66"
+    ],
+    [
+     "etag",
+     "W/\"42-bZEO5zJnQPqQM7I07UJVCJmSICU\""
+    ]
+   ],
+   "body": "{\"message\":\"Invalid API key\",\"error\":\"Forbidden\",\"statusCode\":403}",
+   "body_sha256": "86c5a366711f967fe114da779d44ae21a3149572142baca1a5f6b3fa867498a9",
+   "problems": []
+  },
+  {
+   "id": "70-throttled-ping-1",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "x-ratelimit-limit",
+     "5"
+    ],
+    [
+     "x-ratelimit-remaining",
+     "4"
+    ],
+    [
+     "x-ratelimit-reset",
+     "60"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "13"
+    ],
+    [
+     "etag",
+     "W/\"d-NMovXDE1NuzTr1lpmBE8ZRjliFM\""
+    ]
+   ],
+   "body": "{\"pong\":true}",
+   "body_sha256": "3874e63167becc35249c13eb1e40b8b0247427fc856b39c21e46a83de36b8a25",
+   "problems": []
+  },
+  {
+   "id": "71-throttled-ping-2",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "x-ratelimit-limit",
+     "5"
+    ],
+    [
+     "x-ratelimit-remaining",
+     "3"
+    ],
+    [
+     "x-ratelimit-reset",
+     "60"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "13"
+    ],
+    [
+     "etag",
+     "W/\"d-NMovXDE1NuzTr1lpmBE8ZRjliFM\""
+    ]
+   ],
+   "body": "{\"pong\":true}",
+   "body_sha256": "3874e63167becc35249c13eb1e40b8b0247427fc856b39c21e46a83de36b8a25",
+   "problems": []
+  },
+  {
+   "id": "72-throttled-ping-3",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "x-ratelimit-limit",
+     "5"
+    ],
+    [
+     "x-ratelimit-remaining",
+     "2"
+    ],
+    [
+     "x-ratelimit-reset",
+     "60"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "13"
+    ],
+    [
+     "etag",
+     "W/\"d-NMovXDE1NuzTr1lpmBE8ZRjliFM\""
+    ]
+   ],
+   "body": "{\"pong\":true}",
+   "body_sha256": "3874e63167becc35249c13eb1e40b8b0247427fc856b39c21e46a83de36b8a25",
+   "problems": []
+  },
+  {
+   "id": "73-throttled-ping-4",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "x-ratelimit-limit",
+     "5"
+    ],
+    [
+     "x-ratelimit-remaining",
+     "1"
+    ],
+    [
+     "x-ratelimit-reset",
+     "60"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "13"
+    ],
+    [
+     "etag",
+     "W/\"d-NMovXDE1NuzTr1lpmBE8ZRjliFM\""
+    ]
+   ],
+   "body": "{\"pong\":true}",
+   "body_sha256": "3874e63167becc35249c13eb1e40b8b0247427fc856b39c21e46a83de36b8a25",
+   "problems": []
+  },
+  {
+   "id": "74-throttled-ping-5",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "x-ratelimit-limit",
+     "5"
+    ],
+    [
+     "x-ratelimit-remaining",
+     "0"
+    ],
+    [
+     "x-ratelimit-reset",
+     "60"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "13"
+    ],
+    [
+     "etag",
+     "W/\"d-NMovXDE1NuzTr1lpmBE8ZRjliFM\""
+    ]
+   ],
+   "body": "{\"pong\":true}",
+   "body_sha256": "3874e63167becc35249c13eb1e40b8b0247427fc856b39c21e46a83de36b8a25",
+   "problems": []
+  },
+  {
+   "id": "75-throttled-ping-6",
+   "status": 429,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "retry-after",
+     "<volatile>"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "68"
+    ],
+    [
+     "etag",
+     "W/\"44-McWaoNlzt3iglN2odEGCDEADErE\""
+    ]
+   ],
+   "body": "{\"statusCode\":429,\"message\":\"ThrottlerException: Too Many Requests\"}",
+   "body_sha256": "c81f3817facbc93b34e800043f7670d138b2c2a530423c7f398b3d639b46a38f",
+   "problems": []
+  },
+  {
+   "id": "76-throttled-strict-1",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "x-ratelimit-limit",
+     "2"
+    ],
+    [
+     "x-ratelimit-remaining",
+     "1"
+    ],
+    [
+     "x-ratelimit-reset",
+     "60"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "15"
+    ],
+    [
+     "etag",
+     "W/\"f-u0XfcBAA81ODBYfKX/Ga7BVWhHg\""
+    ]
+   ],
+   "body": "{\"strict\":true}",
+   "body_sha256": "f73b69e6270cf767e0d8a99e2a78c8a3d5b241d8ad0bf4c8ba8f5626fcafc9c2",
+   "problems": []
+  },
+  {
+   "id": "77-throttled-strict-2",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "x-ratelimit-limit",
+     "2"
+    ],
+    [
+     "x-ratelimit-remaining",
+     "0"
+    ],
+    [
+     "x-ratelimit-reset",
+     "60"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "15"
+    ],
+    [
+     "etag",
+     "W/\"f-u0XfcBAA81ODBYfKX/Ga7BVWhHg\""
+    ]
+   ],
+   "body": "{\"strict\":true}",
+   "body_sha256": "f73b69e6270cf767e0d8a99e2a78c8a3d5b241d8ad0bf4c8ba8f5626fcafc9c2",
+   "problems": []
+  },
+  {
+   "id": "78-throttled-strict-3",
+   "status": 429,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "retry-after",
+     "<volatile>"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "68"
+    ],
+    [
+     "etag",
+     "W/\"44-McWaoNlzt3iglN2odEGCDEADErE\""
+    ]
+   ],
+   "body": "{\"statusCode\":429,\"message\":\"ThrottlerException: Too Many Requests\"}",
+   "body_sha256": "c81f3817facbc93b34e800043f7670d138b2c2a530423c7f398b3d639b46a38f",
+   "problems": []
+  },
+  {
+   "id": "79-throttled-skipped-1",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  },
+  {
+   "id": "80-throttled-skipped-2",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  },
+  {
+   "id": "81-throttled-skipped-3",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  },
+  {
+   "id": "82-throttled-skipped-4",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  },
+  {
+   "id": "83-throttled-skipped-5",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  },
+  {
+   "id": "84-throttled-skipped-6",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  },
+  {
+   "id": "85-throttled-skipped-7",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  },
+  {
+   "id": "86-throttled-skipped-8",
+   "status": 200,
+   "headers": [
+    [
+     "x-powered-by",
+     "Express"
+    ],
+    [
+     "content-type",
+     "application/json; charset=utf-8"
+    ],
+    [
+     "content-length",
+     "16"
+    ],
+    [
+     "etag",
+     "W/\"10-f60iaSYoax1E4bhniDztP2Us98U\""
+    ]
+   ],
+   "body": "{\"skipped\":true}",
+   "body_sha256": "1527fe2f6ebd56a8b429ca17d721758490c37aac8af902dcfc06b3d942f725df",
+   "problems": []
+  }
+ ]
+}

@@ -22,4 +22,4 @@ description: Run the Tyrus quality gates (scripts/gates.sh) and interpret failur
    never blanket-allow.
 5. Report the per-gate verdicts and the coverage TOTAL line, with exit codes observed.
 
-$ARGUMENTS: optional single gate name (fmt|clippy|filesize|unsafe|test|coverage|deny|audit|machete).
+$ARGUMENTS: optional single gate name (fmt|clippy|filesize|unsafe|test|coverage|deny|audit|machete|replica).

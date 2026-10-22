@@ -45,3 +45,6 @@ docs/CODEMAPS/
 # Common assistant artifacts
 **/CLAUDE.md.bak
 **/.cursor/
+
+# Python tooling caches (oracle/apps/replica)
+__pycache__/
