@@ -391,5 +391,22 @@ class ReferenceEngineTest(unittest.TestCase):
             self.assertIn("desatualizados", err)
 
 
+class NegativeControlTest(unittest.TestCase):
+    """Motores conhecidamente diferentes tem de reprovar nas classes certas."""
+
+    def test_foreign_engines_fail_exactly_where_measured(self):
+        with open(os.path.join(HERE, "negative_controls.json"), encoding="utf-8") as handle:
+            controls = json.load(handle)
+        for name, spec in controls.items():
+            with self.subTest(engine=name):
+                code, out, err = run_cli("--engine-cmd", require_env(spec["env"]), "--compare", GOLDEN_DIR)
+                self.assertEqual(code, 1, err)
+                report = json.loads(out)
+                self.assertFalse(report["tuple_matches"])
+                diff = set(report["diff_classes"])
+                self.assertEqual(sorted(set(spec["must_diff"]) - diff), [], "deveria diferir")
+                self.assertEqual(sorted(set(spec["must_not_diff"]) & diff), [], "nao deveria diferir")
+
+
 if __name__ == "__main__":
     unittest.main()
