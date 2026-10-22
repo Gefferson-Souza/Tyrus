@@ -1,7 +1,7 @@
 # 9. Mutex Re-entrance Protocol for Generated `@Injectable` State
 
 Date: 2026-05-03
-Status: Accepted (retroactive — backfill of PR #141)
+Status: Accepted (retroactive — backfill of PR #141). Legacy-scoped by [ADR 0016](0016-ppr-foundation-and-constitution.md), effective when ADR 0016 is accepted; deleted with the legacy code.
 
 ## Context
 
