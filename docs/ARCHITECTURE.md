@@ -197,6 +197,7 @@ The project enforces strict correctness via:
 
 Numbered ADRs under [`docs/architecture/decisions/`](architecture/decisions/) are the binding record of architectural choices. Most-recent-first:
 
+- [ADR 0019 — Oracle and Harness Tooling](architecture/decisions/0019-oracle-and-harness-tooling.md) — Proposto: pinned Node tuple, Python `-I` stdlib harnesses, `cargo-mutants`, `jsonschema` dev-dependency and its `Cargo.lock` bumps, npm/Docker pinning.
 - [ADR 0015 — Tooling Evaluated and Rejected](architecture/decisions/0015-rejected-tooling.md) — Ferrocene, Miri, sanitizers, cargo-vet/crev, restriction-as-group: why not, and what would reopen each.
 - [ADR 0014 — Development Flow Rules (F1–F10)](architecture/decisions/0014-development-flow-rules.md) — process standard companion to the Power of Ten; see [DEVELOPMENT_FLOW.md](standards/DEVELOPMENT_FLOW.md).
 - [ADR 0013 — Power of Ten v2](architecture/decisions/0013-power-of-ten-v2.md) — R13 (forbid unsafe), R14 (stable error codes), amendments to R4/R5/R6/R9/R12, Consortium traceability annex.
