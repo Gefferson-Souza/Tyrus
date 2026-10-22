@@ -2,6 +2,7 @@
 //! vereditos fechada. Só o oráculo emite vereditos (D21).
 #![forbid(unsafe_code)]
 
+pub mod cli;
 pub mod codes;
 pub mod error;
 pub mod lock;
