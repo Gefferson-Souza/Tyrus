@@ -1,0 +1,17 @@
+const util = require('util');
+console.log(-0, [-0], 0, NaN, Infinity, -Infinity, 1e21, 1e-7, 0.1 + 0.2);
+console.log(10n, [10n], -5n, 2n ** 80n, Object(1n));
+console.log(util.inspect(1234567.891, { numericSeparator: true }), util.inspect(123456789n, { numericSeparator: true }));
+console.log([1, , 3], [, ,], new Array(5), [1, 2, , , , 6]);
+const withExtra = [1, 2];
+withExtra.tag = 'x';
+console.log(withExtra);
+console.log(new Uint8Array([1, 2, 3]), new Float64Array([0.5, -0]), new BigInt64Array([1n]), new Uint8Array(0));
+console.log(new ArrayBuffer(4), new SharedArrayBuffer(2));
+console.log(new DataView(new ArrayBuffer(2)));
+console.log(Buffer.from('héllo'), Buffer.alloc(60, 1));
+console.log(Array.from({ length: 120 }, (_, i) => i));
+console.log(Array.from({ length: 7 }, (_, i) => i * 1000));
+console.log(Array.from({ length: 30 }, (_, i) => 'item' + i));
+console.log([1.5, 22.25, 333.125, 4, 5, 6, 7, 8, 9, 10]);
+console.log([[1, 2, [3, 4, [5, [6]]]], { a: { b: { c: { d: 1 } } } }]);

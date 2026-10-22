@@ -267,5 +267,24 @@ class EsmLitmusTest(unittest.TestCase):
         self.assertEqual(len(classes), 6)
 
 
+class InspectTest(unittest.TestCase):
+    def test_first_lines_match_documented_node_formatting(self):
+        reference = require_env("TYRUS_NODE_REFERENCE")
+        env = RUN.engine_env("UTC", {}, tempfile.gettempdir())
+        for name, expected in INSPECT_FIRST_LINES.items():
+            with self.subTest(inspect=name):
+                result = RUN.run_script(reference, os.path.join(ROOT, "inspect", name + ".js"), env)
+                self.assertEqual(result["exit"], 0)
+                self.assertEqual(result["stdout"].decode("utf-8").splitlines()[0], expected)
+
+    def test_has_at_least_16_inspect_scripts(self):
+        self.assertGreaterEqual(len([f for f in os.listdir(os.path.join(ROOT, "inspect")) if f.endswith(".js")]), 16)
+
+    def test_no_inspect_script_is_unstable_in_five_runs(self):
+        env = RUN.engine_env("UTC", {}, tempfile.gettempdir())
+        classes, _ = RUN.script_classes(require_env("TYRUS_NODE_REFERENCE"), os.path.join(ROOT, "inspect"), "inspect", env, RUN.Selection(5, None))
+        self.assertEqual([c for c, v in classes.items() if v.get("unstable")], [])
+
+
 if __name__ == "__main__":
     unittest.main()

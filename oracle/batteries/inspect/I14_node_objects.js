@@ -1,0 +1,13 @@
+const { EventEmitter } = require('events');
+console.log(new EventEmitter());
+console.log(EventEmitter.name, typeof EventEmitter.once, Object.keys(EventEmitter).sort().join(','));
+console.log(new URL('http://user:pw@example.com:8080/p/a?x=1&y=2#h'));
+console.log(new URLSearchParams('a=1&b=2&a=3'), new URLSearchParams('a=1').entries());
+console.log(require('util').inspect(new Event('e')).replace(/timeStamp: [0-9.]+/, 'timeStamp: <t>'), new AbortController().signal);
+console.log(process.nextTick, setTimeout, Buffer, Buffer.from, require('fs').readFile);
+console.log(new TextEncoder(), new TextDecoder('utf-8', { fatal: true }));
+console.log(setTimeout(() => {}, 0).constructor.name, typeof setImmediate(() => {}), Object.keys(setTimeout(() => {}, 1)).sort().join(','));
+console.log(require('path').posix.parse('/a/b.c'), require('os').EOL === '\n');
+console.log(new (require('stream').Readable)({ read() {} }).readableFlowing, Object.keys(new (require('stream').PassThrough)()).length > 0);
+console.log(structuredClone({ d: new Date(0), m: new Map([[1, { a: 1 }]]), s: new Set([1]), r: /x/g, e: new RangeError('r') }).m);
+console.log(new Blob(['abc'], { type: 'text/plain' }), new Headers({ 'X-A': '1' }));

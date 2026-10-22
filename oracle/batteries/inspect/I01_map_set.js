@@ -1,0 +1,15 @@
+const util = require('util');
+const m = new Map([['a', 1], [{ k: 1 }, [1, 2]], [NaN, new Set([1])]]);
+console.log(m);
+console.log(new Set(['x', 'y', { z: 1 }]));
+console.log(new Map());
+console.log(new Set());
+console.log(m.entries());
+console.log(m.keys());
+console.log(new Set([1, 2]).values());
+console.log(new WeakMap(), new WeakSet());
+console.log(new Map(Array.from({ length: 120 }, (_, i) => [i, i])));
+console.log(util.inspect(new Map([[1, new Map([[2, new Map([[3, new Map()]])]])]]), { depth: 1 }));
+const mapWithProp = new Map([[1, 2]]);
+mapWithProp.extra = true;
+console.log(mapWithProp);
