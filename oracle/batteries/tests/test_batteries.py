@@ -408,5 +408,27 @@ class NegativeControlTest(unittest.TestCase):
                 self.assertEqual(sorted(set(spec["must_not_diff"]) & diff), [], "nao deveria diferir")
 
 
+class MutantEngineTest(unittest.TestCase):
+    """Cada mutante e um motor defeituoso conhecido; as baterias tem de mata-lo."""
+
+    def test_every_mutant_is_killed_by_its_declared_classes(self):
+        reference = require_env("TYRUS_NODE_REFERENCE")
+        with open(os.path.join(ROOT, "mutants", "mutants.json"), encoding="utf-8") as handle:
+            mutants = json.load(handle)
+        self.assertGreaterEqual(len(mutants), 12)
+        for name, spec in mutants.items():
+            with self.subTest(mutant=name):
+                preload = os.path.join(ROOT, "mutants", spec["preload"])
+                code, out, _ = run_cli("--engine-cmd", f"{reference} --require {preload}", "--compare", GOLDEN_DIR, "--class", ",".join(spec["must_diff"]))
+                self.assertEqual(code, 1, name)
+                self.assertEqual(sorted(set(spec["must_diff"]) - set(json.loads(out)["diff_classes"])), [])
+
+    def test_mutants_json_lists_every_preload_file(self):
+        with open(os.path.join(ROOT, "mutants", "mutants.json"), encoding="utf-8") as handle:
+            declared = {spec["preload"] for spec in json.load(handle).values()}
+        on_disk = {f for f in os.listdir(os.path.join(ROOT, "mutants")) if f.endswith(".js")}
+        self.assertEqual(declared, on_disk)
+
+
 if __name__ == "__main__":
     unittest.main()
