@@ -225,5 +225,47 @@ class ReferenceLockTest(unittest.TestCase):
             self.assertEqual(tuple_info[key], lock[key], key)
 
 
+ESM_LITMUS_TRACES = {
+    "L31_esm_entry_order": "sync promise microtask tick immediate",
+    "L32_esm_top_level_await": "before-await promise-1 after-await-null promise-2 tick tick-2 after-await-immediate timeout-0 after-await-timeout",
+    "L33_esm_dynamic_import_order": "sync promise eval-esm-tla-start eval-esm-plain eval-esm-tla-end awaited-plain then-dep-tla tick immediate",
+    "L34_require_esm_sync": "before-require eval-esm-plain after-require-plain-[object Module] same-instance-true sync-end tick promise",
+    "L35_require_esm_tla_error": "before-require caught-ERR_REQUIRE_ASYNC_MODULE is-error-true after-require promise",
+    "L36_esm_import_cjs": "eval-cjs-dep default-n-e named-n require-same-true meta-true",
+}
+
+
+class EsmLitmusTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.reference = require_env("TYRUS_NODE_REFERENCE")
+        cls.env = RUN.engine_env("UTC", {}, tempfile.gettempdir())
+
+    def test_traces_match_documented_esm_semantics(self):
+        for name, expected in ESM_LITMUS_TRACES.items():
+            with self.subTest(litmus=name):
+                result = RUN.run_script(self.reference, litmus_path(name), self.env)
+                self.assertEqual(result["exit"], 0)
+                self.assertEqual(result["stdout"].decode("utf-8").split(), expected.split())
+
+    def test_runner_discovers_mjs_litmus_and_skips_fixtures(self):
+        wanted = {f"litmus.{n}" for n in ESM_LITMUS_TRACES}
+        classes, _ = RUN.script_classes(self.reference, os.path.join(ROOT, "litmus"), "litmus", self.env, RUN.Selection(1, wanted))
+        self.assertEqual(sorted(classes), sorted(wanted))
+        self.assertEqual({v["exit"] for v in classes.values()}, {0})
+        every, _ = RUN.script_classes(self.reference, os.path.join(ROOT, "litmus"), "litmus", self.env, RUN.Selection(1, None))
+        self.assertFalse([c for c in every if "esm_dep" in c or "cjs_dep" in c])
+
+    def test_esm_litmus_are_the_last_six_and_total_is_36(self):
+        self.assertEqual([n for n in litmus_names() if n >= "L31"], sorted(ESM_LITMUS_TRACES))
+        self.assertEqual(len(litmus_names()), 36)
+
+    def test_esm_litmus_do_not_flutter_in_five_runs(self):
+        wanted = {f"litmus.{n}" for n in ESM_LITMUS_TRACES}
+        classes, _ = RUN.script_classes(self.reference, os.path.join(ROOT, "litmus"), "litmus", self.env, RUN.Selection(5, wanted))
+        self.assertEqual([c for c, v in classes.items() if v.get("unstable")], [])
+        self.assertEqual(len(classes), 6)
+
+
 if __name__ == "__main__":
     unittest.main()

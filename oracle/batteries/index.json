@@ -2,21 +2,115 @@
   "schema": 1,
   "reference_lock": "../oracle.lock",
   "fingerprint": {
-    "probes": ["core", "intl", "unicode", "tz", "runtime"],
+    "probes": [
+      "core",
+      "intl",
+      "unicode",
+      "tz",
+      "runtime"
+    ],
     "local_probe": "tzlocal",
-    "local_time_zones": ["UTC", "America/Sao_Paulo", "Asia/Kolkata", "Australia/Lord_Howe", "America/St_Johns", "America/Winnipeg", "Africa/Casablanca"]
+    "local_time_zones": [
+      "UTC",
+      "America/Sao_Paulo",
+      "Asia/Kolkata",
+      "Australia/Lord_Howe",
+      "America/St_Johns",
+      "America/Winnipeg",
+      "Africa/Casablanca"
+    ]
   },
   "sections": {
-    "S01": {"title": "timers 0/1/2 e fila de timers", "members": ["L05_same_list_timers", "L06_nested_immediates", "L08_tick_between_timers"]},
-    "S02": {"title": "nextTick x microtask", "members": ["L01_tick_vs_promise_main", "L02_tick_promise_interleave", "L03_queue_microtask_order"]},
-    "S03": {"title": "callback de I/O", "members": ["L04_io_timeout_vs_immediate", "L09_readfile_tick_vs_promise", "L10_fs_promises_await_vs_tick"]},
-    "S04": {"title": "thenable", "members": ["L12_thenable_ticks", "L14_async_return_value_vs_promise"]},
-    "S05": {"title": "await e return await", "members": ["L11_async_await_basic", "L13_return_await", "L30_async_generator_interleave"]},
-    "S06": {"title": "EventEmitter e EventTarget", "members": ["L17_emitter_semantics", "L18_events_once_promise", "L26_abort_and_eventtarget"]},
-    "S07": {"title": "stream", "members": ["L19_readable_events", "L20_writable_callbacks", "L21_stream_async_iteration"]},
-    "S08": {"title": "http", "members": ["L22_http_event_order"]},
-    "S09": {"title": "net", "members": ["L23_net_close_order"]},
-    "S10": {"title": "hooks de saida e avisos", "members": ["L24_exit_hooks", "L25_emit_warning_timing", "L28_uncaught_exception_order"]},
-    "S11": {"title": "fases do laco, promessas combinadas e contexto assincrono", "members": ["L07_tick_between_immediates", "L15_promise_combinators", "L16_unhandled_rejection_timing", "L27_timers_promises", "L29_async_local_storage"]}
+    "S01": {
+      "title": "timers 0/1/2 e fila de timers",
+      "members": [
+        "L05_same_list_timers",
+        "L06_nested_immediates",
+        "L08_tick_between_timers"
+      ]
+    },
+    "S02": {
+      "title": "nextTick x microtask",
+      "members": [
+        "L01_tick_vs_promise_main",
+        "L02_tick_promise_interleave",
+        "L03_queue_microtask_order",
+        "L31_esm_entry_order"
+      ]
+    },
+    "S03": {
+      "title": "callback de I/O",
+      "members": [
+        "L04_io_timeout_vs_immediate",
+        "L09_readfile_tick_vs_promise",
+        "L10_fs_promises_await_vs_tick"
+      ]
+    },
+    "S04": {
+      "title": "thenable",
+      "members": [
+        "L12_thenable_ticks",
+        "L14_async_return_value_vs_promise"
+      ]
+    },
+    "S05": {
+      "title": "await e return await",
+      "members": [
+        "L11_async_await_basic",
+        "L13_return_await",
+        "L30_async_generator_interleave",
+        "L32_esm_top_level_await"
+      ]
+    },
+    "S06": {
+      "title": "EventEmitter e EventTarget",
+      "members": [
+        "L17_emitter_semantics",
+        "L18_events_once_promise",
+        "L26_abort_and_eventtarget"
+      ]
+    },
+    "S07": {
+      "title": "stream",
+      "members": [
+        "L19_readable_events",
+        "L20_writable_callbacks",
+        "L21_stream_async_iteration"
+      ]
+    },
+    "S08": {
+      "title": "http",
+      "members": [
+        "L22_http_event_order"
+      ]
+    },
+    "S09": {
+      "title": "net",
+      "members": [
+        "L23_net_close_order"
+      ]
+    },
+    "S10": {
+      "title": "hooks de saida e avisos",
+      "members": [
+        "L24_exit_hooks",
+        "L25_emit_warning_timing",
+        "L28_uncaught_exception_order"
+      ]
+    },
+    "S11": {
+      "title": "fases do laco, promessas combinadas, contexto assincrono e modulos ESM",
+      "members": [
+        "L07_tick_between_immediates",
+        "L15_promise_combinators",
+        "L16_unhandled_rejection_timing",
+        "L27_timers_promises",
+        "L29_async_local_storage",
+        "L33_esm_dynamic_import_order",
+        "L34_require_esm_sync",
+        "L35_require_esm_tla_error",
+        "L36_esm_import_cjs"
+      ]
+    }
   }
 }

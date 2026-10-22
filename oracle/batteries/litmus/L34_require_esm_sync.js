@@ -1,0 +1,11 @@
+'use strict';
+const fs = require('fs');
+const L = (s) => fs.writeSync(1, s + '\n');
+process.nextTick(() => L('tick'));
+Promise.resolve().then(() => L('promise'));
+L('before-require');
+const mod = require('./fixtures/esm_dep_plain.mjs');
+L('after-require-' + mod.value + '-' + Object.prototype.toString.call(mod));
+const again = require('./fixtures/esm_dep_plain.mjs');
+L('same-instance-' + (again === mod));
+L('sync-end');
