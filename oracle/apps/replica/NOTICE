@@ -1,0 +1,8 @@
+Réplica de desenvolvimento do Tyrus (oracle/apps/replica)
+
+O código-fonte de src/ foi escrito para o projeto Tyrus. Não contém código de terceiros nem código da Duofy
+Soluções, e nenhuma rota, DTO, nome de tabela ou dado de seed deriva de sistema da Duofy.
+
+As dependências (NestJS, TypeORM, pg, class-validator, class-transformer, rxjs, reflect-metadata, Express,
+Fastify, TypeScript, webpack, ts-loader) não são copiadas para o repositório: package-lock.json as resolve do
+registro npm, cada uma sob a sua licença. A imagem do Postgres é referenciada por digest em db/replica.env.
