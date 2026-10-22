@@ -268,6 +268,9 @@ def main(argv):
         goldens_dir = args.compare
         golden = {**load_json(os.path.join(goldens_dir, "golden.json")), "tuple": load_json(os.path.join(goldens_dir, "meta.json"))["tuple"]}
         wanted = {c for c in golden["classes"] if matches(c, patterns)} if patterns else None
+        dead = [p for p in patterns or [] if not any(matches(c, [p]) for c in golden["classes"])]
+        if dead:
+            raise HarnessError(f"filtro --class nao casa nenhuma classe do golden: {dead}")
         tuple_info, actual, failed, outputs, index = collect(args.engine_cmd, wanted, golden["classes"], args.stability or 1, extra_env)
         unexpected = sorted(set(actual) - set(golden["classes"]))
         if unexpected:

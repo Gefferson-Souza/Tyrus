@@ -553,7 +553,7 @@
   "inspect.I03_getters_setters_hidden": {
    "exit": 0,
    "kind": "inspect",
-   "sha256": "b9b06270d3f4a9fbd4c2340c568d81819d0081ad8e6ffb6831b5024a2d04cee6"
+   "sha256": "19fe6623848c54ae6e2536f4daa772e5b72b55f9dd68fa4227dc3f65f72871be"
   },
   "inspect.I04_circular": {
    "exit": 0,

@@ -52,6 +52,38 @@ def require_env(name):
     return value
 
 
+def delay_value(raw):
+    text = raw.strip().strip("'\"")
+    if text == "NaN":
+        return 0
+    try:
+        return max(float(text), 0)
+    except ValueError:
+        return float("inf")
+
+
+def timer_delays(source):
+    promise_timers = "timers/promises" in source
+    delays = []
+    for match in re.finditer(r"(\.?)\b(?:setTimeout|setInterval)\(", source):
+        depth, commas, index = 1, [], match.end()
+        for index in range(match.end(), len(source)):
+            char = source[index]
+            if char in "([{":
+                depth += 1
+            elif char in ")]}":
+                depth -= 1
+                if depth == 0:
+                    break
+            elif char == "," and depth == 1:
+                commas.append(index)
+        bounds = [match.end() - 1] + commas + [index]
+        args = [source[bounds[i] + 1:bounds[i + 1]] for i in range(len(bounds) - 1)]
+        position = 0 if match.group(1) and promise_timers else 1
+        delays.append(delay_value(args[position]) if position < len(args) else 0)
+    return delays
+
+
 def run_cli(*argv):
     out, err = io.StringIO(), io.StringIO()
     with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
@@ -188,13 +220,45 @@ class LitmusTest(unittest.TestCase):
     def test_no_litmus_depends_on_a_long_wait(self):
         for name in self.litmus:
             with open(litmus_path(name), encoding="utf-8") as handle:
-                delays = [int(d) for d in re.findall(r"set(?:Timeout|Interval)\([^;]*?,\s*(\d+)\)", handle.read())]
+                delays = timer_delays(handle.read())
             self.assertTrue(all(d < 10 for d in delays), f"{name}: {delays}")
+
+    def test_timer_delay_scan_sees_waits_the_old_regex_missed(self):
+        self.assertEqual(timer_delays("setTimeout(() => { L('a'); L('b'); }, 50);"), [50])
+        self.assertEqual(timer_delays("await new Promise(r => setTimeout(r, 30));"), [30])
+        self.assertEqual(timer_delays("const tp = require('timers/promises'); await tp.setTimeout(20);"), [20])
+        self.assertEqual(timer_delays("setInterval(f, 15)"), [15])
+        self.assertEqual(timer_delays("setTimeout(f, 1); setTimeout(g)"), [1, 0])
+        self.assertEqual(timer_delays("setTimeout(f, delay)"), [float("inf")])
 
     def test_no_litmus_flutters_in_five_runs(self):
         classes, _ = RUN.script_classes(self.reference, os.path.join(ROOT, "litmus"), "litmus", self.env, RUN.Selection(5, None))
         self.assertEqual([c for c, v in classes.items() if v.get("unstable")], [])
         self.assertEqual(len(classes), len(self.litmus))
+
+
+class GoldenPortabilityTest(unittest.TestCase):
+    def test_no_golden_output_leaks_host_paths_or_node_internals(self):
+        forbidden = re.compile(r"/home/|/tmp/|/Users/|node:internal|tyrus-wt")
+        outputs = os.path.join(GOLDEN_DIR, "outputs")
+        checked = 0
+        for folder, _, names in os.walk(outputs):
+            for name in names:
+                with open(os.path.join(folder, name), encoding="utf-8") as handle:
+                    self.assertIsNone(forbidden.search(handle.read()), os.path.join(folder, name))
+                checked += 1
+        self.assertGreater(checked, 40)
+
+    def test_compare_passes_from_a_copy_in_another_directory(self):
+        reference = require_env("TYRUS_NODE_REFERENCE")
+        with tempfile.TemporaryDirectory() as temp:
+            clone = os.path.join(temp, "batteries")
+            shutil.copytree(ROOT, clone, ignore=shutil.ignore_patterns("__pycache__"))
+            lock = os.path.normpath(os.path.join(ROOT, load_index()["reference_lock"]))
+            shutil.copy(lock, os.path.join(temp, "oracle.lock"))
+            runner = load_runner(os.path.join(clone, "run.py"))
+            code = runner.main(["--engine-cmd", reference, "--compare", os.path.join(clone, "goldens", "node-26.11.1"), "--class", "inspect.*"])
+        self.assertEqual(code, 0)
 
 
 class LitmusIndexTest(unittest.TestCase):
@@ -345,6 +409,17 @@ class ReferenceEngineTest(unittest.TestCase):
         code, out, _ = run_cli("--engine-cmd", self.reference, "--compare", GOLDEN_DIR, "--class", "fingerprint.sin,litmus.L01*")
         self.assertEqual(code, 0)
         self.assertEqual(sorted(json.loads(out)["statuses"]), ["fingerprint.sin", "litmus.L01_tick_vs_promise_main"])
+
+    def test_class_filter_matching_nothing_is_a_harness_error(self):
+        code, out, err = run_cli("--engine-cmd", self.reference, "--compare", GOLDEN_DIR, "--class", "litmus.L99_typo")
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertIn("L99_typo", err)
+
+    def test_class_filter_with_one_dead_pattern_is_a_harness_error(self):
+        code, _, err = run_cli("--engine-cmd", self.reference, "--compare", GOLDEN_DIR, "--class", "fingerprint.sin,litmus.L99*")
+        self.assertEqual(code, 2)
+        self.assertIn("L99*", err)
 
     def test_record_refuses_unstable_scripts(self):
         with tempfile.TemporaryDirectory() as temp:
