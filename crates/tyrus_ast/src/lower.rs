@@ -23,9 +23,14 @@ mod tests {
         };
         let program = Program::Module(module);
         let result = lower_program(&program);
-        assert!(result.declarations.is_empty());
-        assert!(result.statements.is_empty());
-        assert!(result.imports.is_empty());
+        assert_eq!(
+            result,
+            TyrusModule {
+                declarations: Vec::new(),
+                statements: Vec::new(),
+                imports: Vec::new(),
+            }
+        );
     }
 
     #[test]
@@ -37,7 +42,13 @@ mod tests {
         };
         let program = Program::Script(script);
         let result = lower_program(&program);
-        assert!(result.declarations.is_empty());
-        assert!(result.statements.is_empty());
+        assert_eq!(
+            result,
+            TyrusModule {
+                declarations: Vec::new(),
+                statements: Vec::new(),
+                imports: Vec::new(),
+            }
+        );
     }
 }
