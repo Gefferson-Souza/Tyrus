@@ -4,6 +4,7 @@
 
 pub mod codes;
 pub mod error;
+pub mod lock;
 pub mod registry;
 pub mod shares;
 pub mod tuple;
