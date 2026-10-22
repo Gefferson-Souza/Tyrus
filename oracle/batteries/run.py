@@ -146,6 +146,11 @@ def probe_tuple(engine_cmd, env):
     return json.loads(result["stdout"])
 
 
+def reference_tuple(index):
+    lock = load_json(os.path.normpath(os.path.join(ROOT, index["reference_lock"])))["reference"]
+    return {"runtime": "node", "version": "v" + lock["node"], "v8": lock["v8"], "icu": lock["icu"], "unicode": lock["unicode"], "tz": lock["tz"], "cldr": lock["cldr"]}
+
+
 def probe_plan(index):
     plan = [(name, name, "UTC") for name in index["fingerprint"]["probes"]]
     local = index["fingerprint"]["local_probe"]

@@ -197,5 +197,33 @@ class LitmusTest(unittest.TestCase):
         self.assertEqual(len(classes), len(self.litmus))
 
 
+class LitmusIndexTest(unittest.TestCase):
+    def setUp(self):
+        self.index = load_index()
+        self.litmus = litmus_names()
+
+    def test_has_at_least_25_litmus(self):
+        self.assertGreaterEqual(len(self.litmus), 25)
+
+    def test_has_exactly_11_sections(self):
+        self.assertEqual(sorted(self.index["sections"]), [f"S{n:02d}" for n in range(1, 12)])
+
+    def test_every_litmus_belongs_to_exactly_one_section(self):
+        members = [m for s in self.index["sections"].values() for m in s["members"]]
+        self.assertEqual(sorted(members), self.litmus)
+
+
+class ReferenceLockTest(unittest.TestCase):
+    def test_reference_tuple_comes_from_the_single_lock(self):
+        index = load_index()
+        self.assertNotIn("reference_tuple", index)
+        tuple_info = RUN.reference_tuple(index)
+        lock = RUN.load_json(os.path.normpath(os.path.join(ROOT, index["reference_lock"])))["reference"]
+        self.assertEqual(tuple_info["runtime"], "node")
+        self.assertEqual(tuple_info["version"], "v" + lock["node"])
+        for key in ("v8", "icu", "unicode", "tz", "cldr"):
+            self.assertEqual(tuple_info[key], lock[key], key)
+
+
 if __name__ == "__main__":
     unittest.main()
