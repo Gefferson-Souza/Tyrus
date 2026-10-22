@@ -7,3 +7,4 @@ pub mod error;
 pub mod registry;
 pub mod shares;
 pub mod tuple;
+pub mod verdict;
