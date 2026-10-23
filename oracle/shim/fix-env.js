@@ -42,10 +42,13 @@ if (perturbMs > 0) {
   };
   for (const name of ['setTimeout', 'setInterval']) {
     const original = globalThis[name];
-    globalThis[name] = function perturbed(...args) {
+    const wrapper = function perturbed(...args) {
       const handle = original.apply(this, args);
       spin();
       return handle;
     };
+    // Preserva `util.promisify.custom` e demais propriedades próprias do original.
+    Object.defineProperties(wrapper, Object.getOwnPropertyDescriptors(original));
+    globalThis[name] = wrapper;
   }
 }

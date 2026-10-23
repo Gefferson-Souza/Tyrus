@@ -44,3 +44,20 @@ fn without_the_shim_the_environment_leaks() {
     let second = run(false);
     assert_ne!(first, second, "relógio/RNG/pid reais deveriam variar");
 }
+
+#[test]
+fn perturbed_timers_keep_promisify_custom() {
+    let script = "const {promisify}=require('util');\
+promisify(setTimeout)(5,'v').then(v=>console.log('resolved',v));";
+    let output = Command::new(node())
+        .env_clear()
+        .env("TYRUS_SHIM_PERTURB_MS", "15")
+        .arg("--require")
+        .arg(shim_path())
+        .arg("-e")
+        .arg(script)
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{output:?}");
+    assert_eq!(String::from_utf8(output.stdout).unwrap(), "resolved v\n");
+}
