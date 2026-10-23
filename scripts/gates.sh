@@ -22,6 +22,7 @@
 #   ./scripts/gates.sh machete     # cargo machete (unused dependencies)
 #   ./scripts/gates.sh unsafe      # Rule 13: forbid(unsafe_code) in every crate root
 #   ./scripts/gates.sh replica     # oracle/apps/replica: parity, request set, tooling tests (no Docker)
+#   ./scripts/gates.sh front       # front/ (ST0): node --test, matriz de TypeScript e teto de 1500 linhas
 #   ./scripts/gates.sh node-pins   # TYRUS_NODE_REFERENCE/TYRUS_NODE_SEED apontam para o Node do oracle.lock
 #
 # Environment variables:
@@ -276,6 +277,17 @@ gate_replica() {
     fi
 }
 
+gate_front() {
+    echo "=== gate: front ==="
+    node_bin="${TYRUS_NODE_REFERENCE:-node}"
+    "$node_bin" --test front/test/
+    lines=$(find front -name '*.ts' -not -path '*/node_modules/*' -exec cat {} + | wc -l)
+    if [ "$lines" -gt 1500 ]; then
+        echo "FAIL: front/ tem $lines linhas de TypeScript (teto 1500)"
+        return 1
+    fi
+}
+
 # --- Dispatcher --------------------------------------------------------------
 
 cmd="${1:-all}"
@@ -290,6 +302,7 @@ case "$cmd" in
     machete)  gate_machete ;;
     unsafe)   gate_unsafe ;;
     replica)  gate_replica ;;
+    front)    gate_front ;;
     node-pins) gate_node_pins ;;
     all)
         gate_fmt
@@ -297,6 +310,7 @@ case "$cmd" in
         gate_filesize
         gate_unsafe
         gate_replica
+        gate_front
         gate_test
         gate_coverage
         gate_deny

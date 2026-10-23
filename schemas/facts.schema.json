@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gefferson-Souza/Tyrus/schemas/facts.schema.json",
+  "title": "facts",
+  "description": "Fatos mínimos do ST0 (M1): inventário de arquivos com sha256, versão do TypeScript do projeto, hash do tsconfig e opções de emit. AST e símbolos são do M2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "typescript", "tsconfig", "emit_options", "sources", "outputs"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "typescript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version"],
+      "properties": {
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "tsconfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "emit_options": { "type": "object" },
+    "sources": { "$ref": "#/$defs/fileList" },
+    "outputs": { "$ref": "#/$defs/fileList" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "fileList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    }
+  }
+}
