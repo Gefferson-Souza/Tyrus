@@ -119,6 +119,9 @@ state = "ACTIVE"
 state = "ACTIVE"
 ci_exempt = "chamado por test e coverage, que sao passos de CI"
 
+[gates.corpus-immutable]
+state = "ACTIVE"
+
 [gates.claims]
 state = "SKIPPED"
 activates_in = "docs-claims-migration"

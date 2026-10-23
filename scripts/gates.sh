@@ -29,6 +29,7 @@
 #   ./scripts/gates.sh gates-toml  # gates.toml válido e em paridade com este script e com o CI
 #   ./scripts/gates.sh gates-selftest  # testes de gates.toml/cfg.py e das portas (scripts/gates/test_cfg.sh)
 #   ./scripts/gates.sh claims      # SKIPPED(docs-claims-migration) até a migração dos docs
+#   ./scripts/gates.sh corpus-immutable  # oracle/corpus/seed bate com corpus.lock (sha256), sem sobra nem falta
 #
 # Limiares e estado (ACTIVE | SKIPPED) vêm de gates.toml (scripts/gates/cfg.py). Gate SKIPPED
 # imprime SKIPPED(<fase>), nunca PASS. TYRUS_GATES_TOML e TYRUS_GATES_ROOT apontam para uma
@@ -367,15 +368,22 @@ gate_front() {
     fi
 }
 
+gate_corpus_immutable() {
+    echo "=== gate: corpus-immutable ==="
+    python3 -B -I -m unittest discover -s "$script_dir/gates" -p 'test_corpus_check.py'
+    # TYRUS_CORPUS_ROOT aponta para outra raiz de árvore (usado pelos testes com cópias).
+    python3 -B -I "$script_dir/gates/corpus_check.py" --root "${TYRUS_CORPUS_ROOT:-$script_dir/..}"
+}
+
 # --- Dispatcher --------------------------------------------------------------
 
 cmd="${1:-all}"
 case "$cmd" in
-    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|claims)
+    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|claims|corpus-immutable)
         run_gate "$cmd" ;;
     all)
         guard_disk "$(cfg get thresholds.disk_min_gb_all)"
-        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit machete claims; do
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit machete claims corpus-immutable; do
             run_gate "$name"
         done
         echo ""
