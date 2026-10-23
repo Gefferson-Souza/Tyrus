@@ -27,6 +27,7 @@
 #   ./scripts/gates.sh node-pins   # TYRUS_NODE_REFERENCE/TYRUS_NODE_SEED apontam para o Node do oracle.lock
 #   ./scripts/gates.sh direction   # dependências respeitam front -> facts -> place -> assemble e o regime legado
 #   ./scripts/gates.sh gates-toml  # gates.toml válido e em paridade com este script e com o CI
+#   ./scripts/gates.sh audit-policy # testes de audit.toml e audit_policy.py (scripts/gates/test_audit_policy.sh)
 #   ./scripts/gates.sh gates-selftest  # testes de gates.toml/cfg.py e das portas (scripts/gates/test_cfg.sh)
 #   ./scripts/gates.sh claims      # SKIPPED(docs-claims-migration) até a migração dos docs
 #   ./scripts/gates.sh corpus-immutable  # oracle/corpus/seed bate com corpus.lock (sha256), sem sobra nem falta
@@ -311,14 +312,20 @@ gate_audit() {
         return 0
     fi
     echo "=== gate: audit ==="
-    # Ignored advisories are duplicated from deny.toml [advisories].ignore
-    # because cargo-audit doesn't read deny.toml. Keep these in sync with
-    # deny.toml whenever advisories are triaged.
-    cargo audit \
-        --ignore RUSTSEC-2025-0119 \
-        --ignore RUSTSEC-2026-0097 \
-        --ignore RUSTSEC-2026-0249 \
-        --deny warnings
+    # Exceções vêm de audit.toml (scripts/gates/audit_policy.py); deny.toml tem de espelhá-las.
+    audit_toml="${TYRUS_AUDIT_TOML:-$script_dir/../audit.toml}"
+    deny_toml="${TYRUS_DENY_TOML:-$script_dir/../deny.toml}"
+    python3 -B -I "$script_dir/gates/audit_policy.py" check --audit "$audit_toml" --deny "$deny_toml"
+    ignores=$(python3 -B -I "$script_dir/gates/audit_policy.py" args --audit "$audit_toml")
+    # shellcheck disable=SC2086
+    set -- $ignores
+    # shellcheck disable=SC2086
+    cargo audit "$@" ${TYRUS_AUDIT_CARGO_ARGS:-} --deny warnings
+}
+
+gate_audit_policy() {
+    echo "=== gate: audit-policy ==="
+    sh "$script_dir/gates/test_audit_policy.sh"
 }
 
 gate_replica() {
@@ -379,11 +386,11 @@ gate_corpus_immutable() {
 
 cmd="${1:-all}"
 case "$cmd" in
-    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|claims|corpus-immutable)
+    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|audit-policy|claims|corpus-immutable)
         run_gate "$cmd" ;;
     all)
         guard_disk "$(cfg get thresholds.disk_min_gb_all)"
-        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit machete claims corpus-immutable; do
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit audit-policy machete claims corpus-immutable; do
             run_gate "$name"
         done
         echo ""
