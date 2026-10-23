@@ -22,6 +22,7 @@
 #   ./scripts/gates.sh machete     # cargo machete (unused dependencies)
 #   ./scripts/gates.sh unsafe      # Rule 13: forbid(unsafe_code) in every crate root
 #   ./scripts/gates.sh replica     # oracle/apps/replica: parity, request set, tooling tests (no Docker)
+#   ./scripts/gates.sh wire        # oracle/harness: HTTP/wire/state comparator, selftest, limits (no Docker)
 #   ./scripts/gates.sh node-pins   # TYRUS_NODE_REFERENCE/TYRUS_NODE_SEED apontam para o Node do oracle.lock
 #
 # Environment variables:
@@ -276,6 +277,20 @@ gate_replica() {
     fi
 }
 
+gate_wire() {
+    echo "=== gate: wire ==="
+    python3 -B -I -m unittest discover -s oracle/harness/tests -t oracle/harness -p 'test_*.py'
+    python3 -B -I oracle/harness/equiv_selftest.py
+    if command -v shellcheck >/dev/null 2>&1; then
+        find oracle/harness/tools -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR
+    elif [ "${TYRUS_REQUIRE_SHELLCHECK:-0}" = "1" ]; then
+        echo "ERROR: shellcheck ausente e TYRUS_REQUIRE_SHELLCHECK=1"
+        return 1
+    else
+        echo "WARN: shellcheck ausente; etapa ignorada (o CI a exige)"
+    fi
+}
+
 # --- Dispatcher --------------------------------------------------------------
 
 cmd="${1:-all}"
@@ -290,6 +305,7 @@ case "$cmd" in
     machete)  gate_machete ;;
     unsafe)   gate_unsafe ;;
     replica)  gate_replica ;;
+    wire)     gate_wire ;;
     node-pins) gate_node_pins ;;
     all)
         gate_fmt
@@ -297,6 +313,7 @@ case "$cmd" in
         gate_filesize
         gate_unsafe
         gate_replica
+        gate_wire
         gate_test
         gate_coverage
         gate_deny

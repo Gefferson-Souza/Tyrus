@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "origin_root": "~/.local/share/tyrus-ceiling (Gate 0, fora do repositório)",
+  "recorded_on": "2026-10-23",
+  "files": [
+    {
+      "path": "wire.py",
+      "origin": "harness/wire.py",
+      "origin_sha256": "6ad200930ebf55238c20369993e94d2d076f4e87d6ab817f15246394fd0e0be1",
+      "mode": "verbatim",
+      "sha256": "6ad200930ebf55238c20369993e94d2d076f4e87d6ab817f15246394fd0e0be1",
+      "note": "agrupa mensagens decodificadas em idas e voltas; sem alteração"
+    },
+    {
+      "path": "pgproxy.py",
+      "origin": "tools/pgproxy.py",
+      "origin_sha256": "20e2c36d83d8a48f2b55bde4de7c060fe6195ea0dba7b876ec215e67842c67d8",
+      "mode": "adapted",
+      "sha256": "618cea74f578c37faae91c63b8098eb83f50fdc045f6e0b08fa8c49171f3ec7d",
+      "note": "sha256 dos bytes de cada mensagem do cliente (`wire_sha256`); gancho `rewrite` para o controle negativo; `stop()` cancela as tarefas pendentes"
+    },
+    {
+      "path": "known_divergences.json",
+      "origin": "harness/known_divergences.json",
+      "origin_sha256": "7dc0a4718dd92da26b366e55b9ac6ad748d2b84642704ddb5e763b018f7516d3",
+      "mode": "adapted",
+      "sha256": "deeec94a13ff10f75335f2a66973a3abb6148b31b61dfcab43d0440f0e805635",
+      "note": "entrada indexada por motor e id do registro fechado (`normalizers.py`); falhas por camada"
+    },
+    {
+      "path": "capture_sql.py",
+      "origin": "harness/capture_sql.py",
+      "origin_sha256": "3dad9116a276c0209ea7fc7f4aaf1b405907ead7a9d1b94df231c4c09872e220",
+      "mode": "adapted",
+      "sha256": "cde1e4c59becb190c1fe7e70ce275efa27437d6331bf4caf03866d2d055fd65a",
+      "note": "CLI genérica sobre `--target-cmd`; o gerador do documento Markdown do Gate 0 não foi importado"
+    },
+    {
+      "path": "sql_facts.py",
+      "origin": "harness/capture_sql.py",
+      "origin_sha256": "3dad9116a276c0209ea7fc7f4aaf1b405907ead7a9d1b94df231c4c09872e220",
+      "mode": "adapted",
+      "sha256": "443973e79079389cf7b2299a791a9bcdbb06b000902f6377a1a4c44688258798",
+      "note": "previsores de chave e de INSERT e asserções de fatos, com os ids de `requests.json` da réplica"
+    },
+    {
+      "path": "wire_compare.py",
+      "origin": "harness/sql_equiv.py",
+      "origin_sha256": "bfd0edff33225992bb8e5bc88afa312b825c2e016e66ac111fcf299e8cf6dea7",
+      "mode": "adapted",
+      "sha256": "d5a39c1ef17c358fa485a1e13dca881817eb42e1ab8b35d9c1e75ad066c3479b",
+      "note": "`compare`/`apply_known` do Gate 0; HTTP vem de `replica_core.diff_runs`; nível `bytes` novo; estado novo"
+    },
+    {
+      "path": "wire_trace.py",
+      "origin": "harness/sql_equiv.py",
+      "origin_sha256": "bfd0edff33225992bb8e5bc88afa312b825c2e016e66ac111fcf299e8cf6dea7",
+      "mode": "adapted",
+      "sha256": "2bd131f623f17ef3246a224d53597c712747e4e74ee5669808f5d3e0881228bd",
+      "note": "`collect` do Gate 0 sem `common.Server`/`Recorder`: executa o alvo genérico com o executor da réplica"
+    },
+    {
+      "path": "equiv_selftest.py",
+      "origin": "harness/equiv_selftest.py",
+      "origin_sha256": "fd12970f115472941121f462d2bdacdb31cda7a37da0dc5edd5be405eb7e6ae4",
+      "mode": "adapted",
+      "sha256": "b9f9a95d6ed6841c7bd42b62ff9b9416d598c9dba8b1bb88725d91dfe726022a",
+      "note": "controles reescritos sobre o comparador de fio, HTTP e estado (o `equiv_core.py` do Gate 0 não é importado)"
+    }
+  ],
+  "not_imported": [
+    {
+      "origin": "harness/equiv.py",
+      "reason": "executor duplicaria `oracle/apps/replica/run_requests.py`"
+    },
+    {
+      "origin": "harness/equiv_core.py",
+      "reason": "normalização e comparação HTTP duplicariam `replica_core`"
+    },
+    {
+      "origin": "harness/make_requests.py",
+      "reason": "gerador duplicaria `oracle/apps/replica/make_requests.py`"
+    },
+    {
+      "origin": "harness/requests.json",
+      "reason": "o conjunto de 86 requisições é `oracle/apps/replica/requests.json`"
+    },
+    {
+      "origin": "harness/common.py, harness/bench_lib/",
+      "reason": "rig de desempenho do Gate 0; fora de escopo (bench-rig-adopt)"
+    }
+  ]
+}

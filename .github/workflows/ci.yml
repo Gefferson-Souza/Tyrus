@@ -52,6 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: ./scripts/gates.sh replica
+      - run: ./scripts/gates.sh wire
 
   replica-e2e:
     name: Replica (end to end)
@@ -67,7 +68,7 @@ jobs:
           base="${{ github.event.pull_request.base.sha || github.event.before }}"
           if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-          elif git diff --name-only "$base" HEAD | grep -qE '^(oracle/apps/replica/|oracle/oracle\.lock|scripts/check_replica_parity\.sh|\.github/workflows/ci\.yml)'; then
+          elif git diff --name-only "$base" HEAD | grep -qE '^(oracle/apps/replica/|oracle/harness/|oracle/oracle\.lock|scripts/check_replica_parity\.sh|\.github/workflows/ci\.yml)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -82,6 +83,8 @@ jobs:
           node-version: ${{ steps.lock.outputs.node }}
       - if: steps.changes.outputs.run == 'true'
         run: oracle/apps/replica/tools/verify_replica.sh
+      - if: steps.changes.outputs.run == 'true'
+        run: oracle/harness/tools/verify_wire.sh
 
   # MSRV — the workspace must keep compiling on the declared minimum
   # supported Rust version ([workspace.package] rust-version).
