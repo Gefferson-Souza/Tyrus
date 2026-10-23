@@ -103,7 +103,7 @@ cargo run -p tyrus_oracle --bin tyrus-oracle -- lock verify --role all
 | `tyrus_common` | ~70 | `FilePath`, `to_snake_case()`, config |
 | `tyrus_test_utils` | ~195 | `assert_rust_compiles()`, `compile_and_run_rust()`, `run_node()` |
 | `tyrus_oracle` | ~970 | Oracle root of trust: pinned Node tuples (`oracle/oracle.lock`), closed `Verdict` algebra with `Shares`, `tyrus-oracle lock verify`. Errors `TYRUS-E5xxx`. Depends on no legacy crate. |
-| `tyrus_facts` | ~500 | Front-end facts (ST1): serde types for `facts.json`, `closure.lock`, `partition.lock` (schemas in `schemas/`), canonical JSON, schema-version (`TYRUS-E7102`) and hash (`TYRUS-E7101`) validation. Depends on no legacy or runtime crate. |
+| `tyrus_facts` | ~760 | Front-end facts (ST1): serde types for `facts.json`, `closure.lock`, `partition.lock` (schemas in `schemas/`), canonical JSON, schema-version (`TYRUS-E7102`) and hash (`TYRUS-E7101`) validation. Depends on no legacy or runtime crate. |
 
 ### Codegen Module Structure (Current)
 
