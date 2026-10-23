@@ -1,0 +1,7 @@
+{
+  "id": "K_strings__string_ends_with",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "true\nfalse\n",
+  "stderr": ""
+}

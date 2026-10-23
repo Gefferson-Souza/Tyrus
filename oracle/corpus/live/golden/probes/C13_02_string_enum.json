@@ -1,0 +1,7 @@
+{
+  "id": "C13_02_string_enum",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "DOWN\n",
+  "stderr": ""
+}

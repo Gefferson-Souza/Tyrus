@@ -1,0 +1,7 @@
+{
+  "id": "C13_05_literal_union",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n-1\n",
+  "stderr": ""
+}

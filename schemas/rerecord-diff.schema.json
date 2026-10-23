@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gefferson-Souza/Tyrus/schemas/rerecord-diff.schema.json",
+  "title": "rerecord-diff",
+  "description": "Diff de vereditos do corpus regravado contra a semente: SAME, CHANGED ou BAD_PROBE por sonda. BAD_PROBE fica fora do verde e fora das contagens de equivalência. Tipos Rust em crates/tyrus_oracle (record::model).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "reference", "seed", "typescript", "counts", "probes"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "reference": { "$ref": "#/$defs/nodeTuple" },
+    "seed": { "$ref": "#/$defs/nodeTuple" },
+    "typescript": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "same", "changed", "bad_probe", "nondeterministic"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 1 },
+        "same": { "type": "integer", "minimum": 0 },
+        "changed": { "type": "integer", "minimum": 0 },
+        "bad_probe": { "type": "integer", "minimum": 0 },
+        "nondeterministic": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "probes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/entry" } }
+  },
+  "$defs": {
+    "nodeTuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "v8", "icu", "unicode", "tz", "cldr"],
+      "properties": {
+        "node": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "v8": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+-node\\.[0-9]+$" },
+        "icu": { "type": "string", "minLength": 1 },
+        "unicode": { "type": "string", "minLength": 1 },
+        "tz": { "type": "string", "minLength": 1 },
+        "cldr": { "type": "string", "minLength": 1 }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "required": ["id", "set", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "set": { "enum": ["probes", "calib"] },
+        "status": { "enum": ["SAME", "CHANGED", "BAD_PROBE"] },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[^\\u0000-\\u001f\\u007f]+$" },
+        "change": { "enum": ["baseline_exit_nonzero", "stdout_differs", "stdout_differs_only_in_trailing_whitespace"] },
+        "seed_verdict": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "BAD_PROBE" } } },
+          "then": { "required": ["reason"], "not": { "required": ["change"] } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "CHANGED" } } },
+          "then": { "required": ["change"], "not": { "required": ["reason"] } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "SAME" } } },
+          "then": { "not": { "anyOf": [{ "required": ["reason"] }, { "required": ["change"] }] } }
+        }
+      ]
+    }
+  }
+}

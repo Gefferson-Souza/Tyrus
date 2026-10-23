@@ -1,0 +1,7 @@
+{
+  "id": "C03_04_slice_unicode",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "çã\n",
+  "stderr": ""
+}

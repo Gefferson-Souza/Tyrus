@@ -1,0 +1,7 @@
+{
+  "id": "C05_02_object_literal",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{ a: 1, b: 'x' }\n",
+  "stderr": ""
+}

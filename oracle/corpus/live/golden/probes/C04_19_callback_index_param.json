@@ -1,0 +1,7 @@
+{
+  "id": "C04_19_callback_index_param",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "0 10\n1 20\n",
+  "stderr": ""
+}

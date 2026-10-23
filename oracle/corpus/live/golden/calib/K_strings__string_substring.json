@@ -1,0 +1,7 @@
+{
+  "id": "K_strings__string_substring",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "hello\nworld\n",
+  "stderr": ""
+}

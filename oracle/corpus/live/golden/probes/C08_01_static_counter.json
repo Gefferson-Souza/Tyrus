@@ -1,0 +1,7 @@
+{
+  "id": "C08_01_static_counter",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "2\n",
+  "stderr": ""
+}

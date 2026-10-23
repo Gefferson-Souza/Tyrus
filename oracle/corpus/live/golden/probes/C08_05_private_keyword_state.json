@@ -1,0 +1,7 @@
+{
+  "id": "C08_05_private_keyword_state",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "5\n",
+  "stderr": ""
+}

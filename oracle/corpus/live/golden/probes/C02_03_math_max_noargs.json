@@ -1,0 +1,7 @@
+{
+  "id": "C02_03_math_max_noargs",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "-Infinity\nInfinity\n",
+  "stderr": ""
+}

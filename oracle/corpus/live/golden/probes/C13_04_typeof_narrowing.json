@@ -1,0 +1,7 @@
+{
+  "id": "C13_04_typeof_narrowing",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "n2\nsA\n",
+  "stderr": ""
+}

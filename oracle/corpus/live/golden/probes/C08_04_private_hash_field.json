@@ -1,0 +1,7 @@
+{
+  "id": "C08_04_private_hash_field",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "5\n",
+  "stderr": ""
+}

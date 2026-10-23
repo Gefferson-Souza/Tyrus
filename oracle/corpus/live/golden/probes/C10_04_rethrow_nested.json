@@ -1,0 +1,7 @@
+{
+  "id": "C10_04_rethrow_nested",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "caught outer\n",
+  "stderr": ""
+}

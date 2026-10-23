@@ -1,0 +1,7 @@
+{
+  "id": "C10_07_throw_across_functions",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\ncaught\ndone\n",
+  "stderr": ""
+}

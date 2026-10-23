@@ -1,0 +1,7 @@
+{
+  "id": "C09_16_camelcase_arrow_params",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "9\n",
+  "stderr": ""
+}

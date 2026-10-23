@@ -1,0 +1,7 @@
+{
+  "id": "C03_07_split_empty",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3\n",
+  "stderr": ""
+}

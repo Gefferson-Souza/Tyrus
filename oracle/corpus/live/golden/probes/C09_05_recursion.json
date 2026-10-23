@@ -1,0 +1,7 @@
+{
+  "id": "C09_05_recursion",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "6765\n2432902008176640000\n",
+  "stderr": ""
+}

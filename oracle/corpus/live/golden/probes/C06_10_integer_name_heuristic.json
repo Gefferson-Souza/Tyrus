@@ -1,0 +1,7 @@
+{
+  "id": "C06_10_integer_name_heuristic",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{\"id\":1.5,\"ratio\":2.5}\n",
+  "stderr": ""
+}

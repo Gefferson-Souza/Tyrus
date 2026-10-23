@@ -1,0 +1,7 @@
+{
+  "id": "C09_04_rest_params",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "6\n0\n",
+  "stderr": ""
+}

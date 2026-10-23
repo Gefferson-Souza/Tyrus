@@ -1,0 +1,7 @@
+{
+  "id": "C02_12_math_max_three_args",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "5\n2\n",
+  "stderr": ""
+}

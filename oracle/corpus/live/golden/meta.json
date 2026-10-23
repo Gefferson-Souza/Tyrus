@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "reference": {
+    "node": "26.11.1",
+    "v8": "14.6.202.34-node.37",
+    "icu": "78.3",
+    "unicode": "17.0",
+    "tz": "2026e",
+    "cldr": "48.0"
+  },
+  "typescript": "5.1.6",
+  "comparison_profile": "exact",
+  "emit": "tsc per-file emit (front sidecar), module commonjs"
+}

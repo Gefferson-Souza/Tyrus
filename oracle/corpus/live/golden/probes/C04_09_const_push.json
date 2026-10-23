@@ -1,0 +1,7 @@
+{
+  "id": "C04_09_const_push",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "2\n",
+  "stderr": ""
+}

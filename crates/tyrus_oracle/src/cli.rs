@@ -66,6 +66,11 @@ pub fn run<F>(
 where
     F: Fn(&str) -> Option<OsString>,
 {
+    if let [command, rest @ ..] = args {
+        if command == "record" {
+            return crate::record::run_record(rest, get_env, out, err);
+        }
+    }
     let parsed = match args {
         [group, command, rest @ ..] if group == "lock" && command == "verify" => parse_verify(rest),
         _ => Err("comando desconhecido".to_owned()),

@@ -1,0 +1,7 @@
+{
+  "id": "C13_06_tuple_type",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\na\n",
+  "stderr": ""
+}

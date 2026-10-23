@@ -1,0 +1,7 @@
+{
+  "id": "C07_01_map_foreach_order",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "zeta\nalpha\nmid\nbeta\nomega\ngamma\ndelta\nkappa\nsigma\ntheta\n",
+  "stderr": ""
+}

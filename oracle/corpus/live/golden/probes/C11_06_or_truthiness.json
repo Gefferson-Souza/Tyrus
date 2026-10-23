@@ -1,0 +1,7 @@
+{
+  "id": "C11_06_or_truthiness",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "5\n",
+  "stderr": ""
+}

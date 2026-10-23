@@ -1,0 +1,7 @@
+{
+  "id": "C08_10_this_increment",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "2\n",
+  "stderr": ""
+}

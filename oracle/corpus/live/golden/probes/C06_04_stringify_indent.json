@@ -1,0 +1,7 @@
+{
+  "id": "C06_04_stringify_indent",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{\n  \"a\": 1,\n  \"b\": [\n    1,\n    2\n  ]\n}\n",
+  "stderr": ""
+}

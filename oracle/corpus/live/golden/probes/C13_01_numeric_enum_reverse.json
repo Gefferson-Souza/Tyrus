@@ -1,0 +1,7 @@
+{
+  "id": "C13_01_numeric_enum_reverse",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\nRed\n",
+  "stderr": ""
+}

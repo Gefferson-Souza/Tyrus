@@ -1,0 +1,7 @@
+{
+  "id": "C05_05_multi_args",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "a 1.5 true b\ntotal: 3\n",
+  "stderr": ""
+}

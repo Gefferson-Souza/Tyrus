@@ -1,0 +1,7 @@
+{
+  "id": "C03_16_regex",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "true\ncoot\n",
+  "stderr": ""
+}

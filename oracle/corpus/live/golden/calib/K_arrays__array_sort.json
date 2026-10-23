@@ -1,0 +1,7 @@
+{
+  "id": "K_arrays__array_sort",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "1\n1\n2\n3\n4\n5\n6\n9\n",
+  "stderr": ""
+}

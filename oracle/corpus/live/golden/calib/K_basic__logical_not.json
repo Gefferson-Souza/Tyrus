@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__logical_not",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "false\ntrue\n",
+  "stderr": ""
+}

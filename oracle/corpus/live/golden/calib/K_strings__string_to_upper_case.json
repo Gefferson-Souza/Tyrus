@@ -1,0 +1,7 @@
+{
+  "id": "K_strings__string_to_upper_case",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "HELLO\n",
+  "stderr": ""
+}

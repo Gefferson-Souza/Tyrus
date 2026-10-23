@@ -1,0 +1,7 @@
+{
+  "id": "C09_17_destructured_param",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "6\n",
+  "stderr": ""
+}

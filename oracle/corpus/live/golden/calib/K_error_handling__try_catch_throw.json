@@ -1,0 +1,7 @@
+{
+  "id": "K_error_handling__try_catch_throw",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "Valid age: 25\nInvalid: caught error\nInvalid: caught error\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C01_05_toFixed",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3.14\n3\n1.00\n0.10000000000000000555\n",
+  "stderr": ""
+}

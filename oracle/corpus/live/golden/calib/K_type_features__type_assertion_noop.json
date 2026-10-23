@@ -1,0 +1,7 @@
+{
+  "id": "K_type_features__type_assertion_noop",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "Alice\n",
+  "stderr": ""
+}

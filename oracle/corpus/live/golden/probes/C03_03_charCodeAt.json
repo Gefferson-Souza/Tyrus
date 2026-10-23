@@ -1,0 +1,7 @@
+{
+  "id": "C03_03_charCodeAt",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "231\n",
+  "stderr": ""
+}

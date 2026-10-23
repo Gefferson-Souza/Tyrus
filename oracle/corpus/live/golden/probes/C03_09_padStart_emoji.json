@@ -1,0 +1,7 @@
+{
+  "id": "C03_09_padStart_emoji",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "😀x\n**ação\n",
+  "stderr": ""
+}

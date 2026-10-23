@@ -1,0 +1,7 @@
+{
+  "id": "K_control_flow__switch_basic",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "one\ntwo\nthree\nother\n",
+  "stderr": ""
+}

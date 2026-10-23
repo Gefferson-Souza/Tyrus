@@ -1,0 +1,7 @@
+{
+  "id": "C09_02_closure_loop_let",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "0\n1\n2\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C09_13_arrow_const",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3\n",
+  "stderr": ""
+}

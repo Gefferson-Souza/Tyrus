@@ -1,0 +1,7 @@
+{
+  "id": "C02_01_bitwise_binary",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n7\n6\n-64\n-4\n15\n-2147483648\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_control_flow__for_of_loop",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "10\n20\n30\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_nestjs_logic__multi_service_create_sequence",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "ok\nUser Alice created with id 1\nUser Bob created with id 2\n[]\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C02_02_bit_not",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "-6\n",
+  "stderr": ""
+}

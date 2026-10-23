@@ -1,0 +1,7 @@
+{
+  "id": "C07_06_map_numeric_keys",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "two\n2\n",
+  "stderr": ""
+}

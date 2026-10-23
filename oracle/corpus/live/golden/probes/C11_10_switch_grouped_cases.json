@@ -1,0 +1,7 @@
+{
+  "id": "C11_10_switch_grouped_cases",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "low\nlow\nmid\nhigh\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_math__math_abs",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "5\n3\n",
+  "stderr": ""
+}

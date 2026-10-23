@@ -1,0 +1,7 @@
+{
+  "id": "C02_08_Number_conv_isNaN",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "0\n16\ntrue\nfalse\n",
+  "stderr": ""
+}

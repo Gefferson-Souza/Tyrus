@@ -1,0 +1,7 @@
+{
+  "id": "C13_03_enum_arith",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "11\n",
+  "stderr": ""
+}

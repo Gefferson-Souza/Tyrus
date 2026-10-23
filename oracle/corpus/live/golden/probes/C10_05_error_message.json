@@ -1,0 +1,7 @@
+{
+  "id": "C10_05_error_message",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "boom\n",
+  "stderr": ""
+}

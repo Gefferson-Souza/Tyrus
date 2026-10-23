@@ -1,0 +1,7 @@
+{
+  "id": "C11_04_break_continue",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "0\n1\n2\n",
+  "stderr": ""
+}

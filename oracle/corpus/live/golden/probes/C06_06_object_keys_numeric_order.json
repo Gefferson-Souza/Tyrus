@@ -1,0 +1,7 @@
+{
+  "id": "C06_06_object_keys_numeric_order",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1,2,b,a\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C01_11_to_string_radix_precision",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "11111111\n123.5\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C10_03_finally_overrides_return",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "2\n",
+  "stderr": ""
+}

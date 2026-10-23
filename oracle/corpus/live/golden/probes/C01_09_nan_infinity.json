@@ -1,0 +1,7 @@
+{
+  "id": "C01_09_nan_infinity",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "NaN\nInfinity\n-Infinity\n",
+  "stderr": ""
+}

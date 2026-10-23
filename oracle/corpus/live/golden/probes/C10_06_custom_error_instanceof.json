@@ -1,0 +1,7 @@
+{
+  "id": "C10_06_custom_error_instanceof",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "bad:7\n",
+  "stderr": ""
+}

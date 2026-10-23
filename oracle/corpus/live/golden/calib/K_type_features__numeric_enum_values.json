@@ -1,0 +1,7 @@
+{
+  "id": "K_type_features__numeric_enum_values",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "Up\nDown\nRight\n",
+  "stderr": ""
+}

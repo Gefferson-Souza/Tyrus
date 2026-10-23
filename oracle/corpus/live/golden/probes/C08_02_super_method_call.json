@@ -1,0 +1,7 @@
+{
+  "id": "C08_02_super_method_call",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "...woof\n",
+  "stderr": ""
+}

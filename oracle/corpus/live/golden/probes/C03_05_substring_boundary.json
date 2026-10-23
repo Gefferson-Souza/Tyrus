@@ -1,0 +1,7 @@
+{
+  "id": "C03_05_substring_boundary",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "aç\n",
+  "stderr": ""
+}

@@ -1,0 +1,1405 @@
+{
+  "schema_version": 1,
+  "reference": {
+    "node": "26.11.1",
+    "v8": "14.6.202.34-node.37",
+    "icu": "78.3",
+    "unicode": "17.0",
+    "tz": "2026e",
+    "cldr": "48.0"
+  },
+  "seed": {
+    "node": "22.21.1",
+    "v8": "12.4.254.21-node.33",
+    "icu": "77.1",
+    "unicode": "16.0",
+    "tz": "2025b",
+    "cldr": "47.0"
+  },
+  "typescript": "5.1.6",
+  "counts": {
+    "total": 246,
+    "same": 245,
+    "changed": 0,
+    "bad_probe": 1,
+    "nondeterministic": 0
+  },
+  "probes": [
+    {
+      "id": "K_arrays__array_concat",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_for_each",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_includes",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_index_of",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_join",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_push",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_reduce_with_initial",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_reverse",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_shift",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_slice",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_arrays__array_sort",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__arithmetic_operations",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__boolean_logic",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__comparison_operators",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__const_vs_let",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__exponentiation",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__if_else",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__logical_not",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__parenthesized_precedence",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__simple_addition",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__string_concatenation",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__unary_negation",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_basic__while_loop",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_console__console_log_boolean",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_console__console_log_number",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_console__console_log_string",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_control_flow__do_while_loop",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_control_flow__for_loop",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_control_flow__for_of_loop",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_control_flow__switch_basic",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_error_handling__nested_try_catch",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_error_handling__try_catch_basic",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_error_handling__try_catch_no_throw",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_error_handling__try_catch_throw",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_getters_setters__getter_only_computed",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_getters_setters__getter_setter_basic",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_getters_setters__setter_with_validation",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_inheritance__class_inheritance_basic",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_inheritance__class_inheritance_method_override",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_abs",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_e_constant",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_floor_ceil_round",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_log",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_max_min",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_pi",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_pow",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_sign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_sin_cos_tan",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_sqrt",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_math__math_trunc",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_nestjs_logic__app_service_health",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_nestjs_logic__class_composition_di",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_nestjs_logic__multi_service_create_sequence",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_nestjs_logic__users_service_create",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_nestjs_logic__users_service_find_all",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_spread__array_spread_single",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_spread__array_spread_two_arrays",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_spread__array_spread_with_elements",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_spread__object_spread_copy",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_spread__object_spread_override",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__all_assign_ops",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__bitwise_and_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__bitwise_or_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__bitwise_xor_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__date_now_type",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__divide_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__left_shift_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__map_delete",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__map_set_get_has",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__modulo_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__multiply_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__right_shift_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__set_add_has",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__set_delete",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__subtract_assign",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_sprint1__this_method_call",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_static_members__static_and_instance",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_static_members__static_method",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_char_at",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_ends_with",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_includes",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_index_of",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_pad_end",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_pad_start",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_repeat",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_replace",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_slice",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_starts_with",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_substring",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_to_lower_case",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_to_upper_case",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_strings__string_trim",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_top_level__top_level_bare_expr_stmt",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_top_level__top_level_const",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_top_level__top_level_for_loop",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_top_level__top_level_if_stmt",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_top_level__top_level_let",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_top_level__top_level_mixed",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_top_level__top_level_uat_quick_scenario",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_type_features__numeric_enum_values",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "K_type_features__type_assertion_noop",
+      "set": "calib",
+      "status": "SAME"
+    },
+    {
+      "id": "C01_01_int_float",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C01_02_negzero",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C01_03_exp_large",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C01_04_exp_small",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C01_05_toFixed",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C01_06_template_concat",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C01_07_String_call",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C01_08_concat_assoc",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C01_09_nan_infinity",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C01_10_float_sums_big_literals",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C01_11_to_string_radix_precision",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C01_12_bigint",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_01_bitwise_binary",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_02_bit_not",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_03_math_max_noargs",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_04_math_nan",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C02_05_int_div_mod",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C02_06_round_floor_ceil_negative",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C02_07_parse_numbers",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_08_Number_conv_isNaN",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_09_Infinity_global",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_10_bitwise_compound_overflow",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C02_11_update_expr_value",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C02_12_math_max_three_args",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C03_01_length_unicode",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_02_index_bracket",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C03_03_charCodeAt",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C03_04_slice_unicode",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_05_substring_boundary",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUNTIME_PANIC"
+    },
+    {
+      "id": "C03_06_slice_negative",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_07_split_empty",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_08_upper_sharp_s",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C03_09_padStart_emoji",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_10_indexOf_unicode",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_11_replaceAll",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C03_12_trim_unicode_spaces",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_13_for_of_emoji",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C03_14_concat_assign",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C03_15_charAt_unicode",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C03_16_regex",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_01_default_sort_numbers",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C04_02_sort_comparator",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_03_includes_nan",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C04_04_slice_negative",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C04_05_splice",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_06_reduce_no_init",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_07_every_some_empty",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_08_find_findIndex",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_09_const_push",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_10_alias_mutation",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_11_join_union_mixed",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_12_join_numbers",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_13_index_oob",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUNTIME_PANIC"
+    },
+    {
+      "id": "C04_14_destructure_swap",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_15_spread_copy",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C04_16_for_of_then_reuse",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_17_index_by_variable",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_18_destructure_rest",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C04_19_callback_index_param",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C05_01_array_numbers",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C05_02_object_literal",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C05_03_interface_object",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C05_04_class_instance",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C05_05_multi_args",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C05_06_null_undefined",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C05_07_long_array_wrap",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C06_01_stringify_key_order",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C06_02_stringify_array_undefined",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C06_03_stringify_numbers",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C06_04_stringify_indent",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C06_05_parse_access",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C06_06_object_keys_numeric_order",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C06_07_spread_order",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C06_08_object_literal_props_dropped",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C06_09_object_property_read",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C06_10_integer_name_heuristic",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C06_11_json_key_case",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C06_12_object_reference_equality",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C07_01_map_foreach_order",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C07_02_map_for_of_destructure",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C07_03_set_ctor_dedupe",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C07_04_set_foreach_order",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C07_05_map_get_default",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C07_06_map_numeric_keys",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_01_static_counter",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_02_super_method_call",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_03_polymorphism_array",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_04_private_hash_field",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_05_private_keyword_state",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C08_06_this_in_arrow",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_07_toString_template",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_08_camelcase_members",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C08_09_inherited_method",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C08_10_this_increment",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_01_counter_factory",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_02_closure_loop_let",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_03_default_params",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_04_rest_params",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_05_recursion",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C09_06_callback_param",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_07_optional_param",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_08_module_state",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_09_array_param_mutation",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_10_identifier_case_collision",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C09_11_rust_keyword_identifiers",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "TYRUS_REFUSED"
+    },
+    {
+      "id": "C09_12_generic_function",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C09_13_arrow_const",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C09_14_nested_function_decl",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_15_camelcase_params",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C09_16_camelcase_arrow_params",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C09_17_destructured_param",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C10_01_finally_on_return",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C10_02_finally_on_throw",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C10_03_finally_overrides_return",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C10_04_rethrow_nested",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C10_05_error_message",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C10_06_custom_error_instanceof",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C10_07_throw_across_functions",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C11_01_switch_fallthrough",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C11_02_switch_default_middle",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C11_03_labeled_continue",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "TYRUS_REFUSED"
+    },
+    {
+      "id": "C11_04_break_continue",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C11_05_for_multi_vars",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C11_06_or_truthiness",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C11_07_nullish",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C11_08_optional_chaining",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C11_09_ternary_short_circuit",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C11_10_switch_grouped_cases",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C11_11_switch_string",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C11_12_while_true_break",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUNTIME_PANIC"
+    },
+    {
+      "id": "C11_13_truthiness_condition",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C12_01_await_interleave",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "DIFFERENT_OUTPUT"
+    },
+    {
+      "id": "C12_02_then_order",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C12_03_async_throw_caught",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C12_04_top_level_await",
+      "set": "probes",
+      "status": "BAD_PROBE",
+      "reason": "reference_exit_nonzero(1): SyntaxError: await is only valid in async functions and the top level bodies of modules",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C13_01_numeric_enum_reverse",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C13_02_string_enum",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C13_03_enum_arith",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C13_04_typeof_narrowing",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C13_05_literal_union",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C13_06_tuple_type",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C14_01_fizzbuzz",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "IDENTICAL"
+    },
+    {
+      "id": "C14_02_word_frequency",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C14_03_inventory_pipeline",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    },
+    {
+      "id": "C14_04_bank_account",
+      "set": "probes",
+      "status": "SAME",
+      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+    }
+  ]
+}
