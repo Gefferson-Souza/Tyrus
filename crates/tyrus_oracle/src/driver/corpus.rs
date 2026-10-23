@@ -2,18 +2,21 @@
 use std::path::{Path, PathBuf};
 
 use crate::error::OracleError;
+use crate::tuple::NodeRole;
 
 const TRANSFORM_PREFIXES: [&str; 1] = ["C13_"];
 const STRIP_FLAG: &str = "--experimental-strip-types";
 const TRANSFORM_FLAG: &str = "--experimental-transform-types";
 
-/// Enum precisa de `transform-types`; o modo só-strip rejeita a sintaxe.
+/// Enum precisa de `transform-types` na tupla semente (Node 22); no Node 26.11.1 a flag
+/// não existe (`bad option`, saída 9), então a referência usa só o modo strip e as sondas
+/// de enum viram `BadProbe` em vez de um falso `Identical`.
 #[must_use]
-pub fn node_flag(probe_id: &str) -> &'static str {
-    if TRANSFORM_PREFIXES
+pub fn node_flag(probe_id: &str, role: NodeRole) -> &'static str {
+    let needs_transform = TRANSFORM_PREFIXES
         .iter()
-        .any(|prefix| probe_id.starts_with(prefix))
-    {
+        .any(|prefix| probe_id.starts_with(prefix));
+    if needs_transform && role == NodeRole::Seed {
         TRANSFORM_FLAG
     } else {
         STRIP_FLAG

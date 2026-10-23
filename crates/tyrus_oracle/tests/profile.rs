@@ -89,3 +89,46 @@ fn profile_names_round_trip() {
     assert_eq!(Profile::LegacyTrim.as_str(), "legacy_trim");
     assert!("outro".parse::<Profile>().is_err());
 }
+
+#[test]
+fn legacy_trim_still_differs_when_the_trimmed_stdout_differs() {
+    let decision = decide(Profile::LegacyTrim, &outcome("a\n", 0), &outcome("b\n", 0));
+    assert_eq!(decision.verdict, Verdict::Different);
+    assert_eq!(decision.detail.as_deref(), Some("stdout"));
+    let decision = decide(Profile::LegacyTrim, &outcome("x\n", 0), &outcome("", 0));
+    assert_eq!(decision.verdict, Verdict::Different);
+}
+
+fn failing_reference(exit_code: i32, stderr: &str) -> Outcome {
+    Outcome {
+        exit_code: Some(exit_code),
+        stdout: Vec::new(),
+        stderr: stderr.as_bytes().to_vec(),
+        timed_out: false,
+    }
+}
+
+#[test]
+fn exact_never_trusts_a_reference_that_died_from_a_harness_error() {
+    let cases = [
+        failing_reference(9, ""),
+        failing_reference(9, "node: bad option: --experimental-transform-types\n"),
+        failing_reference(1, "node: bad option: --x\n"),
+        failing_reference(1, "SyntaxError [ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX]: enum\n"),
+    ];
+    for reference in cases {
+        let decision = decide(Profile::Exact, &reference, &reference.clone());
+        assert!(
+            matches!(decision.verdict, Verdict::BadProbe { .. }),
+            "{reference:?} => {decision:?}"
+        );
+        assert!(!decision.verdict.is_green());
+    }
+}
+
+#[test]
+fn exact_still_accepts_a_reference_that_fails_by_the_probe_itself() {
+    let reference = failing_reference(1, "Error: boom\n    at x\n");
+    let decision = decide(Profile::Exact, &reference, &reference.clone());
+    assert_eq!(decision.verdict, Verdict::Identical);
+}

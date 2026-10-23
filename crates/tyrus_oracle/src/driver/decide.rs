@@ -69,13 +69,32 @@ fn decide_exact(reference: &Outcome, hosted: &Outcome) -> Decision {
     }
 }
 
+/// Saída 9 do Node é opção inválida; os outros marcadores são falha do harness, não
+/// comportamento do programa, e nunca podem servir de oráculo.
+const HARNESS_EXIT_CODE: i32 = 9;
+const HARNESS_STDERR_MARKERS: [&str; 2] = ["bad option", "ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX"];
+
+fn reference_harness_failure(reference: &Outcome) -> Option<&'static str> {
+    let stderr = String::from_utf8_lossy(&reference.stderr);
+    if reference.exit_code == Some(HARNESS_EXIT_CODE) || stderr.contains(HARNESS_STDERR_MARKERS[0])
+    {
+        return Some("referência rejeitou a opção do Node");
+    }
+    stderr
+        .contains(HARNESS_STDERR_MARKERS[1])
+        .then_some("referência não executa a sintaxe TypeScript da sonda")
+}
+
 #[must_use]
 pub fn decide(profile: Profile, reference: &Outcome, hosted: &Outcome) -> Decision {
     if reference.timed_out {
         return bad_probe("referência estourou o tempo");
     }
     match profile {
-        Profile::Exact => decide_exact(reference, hosted),
+        Profile::Exact => match reference_harness_failure(reference) {
+            Some(reason) => bad_probe(reason),
+            None => decide_exact(reference, hosted),
+        },
         Profile::LegacyTrim => decide_legacy(reference, hosted),
     }
 }
