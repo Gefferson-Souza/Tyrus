@@ -22,6 +22,7 @@
 #   ./scripts/gates.sh machete     # cargo machete (unused dependencies)
 #   ./scripts/gates.sh unsafe      # Rule 13: forbid(unsafe_code) in every crate root
 #   ./scripts/gates.sh replica     # oracle/apps/replica: parity, request set, tooling tests (no Docker)
+#   ./scripts/gates.sh wire        # oracle/harness: HTTP/wire/state comparator, selftest, limits (no Docker)
 #   ./scripts/gates.sh node-pins   # TYRUS_NODE_REFERENCE/TYRUS_NODE_SEED apontam para o Node do oracle.lock
 #   ./scripts/gates.sh direction   # dependências respeitam front -> facts -> place -> assemble e o regime legado
 #   ./scripts/gates.sh gates-toml  # gates.toml válido e em paridade com este script e com o CI
@@ -338,15 +339,29 @@ gate_replica() {
     fi
 }
 
+gate_wire() {
+    echo "=== gate: wire ==="
+    python3 -B -I -m unittest discover -s oracle/harness/tests -t oracle/harness -p 'test_*.py'
+    python3 -B -I oracle/harness/equiv_selftest.py
+    if command -v shellcheck >/dev/null 2>&1; then
+        find oracle/harness/tools -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR
+    elif [ "${TYRUS_REQUIRE_SHELLCHECK:-0}" = "1" ]; then
+        echo "ERROR: shellcheck ausente e TYRUS_REQUIRE_SHELLCHECK=1"
+        return 1
+    else
+        echo "WARN: shellcheck ausente; etapa ignorada (o CI a exige)"
+    fi
+}
+
 # --- Dispatcher --------------------------------------------------------------
 
 cmd="${1:-all}"
 case "$cmd" in
-    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|node-pins|direction|gates-toml|gates-selftest|claims)
+    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|node-pins|direction|gates-toml|gates-selftest|claims)
         run_gate "$cmd" ;;
     all)
         guard_disk "$(cfg get thresholds.disk_min_gb_all)"
-        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica test coverage deny audit machete claims; do
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire test coverage deny audit machete claims; do
             run_gate "$name"
         done
         echo ""

@@ -94,6 +94,9 @@ state = "ACTIVE"
 [gates.replica]
 state = "ACTIVE"
 
+[gates.wire]
+state = "ACTIVE"
+
 [gates.test]
 state = "ACTIVE"
 
