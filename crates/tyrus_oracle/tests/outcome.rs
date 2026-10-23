@@ -29,14 +29,22 @@ fn first_error_line_is_the_first_name_message_pair() {
         Some("RangeError: Invalid count")
     );
     assert_eq!(
-        with_stderr("AggregateException: varios\n").error_first_line().as_deref(),
+        with_stderr("AggregateException: varios\n")
+            .error_first_line()
+            .as_deref(),
         Some("AggregateException: varios")
     );
 }
 
 #[test]
 fn lines_that_only_look_like_errors_are_ignored() {
-    assert_eq!(with_stderr("aviso: algo\nErro sem dois pontos\n").error_first_line(), None);
-    assert_eq!(with_stderr("Error sem separador\n").error_first_line(), None);
+    assert_eq!(
+        with_stderr("aviso: algo\nErro sem dois pontos\n").error_first_line(),
+        None
+    );
+    assert_eq!(
+        with_stderr("Error sem separador\n").error_first_line(),
+        None
+    );
     assert_eq!(with_stderr("nome: Error\n").error_first_line(), None);
 }
