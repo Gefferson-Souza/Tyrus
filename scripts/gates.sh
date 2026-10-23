@@ -385,7 +385,10 @@ gate_corpus_immutable() {
 
 gate_closure() {
     echo "=== gate: closure ==="
-    cargo test --locked -p tyrus_closure
+    guard_disk
+    # nextest roda um processo por teste: os testes de build escrevem e executam um npm falso,
+    # e threads do libtest concorrentes causam ETXTBSY (fork com o arquivo ainda aberto).
+    cargo nextest run --locked -p tyrus_closure
     python3 -B -I -m unittest discover -s oracle/harness/tests -t oracle/harness -p 'test_closure_trace_hook.py'
 }
 

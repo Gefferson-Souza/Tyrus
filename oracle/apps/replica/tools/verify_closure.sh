@@ -6,14 +6,15 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 ROOT="$(cd "$HERE/../../.." && pwd)"
 cd "$HERE"
 LOCK="$ROOT/oracle/oracle.lock"
-EXPECT_NODE="v$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["reference"]["node"])' "$LOCK")"
+# shellcheck source=lock_value.sh
+. "$HERE/tools/lock_value.sh"
+EXPECT_NODE="v$(lock_value node)"
 [ "$(node --version)" = "$EXPECT_NODE" ] || { echo "verify_closure: Node $(node --version), esperado $EXPECT_NODE" >&2; exit 2; }
 TYRUS="${TYRUS_BIN:-$ROOT/target/debug/tyrus}"
 [ -x "$TYRUS" ] || { echo "verify_closure: binário tyrus ausente ($TYRUS); rode cargo build -p tyrus_cli" >&2; exit 2; }
 NPM_CACHE="${NPM_CACHE:-$HOME/.cache/npm}"
 WORK="${CLOSURE_WORK:-$HOME/.local/share/tyrus-closure}/run.$$"
-free_kb=$(df -Pk "$HOME" | awk 'NR==2 {print $4}')
-[ "$free_kb" -ge 2097152 ] || { echo "verify_closure: menos de 2 GB livres" >&2; exit 1; }
+sh "$ROOT/scripts/gates/disk_guard.sh"
 mkdir -p "$WORK"
 
 export REPLICA_PG_CONTAINER="${REPLICA_PG_CONTAINER:-tyrus-wave3-closure-pg}"
@@ -54,7 +55,7 @@ echo "== typescript e pacotes só de desenvolvimento fora do fecho =="
 for blocked in typescript webpack ts-loader; do
     [ ! -e "$tree/node_modules/$blocked" ] || { echo "verify_closure: $blocked presente no fecho" >&2; exit 1; }
 done
-# @types só pode existir quando o lockfile o lista como produção (ex.: @types/validator do class-validator).
+# Aceite (4) na forma emendada (decisão do dono pendente): "lockfile manda"; @types só pode existir quando o lockfile o lista como produção (ex.: @types/validator do class-validator).
 python3 -I - "$tree" "$HERE/package-lock.json" <<'PY'
 import json, pathlib, sys
 tree, packages = pathlib.Path(sys.argv[1]), json.load(open(sys.argv[2]))["packages"]

@@ -26,6 +26,7 @@ class ClosureTraceHookTest(unittest.TestCase):
         )
         (self.root / "app" / "data.json").write_text("{}")
         (self.root / "app" / "note.txt").write_text("x")
+        (self.root / "app" / "extra.txt").write_text("y")
         (self.root / "node_modules" / "dep" / "index.js").write_text("module.exports = 1;\n")
         self.outside = self.tmp / "outside.txt"
         self.outside.write_text("fora")
@@ -66,6 +67,40 @@ class ClosureTraceHookTest(unittest.TestCase):
     def test_never_records_the_trace_file_itself(self):
         _, trace = self.run_node()
         self.assertFalse([e for e in self.entries(trace) if e["path"].endswith("trace.jsonl")])
+
+    def run_script(self, source):
+        (self.root / "app" / "main.js").write_text(source)
+        return self.run_node()
+
+    def test_missing_file_probe_is_not_recorded_as_read(self):
+        result, trace = self.run_script(
+            "try { require('fs').readFileSync(__dirname + '/nao-existe.json'); } catch (e) {}\n"
+            "require('fs').readFileSync(__dirname + '/note.txt');\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        reads = {e["path"] for e in self.entries(trace) if e["kind"] == "read"}
+        self.assertEqual(reads - {"app/main.js"}, {"app/note.txt"})
+
+    def test_async_reads_and_streams_are_recorded(self):
+        result, trace = self.run_script(
+            "const fs = require('fs');\n"
+            "fs.readFile(__dirname + '/note.txt', () => {\n"
+            "  fs.promises.readFile(__dirname + '/data.json').then(() => {\n"
+            "    fs.createReadStream(__dirname + '/extra.txt').on('data', () => {});\n"
+            "  });\n"
+            "});\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        reads = {e["path"] for e in self.entries(trace) if e["kind"] == "read"}
+        self.assertEqual(reads - {"app/main.js"}, {"app/note.txt", "app/data.json", "app/extra.txt"})
+
+    def test_package_json_consulted_by_resolution_is_recorded(self):
+        pkg = self.root / "node_modules" / "dep"
+        (pkg / "package.json").write_text('{"name":"dep","main":"lib/entry.js"}')
+        (pkg / "lib").mkdir()
+        (pkg / "lib" / "entry.js").write_text("module.exports = 1;\n")
+        result, trace = self.run_script("require('dep');\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        reads = {e["path"] for e in self.entries(trace) if e["kind"] == "read"}
+        self.assertIn("node_modules/dep/package.json", reads)
 
     def test_refuses_to_start_without_configuration(self):
         result, _ = self.run_node({"TYRUS_CLOSURE_TRACE": ""})

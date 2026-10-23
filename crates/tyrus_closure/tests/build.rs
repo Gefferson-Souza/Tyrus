@@ -4,6 +4,7 @@ mod support;
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
+use std::sync::Mutex;
 
 use tyrus_closure::{build_closure, BuildRequest};
 use tyrus_facts::{parse_closure_lock, ClosureFile};
@@ -13,15 +14,34 @@ const DEV_NPM: &str =
     "#!/bin/sh\nmkdir -p node_modules/typescript\necho 1 > node_modules/typescript/package.json\n";
 const FAILING_NPM: &str = "#!/bin/sh\necho 'registry fora do ar' >&2\nexit 7\n";
 
+const PROD_TYPES_NPM: &str =
+    "#!/bin/sh\nmkdir -p node_modules/@types/prod\necho 1 > node_modules/@types/prod/index.d.ts\n";
+const DEV_TYPES_NPM: &str =
+    "#!/bin/sh\nmkdir -p node_modules/devonly\necho 1 > node_modules/devonly/index.js\n";
+const PROD_TYPES_LOCK: &[u8] =
+    b"{\"lockfileVersion\":3,\"packages\":{\"node_modules/@types/prod\":{}}}\n";
+const DEV_ONLY_LOCK: &[u8] =
+    b"{\"lockfileVersion\":3,\"packages\":{\"node_modules/devonly\":{\"dev\":true}}}\n";
+
+// Escrever o npm falso enquanto outra thread faz fork deixa o arquivo aberto no filho: ETXTBSY.
+static SPAWN_LOCK: Mutex<()> = Mutex::new(());
+
 struct Fixture {
     root: support::TempTree,
 }
 
 impl Fixture {
     fn new(label: &str, npm_script: &str) -> Self {
+        Self::with_lockfile(label, npm_script, b"{\"lockfileVersion\":3}\n")
+    }
+
+    fn with_lockfile(label: &str, npm_script: &str, lockfile: &[u8]) -> Self {
+        let _guard = SPAWN_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         let root = support::TempTree::new(label);
         root.write("project/package.json", b"{}\n");
-        root.write("project/package-lock.json", b"{\"lockfileVersion\":3}\n");
+        root.write("project/package-lock.json", lockfile);
         root.write("emit/main.js", b"require('pg');\n");
         root.write("emit/nested/util.js", b"exports.a = 1;\n");
         let npm = root.write("fake-npm", npm_script.as_bytes());
@@ -41,6 +61,9 @@ fn build(
         base.join("emit"),
         base.join("fake-npm"),
     );
+    let _guard = SPAWN_LOCK
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
     build_closure(&BuildRequest {
         project: &project,
         emit: &emit,
@@ -123,5 +146,27 @@ fn missing_lockfile_is_refused() {
     assert_eq!(
         build(&fixture, "out").unwrap_err().stable_code(),
         "TYRUS-E7205"
+    );
+}
+
+#[test]
+fn types_package_listed_as_production_in_the_lockfile_builds() {
+    let fixture = Fixture::with_lockfile("build-types-prod", PROD_TYPES_NPM, PROD_TYPES_LOCK);
+    let report = build(&fixture, "out").unwrap();
+    assert!(report
+        .lock
+        .files()
+        .iter()
+        .any(|file| file.path() == "node_modules/@types/prod/index.d.ts"));
+}
+
+#[test]
+fn package_marked_dev_in_the_lockfile_is_refused_with_e7201() {
+    let fixture = Fixture::with_lockfile("build-dev-lock", DEV_TYPES_NPM, DEV_ONLY_LOCK);
+    let error = build(&fixture, "out").unwrap_err();
+    assert_eq!(error.stable_code(), "TYRUS-E7201");
+    assert!(
+        error.to_string().contains("node_modules/devonly"),
+        "{error}"
     );
 }

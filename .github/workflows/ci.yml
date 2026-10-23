@@ -131,6 +131,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: closure
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
       - run: ./scripts/gates.sh closure
       - run: cargo build --locked -p tyrus_cli
       - run: oracle/apps/replica/tools/verify_closure.sh
