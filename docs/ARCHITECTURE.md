@@ -69,6 +69,7 @@ A dedicated crate for handling the application's dependency graph.
 | `tyrus_common`      | Shared types (`FilePath` newtype), config, filesystem utilities.       |
 | `tyrus_test_utils`  | Test helpers including `assert_rust_compiles()`.                      |
 | `tyrus_oracle`      | Oracle root of trust: `oracle/oracle.lock` tuple pins, node probe, closed verdict algebra (`Verdict`, `Shares`). Stable codes `TYRUS-E5xxx`. |
+| `tyrus_facts`      | Front-end facts (ST1): types for `facts.json`, `closure.lock`, `partition.lock`, canonical JSON, version and sha256 validation. Stable codes `TYRUS-E71xx`. |
 
 ---
 
