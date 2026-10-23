@@ -382,7 +382,7 @@ case "$cmd" in
         run_gate "$cmd" ;;
     all)
         guard_disk "$(cfg get thresholds.disk_min_gb_all)"
-        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest audit-policy replica wire front test coverage deny audit machete claims; do
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit audit-policy machete claims; do
             run_gate "$name"
         done
         echo ""

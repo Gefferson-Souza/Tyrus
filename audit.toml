@@ -21,10 +21,3 @@ reach = "absent"
 owner = "Gefferson-Souza"
 expires = 2027-01-20
 justification = "rand unsound só com rand_core::CryptoRng customizado e um padrão de logger específico, que o projeto não constrói; some com o rand >= 0.9."
-
-[[exception]]
-id = "RUSTSEC-2026-0249"
-reach = "absent"
-owner = "Gefferson-Souza"
-expires = 2027-01-20
-justification = "smartstring sem manutenção, vem do swc_ecma_parser (parser do compilador, #242); não é vulnerabilidade e não entra no app emitido."

@@ -9,9 +9,11 @@ gates="$repo/scripts/gates.sh"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT INT TERM
 fails=0
+# Data fixa e exportada: nenhum caso depende do relógio real nem do TYRUS_AUDIT_TODAY do ambiente.
 today=2026-10-23
+export TYRUS_AUDIT_TODAY=$today
 
-policy() { TYRUS_AUDIT_TODAY=$today python3 -B -I "$here/audit_policy.py" "$@"; }
+policy() { python3 -B -I "$here/audit_policy.py" "$@"; }
 
 check() {
     name=$1
@@ -104,16 +106,38 @@ t_gate_has_no_inline_ignore() {
     ! grep -q -- '--ignore RUSTSEC' "$gates"
 }
 
+# Os casos a seguir passam por gates.sh audit (a ligação com audit_policy.py), não pelo script direto.
+# TYRUS_SKIP_AUDIT=0 explícito: o escape do ambiente não pode desligar o gate sob teste.
+t_gate_rejects_expired() {
+    entry RUSTSEC-2025-0001 absent 2026-10-22 >"$tmp/a.toml"
+    deny_for RUSTSEC-2025-0001 >"$tmp/d.toml"
+    must_fail 'expirada' env TYRUS_SKIP_AUDIT=0 TYRUS_AUDIT_TOML="$tmp/a.toml" TYRUS_DENY_TOML="$tmp/d.toml" sh "$gates" audit
+}
+
+t_gate_rejects_missing_reach() {
+    entry RUSTSEC-2025-0001 absent 2026-12-01 | grep -v '^reach' >"$tmp/a.toml"
+    deny_for RUSTSEC-2025-0001 >"$tmp/d.toml"
+    must_fail 'reach' env TYRUS_SKIP_AUDIT=0 TYRUS_AUDIT_TOML="$tmp/a.toml" TYRUS_DENY_TOML="$tmp/d.toml" sh "$gates" audit
+}
+
 # Remover a exceção de um advisory conhecido (audit.toml e deny.toml coerentes) faz o cargo audit reprovar.
+# Sem cargo audit, sem advisory-db local ou sem o advisory no Cargo.lock vivo, o caso é pulado (nao vacuo: avisa).
 t_removed_exception_fails_audit() {
-    { entry RUSTSEC-2025-0119 absent 2026-12-01; entry RUSTSEC-2026-0249 absent 2026-12-01; } >"$tmp/audit_missing.toml"
-    deny_for RUSTSEC-2025-0119 RUSTSEC-2026-0249 >"$tmp/deny_missing.toml"
-    must_fail 'RUSTSEC-2026-0097' env TYRUS_AUDIT_TOML="$tmp/audit_missing.toml" \
+    if ! (cd "$repo" && cargo audit --no-fetch --deny warnings) >"$tmp/live.out" 2>&1 \
+        && ! grep -q 'RUSTSEC-2026-0097' "$tmp/live.out"; then
+        echo "     pulado: cargo audit indisponivel ou sem advisory-db local"
+        return 0
+    fi
+    grep -q 'RUSTSEC-2026-0097' "$tmp/live.out" || {
+        echo "     pulado: RUSTSEC-2026-0097 nao aparece mais no Cargo.lock"
+        return 0
+    }
+    entry RUSTSEC-2025-0119 absent 2026-12-01 >"$tmp/audit_missing.toml"
+    deny_for RUSTSEC-2025-0119 >"$tmp/deny_missing.toml"
+    must_fail 'RUSTSEC-2026-0097' env TYRUS_SKIP_AUDIT=0 TYRUS_AUDIT_TOML="$tmp/audit_missing.toml" \
         TYRUS_DENY_TOML="$tmp/deny_missing.toml" TYRUS_AUDIT_CARGO_ARGS=--no-fetch \
         sh "$gates" audit
 }
-
-t_current_tree_green() { sh "$gates" audit; }
 
 check "audit.toml e deny.toml do repositório são válidos" t_real_policy_valid
 check "exceção expirada reprova" t_expired
@@ -123,8 +147,9 @@ check "owner, justification e id único são obrigatórios" t_required_fields
 check "deny.toml fora de sincronia com audit.toml reprova" t_deny_sync
 check "args deriva os --ignore só do audit.toml" t_args_single_source
 check "gates.sh não carrega --ignore inline" t_gate_has_no_inline_ignore
+check "gates.sh audit reprova exceção expirada" t_gate_rejects_expired
+check "gates.sh audit reprova exceção sem reach" t_gate_rejects_missing_reach
 check "remover exceção de advisory conhecido reprova no cargo audit" t_removed_exception_fails_audit
-check "gates.sh audit na árvore atual passa" t_current_tree_green
 
 if [ "$fails" -ne 0 ]; then
     echo "test_audit_policy: $fails falha(s)"
