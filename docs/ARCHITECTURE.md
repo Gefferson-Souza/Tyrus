@@ -71,6 +71,7 @@ A dedicated crate for handling the application's dependency graph.
 | `tyrus_oracle`      | Oracle root of trust: `oracle/oracle.lock` tuple pins, node probe, closed verdict algebra (`Verdict`, `Shares`). Stable codes `TYRUS-E5xxx`. |
 | `tyrus_archive`     | Runtime closure archive: deterministic `ArchiveWriter`/`ArchiveReader` (zstd per entry, sha256 per entry and set), `tyrus-archive inspect --json`. Stable codes `TYRUS-E81xx`. Depends on no compiler crate. |
 | `tyrus_facts`      | Front-end facts (ST1): types for `facts.json`, `closure.lock`, `partition.lock`, canonical JSON, version and sha256 validation. Stable codes `TYRUS-E71xx`. |
+| `tyrus_closure`    | Production closure: tree assembly (`npm ci --omit=dev` + app emit), `closure.lock` via `tyrus_facts`, validation against the oracle's module-load trace. Stable codes `TYRUS-E72xx`. |
 
 ---
 
