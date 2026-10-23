@@ -1,0 +1,23 @@
+[package]
+name = "tyrus_closure"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Fecho de produção do app (ST1.5): monta a árvore, grava closure.lock e valida o fecho contra o rastro de carga do oráculo."
+publish = false
+
+[lib]
+name = "tyrus_closure"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+tyrus_facts = { path = "../tyrus_facts" }
+
+[lints]
+workspace = true

@@ -10,6 +10,7 @@
 )]
 
 mod cli;
+mod cli_closure;
 mod cli_gate;
 mod compilation;
 mod equivalence;

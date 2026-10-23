@@ -5,7 +5,8 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$HERE"
 LOCK="$HERE/../../oracle.lock"
 [ -f "$LOCK" ] || { echo "verify_replica: oracle.lock ausente ($LOCK)" >&2; exit 2; }
-lock_value() { python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["reference"][sys.argv[2]])' "$LOCK" "$1"; }
+# shellcheck source=lock_value.sh
+. "$HERE/tools/lock_value.sh"
 EXPECT_NODE="${EXPECT_NODE:-v$(lock_value node)}"
 EXPECT_TUPLE="$(lock_value v8) $(lock_value icu) $(lock_value tz) $(lock_value cldr)"
 OUT="${REPLICA_OUT:-$HOME/.local/share/tyrus-replica/runs}"
