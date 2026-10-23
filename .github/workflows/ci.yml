@@ -44,6 +44,8 @@ jobs:
       # gates.toml is the single source of thresholds and gate state; it must stay
       # valid and in parity with gates.sh and this workflow.
       - run: ./scripts/gates.sh gates-toml
+      # Prints SKIPPED(<phase>) until the docs migration activates it; never a silent pass.
+      - run: ./scripts/gates.sh claims
 
   # Replica gate (oracle/apps/replica): parity with Gate 0, request set, tooling tests.
   # The Docker end-to-end run is the replica-e2e job below (change detection inside the job).

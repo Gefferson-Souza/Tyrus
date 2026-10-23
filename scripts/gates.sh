@@ -238,64 +238,9 @@ gate_filesize() {
     return "$fail"
 }
 
-# Raiz de crate -> "crate:raiz" para cada lib.rs/main.rs; o membro tests é legado.
-crate_roots() {
-    for root in crates/*/src/lib.rs crates/*/src/main.rs tests/src/lib.rs; do
-        [ -f "$root" ] || continue
-        case "$root" in
-            crates/*) crate=${root#crates/}; crate=${crate%%/*} ;;
-            *) crate=integration_tests ;;
-        esac
-        echo "$crate:$root"
-    done
-}
-
-unsafe_modules_of() {
-    cfg get "unsafe_allowlist.modules.$1" 2>/dev/null || true
-}
-
-# Em crate da allowlist, #[allow(unsafe_code)] só vale em arquivo nomeado em gates.toml.
-check_allow_modules() {
-    crate=$1
-    named=$(unsafe_modules_of "$crate")
-    fail=0
-    for file in $(grep -rl 'allow(unsafe_code)' "crates/$crate/src" 2>/dev/null || true); do
-        rel=${file#"crates/$crate/src/"}
-        if ! echo "$named" | grep -qxF "$rel"; then
-            echo "FAIL: allow(unsafe_code) em $file, módulo não nomeado em gates.toml [unsafe_allowlist.modules]"
-            fail=1
-        fi
-    done
-    return "$fail"
-}
-
 gate_unsafe() {
     echo "=== gate: unsafe ==="
-    # PoT R13 emendada pelo ADR 0016: crate fora da allowlist declara
-    # #![forbid(unsafe_code)]; crate da allowlist declara #![deny(unsafe_code)] e só
-    # abre #[allow(unsafe_code)] em módulos nomeados em gates.toml. O lint do
-    # workspace é deny (forbid no workspace impediria o allow), então o forbid
-    # por crate é o que esta porta garante que nunca desaparece.
-    allowlist=$(cfg get unsafe_allowlist.crates)
-    fail=0
-    for entry in $(crate_roots); do
-        crate=${entry%%:*}
-        root=${entry#*:}
-        if echo "$allowlist" | grep -qx "$crate"; then
-            wanted='deny'
-            check_allow_modules "$crate" || fail=1
-        else
-            wanted='forbid'
-        fi
-        if ! grep -q "^#!\[$wanted(unsafe_code)\]" "$root"; then
-            echo "FAIL: missing #![$wanted(unsafe_code)] in $root ($crate)"
-            fail=1
-        fi
-    done
-    if [ "$fail" -eq 0 ]; then
-        echo "All crate roots declare their unsafe_code level."
-    fi
-    return "$fail"
+    sh "$script_dir/gates/unsafe_check.sh"
 }
 
 gate_direction() {

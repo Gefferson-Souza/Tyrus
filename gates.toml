@@ -116,4 +116,3 @@ ci_exempt = "chamado por test e coverage, que sao passos de CI"
 [gates.claims]
 state = "SKIPPED"
 activates_in = "docs-claims-migration"
-ci_exempt = "SKIPPED ate a migracao dos docs"

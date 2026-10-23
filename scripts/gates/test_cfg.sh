@@ -57,6 +57,10 @@ make_member() {
     printf '#![forbid(unsafe_code)]\n' >"$dir/src/lib.rs"
 }
 
+with_workspace_lints() {
+    printf '\n[lints]\nworkspace = true\n' >>"$1/crates/$2/Cargo.toml"
+}
+
 make_workspace() {
     mkdir -p "$1/crates"
     printf '[workspace]\nmembers = ["crates/*"]\nresolver = "2"\n' >"$1/Cargo.toml"
@@ -118,11 +122,43 @@ t_unsafe_roots() {
     printf '#![forbid(unsafe_code)]\n' >"$ok/crates/tyrus_demo/src/lib.rs"
     gate_with "$ok" "$toml" unsafe || return 1
     make_member "$ok" tyrus_host
+    with_workspace_lints "$ok" tyrus_host
     must_fail 'tyrus_host' gate_with "$ok" "$toml" unsafe || return 1
     printf '#![deny(unsafe_code)]\n' >"$ok/crates/tyrus_host/src/lib.rs"
     gate_with "$ok" "$toml" unsafe || return 1
     printf '#![deny(unsafe_code)]\n#[allow(unsafe_code)]\nmod ffi {}\n' >"$ok/crates/tyrus_host/src/lib.rs"
-    must_fail 'allow(unsafe_code)' gate_with "$ok" "$toml" unsafe
+    must_fail 'unsafe_code liberado' gate_with "$ok" "$toml" unsafe
+}
+
+# Formas equivalentes de abrir unsafe_code fora do módulo nomeado devem reprovar.
+t_unsafe_allow_variants() {
+    fx="$tmp/un_var"
+    make_workspace "$fx"
+    make_member "$fx" tyrus_host
+    with_workspace_lints "$fx" tyrus_host
+    for body in \
+        '#[allow(dead_code, unsafe_code)]' \
+        '#[expect(unsafe_code)]' \
+        '#![allow(unsafe_code)]' \
+        '#[cfg_attr(not(test), allow(
+    unsafe_code,
+))]'; do
+        printf '#![deny(unsafe_code)]\n%s\nmod ffi {}\n' "$body" >"$fx/crates/tyrus_host/src/lib.rs"
+        must_fail 'unsafe_code liberado' gate_with "$fx" "$toml" unsafe || return 1
+    done
+    printf '#![deny(unsafe_code)]\n#[cfg_attr(test, deny(unsafe_code))]\n// allow(unsafe_code) em comentário\nmod ffi {}\n' \
+        >"$fx/crates/tyrus_host/src/lib.rs"
+    gate_with "$fx" "$toml" unsafe
+}
+
+t_unsafe_needs_workspace_lints() {
+    fx="$tmp/un_lints"
+    make_workspace "$fx"
+    make_member "$fx" tyrus_host
+    printf '#![deny(unsafe_code)]\n' >"$fx/crates/tyrus_host/src/lib.rs"
+    must_fail 'workspace = true' gate_with "$fx" "$toml" unsafe || return 1
+    with_workspace_lints "$fx" tyrus_host
+    gate_with "$fx" "$toml" unsafe
 }
 
 lint_workspace() {
@@ -168,7 +204,12 @@ t_parity_detects_drift() {
     printf 'gate_phantom() {\n    :\n}\n' >>"$tmp/par/gates.sh"
     must_fail 'phantom' cfg parity --gates-sh "$tmp/par/gates.sh" || return 1
     awk '/^\[gates.audit\]/ {skip=1; next} /^\[/ {skip=0} !skip {print}' "$toml" >"$tmp/par.toml"
-    must_fail 'audit' cfg parity "$tmp/par.toml"
+    must_fail 'audit' cfg parity "$tmp/par.toml" || return 1
+    ci="$repo/.github/workflows/ci.yml"
+    grep -v 'gates.sh direction' "$ci" >"$tmp/par/ci_missing.yml"
+    must_fail "gate 'direction' sem passo" cfg parity --ci "$tmp/par/ci_missing.yml" || return 1
+    { cat "$ci"; printf '      - run: ./scripts/gates.sh phantom\n'; } >"$tmp/par/ci_phantom.yml"
+    must_fail "ci.yml chama gate inexistente 'phantom'" cfg parity --ci "$tmp/par/ci_phantom.yml"
 }
 
 t_get_values() {
@@ -184,6 +225,8 @@ check "gate SKIPPED imprime SKIPPED( e nunca PASS" t_skipped_never_pass
 check "SKIPPED vence a falha do gate" t_skipped_overrides_failure
 check "direction reprova dependência invertida e legado" t_direction
 check "unsafe exige forbid/deny e módulos nomeados" t_unsafe_roots
+check "unsafe reprova allow/expect/cfg_attr equivalentes" t_unsafe_allow_variants
+check "unsafe exige lints do workspace na allowlist" t_unsafe_needs_workspace_lints
 check "clippy exige SAFETY em unsafe" t_unsafe_needs_safety_comment
 check "validate reprova limiares ausentes ou inválidos" t_validate_rejects
 check "parity detecta gate fantasma e gate sem entrada" t_parity_detects_drift
