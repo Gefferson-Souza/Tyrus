@@ -91,6 +91,26 @@ jobs:
       - if: steps.changes.outputs.run == 'true'
         run: oracle/harness/tools/verify_wire.sh
 
+  # Front-end ST0 (front/): node --test, TypeScript matrix and the 1500-line ceiling.
+  front:
+    name: Front (ST0 emit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup Node.js 22.21.1 (oracle seed tuple)
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.21.1'
+      - name: Pin the seed Node binary
+        run: echo "TYRUS_NODE_SEED=$(command -v node)" >> "$GITHUB_ENV"
+      - name: Setup Node.js 26.11.1 (oracle reference tuple)
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26.11.1'
+      - name: Pin the reference Node binary
+        run: echo "TYRUS_NODE_REFERENCE=$(command -v node)" >> "$GITHUB_ENV"
+      - run: ./scripts/gates.sh front
+
   # MSRV — the workspace must keep compiling on the declared minimum
   # supported Rust version ([workspace.package] rust-version).
   msrv:

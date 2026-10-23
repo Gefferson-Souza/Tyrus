@@ -1,0 +1,11 @@
+{
+  "name": "tyrus-front",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ST0 do Tyrus: emit por arquivo com o TypeScript do próprio projeto e facts.json mínimo",
+  "engines": { "node": "26.11.1" },
+  "scripts": {
+    "test": "node --test front/test/"
+  }
+}

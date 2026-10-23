@@ -97,6 +97,9 @@ state = "ACTIVE"
 [gates.wire]
 state = "ACTIVE"
 
+[gates.front]
+state = "ACTIVE"
+
 [gates.test]
 state = "ACTIVE"
 

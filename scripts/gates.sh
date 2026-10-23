@@ -23,6 +23,7 @@
 #   ./scripts/gates.sh unsafe      # Rule 13: forbid(unsafe_code) in every crate root
 #   ./scripts/gates.sh replica     # oracle/apps/replica: parity, request set, tooling tests (no Docker)
 #   ./scripts/gates.sh wire        # oracle/harness: HTTP/wire/state comparator, selftest, limits (no Docker)
+#   ./scripts/gates.sh front       # front/ (ST0): node --test, matriz de TypeScript e teto de 1500 linhas
 #   ./scripts/gates.sh node-pins   # TYRUS_NODE_REFERENCE/TYRUS_NODE_SEED apontam para o Node do oracle.lock
 #   ./scripts/gates.sh direction   # dependências respeitam front -> facts -> place -> assemble e o regime legado
 #   ./scripts/gates.sh gates-toml  # gates.toml válido e em paridade com este script e com o CI
@@ -353,15 +354,28 @@ gate_wire() {
     fi
 }
 
+gate_front() {
+    echo "=== gate: front ==="
+    gate_node_pins
+    # Instala 3 TypeScript e a réplica (~270 MB) na primeira execução.
+    sh scripts/gates/disk_guard.sh
+    "$TYRUS_NODE_REFERENCE" --test front/test/
+    lines=$(find front -name '*.ts' -not -path '*/node_modules/*' -exec cat {} + | wc -l)
+    if [ "$lines" -gt 1500 ]; then
+        echo "FAIL: front/ tem $lines linhas de TypeScript (teto 1500)"
+        return 1
+    fi
+}
+
 # --- Dispatcher --------------------------------------------------------------
 
 cmd="${1:-all}"
 case "$cmd" in
-    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|node-pins|direction|gates-toml|gates-selftest|claims)
+    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|claims)
         run_gate "$cmd" ;;
     all)
         guard_disk "$(cfg get thresholds.disk_min_gb_all)"
-        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire test coverage deny audit machete claims; do
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit machete claims; do
             run_gate "$name"
         done
         echo ""

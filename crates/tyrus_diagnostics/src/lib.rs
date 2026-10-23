@@ -23,6 +23,8 @@ pub enum ErrorCategory {
     Io,
     /// Formatting of the generated Rust source.
     Format,
+    /// Front-end sidecar (project TypeScript resolution, emit, facts).
+    Frontend,
 }
 
 impl ErrorCategory {
@@ -35,6 +37,7 @@ impl ErrorCategory {
             Self::Codegen => "codegen",
             Self::Io => "io",
             Self::Format => "format",
+            Self::Frontend => "frontend",
         }
     }
 }
@@ -43,7 +46,7 @@ impl TyrusError {
     /// Stable machine-readable code (Rule 14). Codes never change meaning or
     /// get reused; the leading digit encodes the category block:
     /// `E0xxx` parse, `E1xxx` analyze, `E2xxx` codegen (reserved),
-    /// `E3xxx` io/input, `E4xxx` format, `E9999` unknown.
+    /// `E3xxx` io/input, `E4xxx` format, `E7xxx` front-end, `E9999` unknown.
     #[must_use]
     pub fn stable_code(&self) -> &'static str {
         match self {
@@ -56,6 +59,7 @@ impl TyrusError {
             Self::IoError(_) => "TYRUS-E3001",
             Self::Validation(_) => "TYRUS-E3002",
             Self::FormattingError(_) => "TYRUS-E4001",
+            Self::MissingProjectTypescript { .. } => "TYRUS-E7001",
             Self::Unknown => "TYRUS-E9999",
         }
     }
@@ -73,6 +77,7 @@ impl TyrusError {
             | Self::AmbiguousMainEntrypoint { .. } => ErrorCategory::Analyze,
             Self::IoError(_) | Self::Validation(_) | Self::Unknown => ErrorCategory::Io,
             Self::FormattingError(_) => ErrorCategory::Format,
+            Self::MissingProjectTypescript { .. } => ErrorCategory::Frontend,
         }
     }
 }
@@ -177,6 +182,17 @@ pub enum TyrusError {
     /// CLI/input validation failure (`TYRUS-E3002`).
     Validation(String),
 
+    #[error(
+        "Front-end Error: o projeto em {root} não tem `typescript` local; \
+         instale a versão do projeto (o Tyrus usa o TypeScript do próprio projeto)."
+    )]
+    #[diagnostic(code(tyrus::frontend::missing_typescript))]
+    /// Project has no local `typescript` package (`TYRUS-E7001`).
+    MissingProjectTypescript {
+        /// Project root where `typescript` was looked up.
+        root: String,
+    },
+
     #[error("Unknown Error")]
     #[diagnostic(code(tyrus::unknown))]
     /// Catch-all with no attributable stage (`TYRUS-E9999`).
@@ -232,6 +248,9 @@ mod tests {
             },
             TyrusError::FormattingError("f".into()),
             TyrusError::Validation("v".into()),
+            TyrusError::MissingProjectTypescript {
+                root: "/project".into(),
+            },
             TyrusError::Unknown,
         ]
     }
@@ -241,6 +260,16 @@ mod tests {
         let variants = all_variants();
         let codes: HashSet<&str> = variants.iter().map(TyrusError::stable_code).collect();
         assert_eq!(codes.len(), variants.len(), "duplicate stable code");
+    }
+
+    #[test]
+    fn missing_project_typescript_has_the_front_end_code() {
+        let error = TyrusError::MissingProjectTypescript {
+            root: "/project".into(),
+        };
+        assert_eq!(error.stable_code(), "TYRUS-E7001");
+        assert_eq!(error.category(), ErrorCategory::Frontend);
+        assert_eq!(error.category().as_str(), "frontend");
     }
 
     #[test]
@@ -267,6 +296,7 @@ mod tests {
                 ErrorCategory::Codegen => '2',
                 ErrorCategory::Io => '3',
                 ErrorCategory::Format => '4',
+                ErrorCategory::Frontend => '7',
             };
             // Unknown (E9999) is the deliberate exception in the Io catch-all.
             if e.stable_code() != "TYRUS-E9999" {
