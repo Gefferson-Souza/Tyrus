@@ -179,3 +179,58 @@ fn run_rejects_unknown_corpus_profile_and_reference() {
         assert!(result.stderr.contains(needle), "{flag}: {}", result.stderr);
     }
 }
+
+#[test]
+fn run_with_a_promoted_cmd_records_the_third_leg() {
+    let out = scratch("promoted-out");
+    let mut args = base_args("promoted", &out);
+    let promoted_dir = scratch("promoted-leg");
+    let promoted = node_target(&promoted_dir);
+    args.extend(["--promoted-cmd".to_owned(), promoted.display().to_string()]);
+    let result = run_cli(&args, process_env);
+    assert_eq!(result.code, 0, "{}", result.stderr);
+    let text = fs::read_to_string(out.join("C01_02_negzero/equivalence.json")).unwrap();
+    let record: Value = serde_json::from_str(&text).unwrap();
+    assert_eq!(record["promoted"]["verdict"]["kind"], "identical", "{text}");
+    assert!(record["promoted_target"]["command"]
+        .as_str()
+        .unwrap()
+        .ends_with("target.sh"));
+    let schema_path = root().join("schemas/equivalence.schema.json");
+    let schema: Value = serde_json::from_str(&fs::read_to_string(schema_path).unwrap()).unwrap();
+    assert!(
+        jsonschema::validator_for(&schema)
+            .unwrap()
+            .is_valid(&record),
+        "{text}"
+    );
+}
+
+#[test]
+fn run_with_a_mutating_promoted_cmd_is_not_green() {
+    let out = scratch("promoted-bad-out");
+    let mut args = base_args("promoted-bad", &out);
+    let dir = scratch("promoted-bad-leg");
+    let node = std::env::var("TYRUS_NODE_REFERENCE").unwrap();
+    let path = dir.join("mut.sh");
+    fs::write(
+        &path,
+        format!("#!/bin/sh\n{node} --experimental-strip-types \"$1\" | sed '1s/./Z/'\n"),
+    )
+    .unwrap();
+    fs::set_permissions(&path, fs::Permissions::from_mode(0o755)).unwrap();
+    args.extend(["--promoted-cmd".to_owned(), path.display().to_string()]);
+    let result = run_cli(&args, process_env);
+    let text = fs::read_to_string(out.join("C01_02_negzero/equivalence.json")).unwrap();
+    let record: Value = serde_json::from_str(&text).unwrap();
+    assert_eq!(record["promoted"]["verdict"]["kind"], "different", "{text}");
+    assert_eq!(record["result"]["verdict"]["kind"], "identical", "{text}");
+    assert_eq!(result.code, 1, "{}", result.stderr);
+    assert!(
+        result
+            .stdout
+            .starts_with("run: 1 sondas, 0 verdes, 1 não verdes\n"),
+        "{}",
+        result.stdout
+    );
+}

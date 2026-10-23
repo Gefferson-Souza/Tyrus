@@ -6,6 +6,7 @@ use std::time::Duration;
 
 use crate::driver::corpus::default_probes_dir;
 use crate::driver::profile::Profile;
+use crate::driver::record::ShimCanary;
 use crate::driver::run::{run_corpus, RunConfig, RunSummary};
 use crate::driver::runner::CommandSpec;
 use crate::error::OracleError;
@@ -21,7 +22,7 @@ pub const EXIT_USAGE: u8 = 64;
 pub const RUN_USAGE: &str = "uso: tyrus-oracle run --corpus <seed|live> --reference node \
 --hosted-cmd <cmd> [--promoted-cmd <cmd>] [--profile exact|legacy_trim] \
 [--tuple-role reference|seed] [--out <dir>] [--lock <caminho>] [--probes-dir <dir>] \
-[--shim <arquivo>] [--filter <prefixo>] [--hosted-timeout-ms <n>]";
+[--shim <arquivo>] [--filter <prefixo>] [--hosted-timeout-ms <n>] [--self-check]";
 
 const DEFAULT_LOCK_PATH: &str = "oracle/oracle.lock";
 const DEFAULT_SHIM_PATH: &str = "oracle/shim/fix-env.js";
@@ -42,6 +43,7 @@ struct RunOptions {
     shim: PathBuf,
     filter: Option<String>,
     hosted_timeout: Duration,
+    self_check: bool,
 }
 
 fn apply_flag(options: &mut RunOptions, flag: &str, value: &str) -> Result<(), String> {
@@ -82,9 +84,14 @@ fn parse_run(args: &[String]) -> Result<RunOptions, String> {
         shim: PathBuf::from(DEFAULT_SHIM_PATH),
         filter: None,
         hosted_timeout: Duration::from_millis(DEFAULT_HOSTED_TIMEOUT_MS),
+        self_check: false,
     };
     let mut rest = args.iter();
     while let Some(flag) = rest.next() {
+        if flag == "--self-check" {
+            options.self_check = true;
+            continue;
+        }
         let value = rest
             .next()
             .ok_or_else(|| format!("{flag} exige um valor"))?;
@@ -162,6 +169,7 @@ where
         hosted: CommandSpec::parse(hosted)?,
         promoted,
         shim: absolute(options.shim.clone()),
+        self_check: options.self_check,
         filter: options.filter.clone(),
         reference_timeout: REFERENCE_TIMEOUT,
         hosted_timeout: options.hosted_timeout,
@@ -177,6 +185,16 @@ fn report(summary: &RunSummary, out: &mut dyn Write) -> io::Result<u8> {
         summary.green_count(),
         total - summary.green_count()
     )?;
+    if summary
+        .records
+        .iter()
+        .any(|record| record.shim_canary == ShimCanary::NotApplied)
+    {
+        writeln!(
+            out,
+            "aviso: o alvo não aplicou o shim de determinismo (canário falhou)"
+        )?;
+    }
     Ok(if summary.all_green() {
         EXIT_OK
     } else {

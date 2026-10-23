@@ -2,6 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::driver::outcome::{sha256_hex, Outcome};
+use crate::driver::runner::CommandSpec;
 use crate::tuple::NodeTuple;
 use crate::verdict::{Verdict, VerdictRecord};
 
@@ -40,6 +41,40 @@ pub struct PromotedRecord {
     pub side: SideRecord,
 }
 
+/// Identifica o alvo julgado: sem isso um Node contra Node seria indistinguível de um
+/// baseline hospedado real para o ledger.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TargetRecord {
+    pub command: String,
+    pub program_sha256: Option<String>,
+}
+
+impl TargetRecord {
+    #[must_use]
+    pub fn from_spec(spec: &CommandSpec) -> Self {
+        let command = std::iter::once(spec.program.display().to_string())
+            .chain(spec.args.iter().cloned())
+            .collect::<Vec<_>>()
+            .join(" ");
+        Self {
+            command,
+            program_sha256: std::fs::read(&spec.program)
+                .ok()
+                .map(|bytes| sha256_hex(&bytes)),
+        }
+    }
+}
+
+/// Resultado do canário que imprime `Date.now()`: prova que o alvo carregou o shim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ShimCanary {
+    Applied,
+    NotApplied,
+    NotChecked,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct EquivalenceRecord {
@@ -50,6 +85,11 @@ pub struct EquivalenceRecord {
     pub tuple_role: String,
     pub tuple: NodeTuple,
     pub shim_sha256: Option<String>,
+    pub shim_canary: ShimCanary,
+    /// `true` quando o alvo hospedado é o próprio Node: o ledger não aceita como baseline.
+    pub self_check: bool,
+    pub hosted_target: TargetRecord,
+    pub promoted_target: Option<TargetRecord>,
     pub reference_stable: bool,
     pub result: VerdictRecord,
     pub detail: Option<String>,

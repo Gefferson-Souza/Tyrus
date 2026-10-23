@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "required": [
     "schema_version", "probe", "corpus", "profile", "tuple_role", "tuple", "shim_sha256",
-    "reference_stable", "result", "detail", "reference", "hosted", "promoted"
+    "shim_canary", "self_check", "hosted_target", "promoted_target", "reference_stable", "result", "detail", "reference", "hosted", "promoted"
   ],
   "properties": {
     "schema_version": { "const": 1 },
@@ -25,6 +25,10 @@
       }
     },
     "shim_sha256": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sha256" }] },
+    "shim_canary": { "enum": ["applied", "not_applied", "not_checked"] },
+    "self_check": { "type": "boolean" },
+    "hosted_target": { "$ref": "#/$defs/target" },
+    "promoted_target": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/target" }] },
     "reference_stable": { "type": "boolean" },
     "result": { "type": "object", "required": ["verdict", "shares"] },
     "detail": { "type": ["string", "null"] },
@@ -48,6 +52,15 @@
   },
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "program_sha256"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "program_sha256": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sha256" }] }
+      }
+    },
     "side": {
       "type": "object",
       "additionalProperties": false,

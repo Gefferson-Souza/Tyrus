@@ -9,7 +9,8 @@ use crate::driver::decide::decide;
 use crate::driver::outcome::{sha256_hex, Outcome};
 use crate::driver::profile::Profile;
 use crate::driver::record::{
-    EquivalenceRecord, PromotedRecord, SideRecord, EQUIVALENCE_SCHEMA_VERSION,
+    EquivalenceRecord, PromotedRecord, ShimCanary, SideRecord, TargetRecord,
+    EQUIVALENCE_SCHEMA_VERSION,
 };
 use crate::driver::runner::{run_command, CommandSpec, RunEnv};
 use crate::error::OracleError;
@@ -29,6 +30,8 @@ pub struct RunConfig {
     pub hosted: CommandSpec,
     pub promoted: Option<CommandSpec>,
     pub shim: PathBuf,
+    /// Declara que o alvo hospedado é o próprio Node (auto-verificação do harness).
+    pub self_check: bool,
     pub filter: Option<String>,
     pub reference_timeout: Duration,
     pub hosted_timeout: Duration,
@@ -39,12 +42,21 @@ pub struct RunSummary {
     pub records: Vec<EquivalenceRecord>,
 }
 
+/// Verde exige o hospedado e, quando existe, o promovido verdes: a terceira perna não é opcional.
+fn record_is_green(record: &EquivalenceRecord) -> bool {
+    record.result.verdict.is_green()
+        && record
+            .promoted
+            .as_ref()
+            .is_none_or(|promoted| promoted.verdict.is_green())
+}
+
 impl RunSummary {
     #[must_use]
     pub fn green_count(&self) -> usize {
         self.records
             .iter()
-            .filter(|record| record.result.verdict.is_green())
+            .filter(|record| record_is_green(record))
             .count()
     }
 
@@ -86,6 +98,60 @@ fn read_shim_hash(cfg: &RunConfig) -> Result<Option<String>, OracleError> {
     Ok(Some(sha256_hex(&bytes)))
 }
 
+const CANARY_FILE: &str = "canary.ts";
+const CANARY_STDOUT: &str = "1700000000000";
+
+/// Dados do cabeçalho comuns a todas as sondas da execução.
+struct RunContext {
+    shim_hash: Option<String>,
+    shim_canary: ShimCanary,
+    self_check: bool,
+    hosted_target: TargetRecord,
+    promoted_target: Option<TargetRecord>,
+}
+
+fn canary_applied(cfg: &RunConfig, spec: &CommandSpec, env: &RunEnv) -> Result<bool, OracleError> {
+    let canary = cfg.shim.with_file_name(CANARY_FILE);
+    let outcome = run_command(
+        spec,
+        &[canary.display().to_string()],
+        &cfg.probes_dir,
+        env,
+        cfg.hosted_timeout,
+    )?;
+    Ok(String::from_utf8_lossy(&outcome.stdout).trim() == CANARY_STDOUT)
+}
+
+fn build_context(cfg: &RunConfig, shim_hash: Option<String>) -> Result<RunContext, OracleError> {
+    let env = base_env(cfg, shim_hash.as_deref());
+    let shim_canary = if shim_hash.is_none() {
+        ShimCanary::NotChecked
+    } else {
+        let mut applied = canary_applied(cfg, &cfg.hosted, &env)?;
+        if let Some(spec) = &cfg.promoted {
+            applied &= canary_applied(cfg, spec, &env)?;
+        }
+        if applied {
+            ShimCanary::Applied
+        } else {
+            ShimCanary::NotApplied
+        }
+    };
+    let hosted_target = TargetRecord::from_spec(&cfg.hosted);
+    let reference_sha = std::fs::read(&cfg.reference_node)
+        .ok()
+        .map(|bytes| sha256_hex(&bytes));
+    let same_program =
+        hosted_target.program_sha256.is_some() && hosted_target.program_sha256 == reference_sha;
+    Ok(RunContext {
+        shim_hash,
+        shim_canary,
+        self_check: cfg.self_check || same_program,
+        hosted_target,
+        promoted_target: cfg.promoted.as_ref().map(TargetRecord::from_spec),
+    })
+}
+
 struct ReferenceRuns {
     outcome: Outcome,
     stable: bool,
@@ -94,7 +160,7 @@ struct ReferenceRuns {
 fn run_reference(cfg: &RunConfig, id: &str, env: &RunEnv) -> Result<ReferenceRuns, OracleError> {
     let spec = CommandSpec {
         program: cfg.reference_node.clone(),
-        args: vec![node_flag(id).to_owned()],
+        args: vec![node_flag(id, cfg.tuple_role).to_owned()],
     };
     let args = [probe_arg(cfg, id)];
     let timeout = cfg.reference_timeout;
@@ -139,9 +205,9 @@ fn run_target(
 fn run_probe(
     cfg: &RunConfig,
     id: &str,
-    shim_hash: Option<&String>,
+    ctx: &RunContext,
 ) -> Result<EquivalenceRecord, OracleError> {
-    let env = base_env(cfg, shim_hash.map(String::as_str));
+    let env = base_env(cfg, ctx.shim_hash.as_deref());
     let reference = run_reference(cfg, id, &env)?;
     let (verdict, detail, hosted, promoted) = if reference.stable {
         judge_targets(cfg, id, &env, &reference.outcome)?
@@ -155,7 +221,11 @@ fn run_probe(
         profile: cfg.profile.as_str().to_owned(),
         tuple_role: cfg.tuple_role.as_str().to_owned(),
         tuple: cfg.tuple.clone(),
-        shim_sha256: shim_hash.cloned(),
+        shim_sha256: ctx.shim_hash.clone(),
+        shim_canary: ctx.shim_canary,
+        self_check: ctx.self_check,
+        hosted_target: ctx.hosted_target.clone(),
+        promoted_target: ctx.promoted_target.clone(),
         reference_stable: reference.stable,
         result: VerdictRecord {
             verdict,
@@ -218,10 +288,10 @@ fn write_record(out_dir: &Path, record: &EquivalenceRecord) -> Result<(), Oracle
 
 pub fn run_corpus(cfg: &RunConfig) -> Result<RunSummary, OracleError> {
     let ids = list_probes(&cfg.probes_dir, cfg.filter.as_deref())?;
-    let shim_hash = read_shim_hash(cfg)?;
+    let ctx = build_context(cfg, read_shim_hash(cfg)?)?;
     let mut records = Vec::with_capacity(ids.len());
     for id in &ids {
-        let record = run_probe(cfg, id, shim_hash.as_ref())?;
+        let record = run_probe(cfg, id, &ctx)?;
         write_record(&cfg.out_dir, &record)?;
         records.push(record);
     }

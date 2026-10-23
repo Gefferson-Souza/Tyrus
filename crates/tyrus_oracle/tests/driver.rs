@@ -6,7 +6,8 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use tyrus_oracle::driver::profile::Profile;
-use tyrus_oracle::driver::run::{run_corpus, RunConfig};
+use tyrus_oracle::driver::record::ShimCanary;
+use tyrus_oracle::driver::run::{run_corpus, RunConfig, RunSummary};
 use tyrus_oracle::driver::runner::CommandSpec;
 use tyrus_oracle::lock::OracleLock;
 use tyrus_oracle::tuple::NodeRole;
@@ -36,9 +37,7 @@ fn write_script(dir: &Path, name: &str, body: &str) -> PathBuf {
     path
 }
 
-const FLAG_PICKER: &str =
-    "case \"$(basename \"$1\")\" in C13_*) flag=--experimental-transform-types;; \
-*) flag=--experimental-strip-types;; esac";
+const FLAG_PICKER: &str = "flag=--experimental-strip-types";
 
 fn node_target(dir: &Path, suffix: &str) -> CommandSpec {
     let body = format!(
@@ -61,6 +60,7 @@ fn config(name: &str, probes: PathBuf, hosted: CommandSpec) -> RunConfig {
         hosted,
         promoted: None,
         shim: manifest().join("../../oracle/shim/fix-env.js"),
+        self_check: false,
         filter: None,
         reference_timeout: Duration::from_secs(20),
         hosted_timeout: Duration::from_secs(10),
@@ -191,4 +191,100 @@ fn an_empty_probes_dir_is_an_error() {
     let targets = scratch("empty-target");
     let error = run_corpus(&config("empty", probes, node_target(&targets, ""))).unwrap_err();
     assert_eq!(error.stable_code(), "TYRUS-E5011");
+}
+
+#[test]
+fn a_probe_the_reference_cannot_run_is_a_bad_probe_never_identical() {
+    let targets = scratch("c13-target");
+    let mut cfg = config("c13", seed_probes(), node_target(&targets, ""));
+    cfg.filter = Some("C13_01".to_owned());
+    let summary = run_corpus(&cfg).unwrap();
+    let record = &summary.records[0];
+    assert!(
+        matches!(record.result.verdict, Verdict::BadProbe { .. }),
+        "{:?}",
+        record.result.verdict
+    );
+    assert!(!record.result.verdict.is_green());
+}
+
+fn promoted_run(name: &str, hosted_suffix: &str, promoted_suffix: &str) -> RunSummary {
+    let probes = probe_dir(name, &[("P01", "console.log('p');\n")]);
+    let hosted_dir = scratch(&format!("{name}-hosted"));
+    let promoted_dir = scratch(&format!("{name}-promoted"));
+    let mut cfg = config(name, probes, node_target(&hosted_dir, hosted_suffix));
+    cfg.promoted = Some(node_target(&promoted_dir, promoted_suffix));
+    run_corpus(&cfg).unwrap()
+}
+
+#[test]
+fn the_promoted_leg_is_judged_against_the_reference_not_the_hosted_leg() {
+    let summary = promoted_run("promoted-ok", " | sed '1s/./Z/'", "");
+    let record = &summary.records[0];
+    assert_eq!(record.result.verdict, Verdict::Different);
+    let promoted = record.promoted.as_ref().unwrap();
+    assert_eq!(promoted.verdict, Verdict::Identical);
+    assert_eq!(promoted.detail, None);
+    assert!(record.promoted_target.is_some());
+}
+
+#[test]
+fn a_promoted_leg_that_changes_one_byte_is_different_while_hosted_stays_identical() {
+    let summary = promoted_run("promoted-bad", "", " | sed '1s/./Z/'");
+    let record = &summary.records[0];
+    assert_eq!(record.result.verdict, Verdict::Identical);
+    let promoted = record.promoted.as_ref().unwrap();
+    assert_eq!(promoted.verdict, Verdict::Different);
+    assert_eq!(promoted.detail.as_deref(), Some("stdout"));
+}
+
+#[test]
+fn the_record_identifies_each_target_and_flags_node_against_node() {
+    let targets = scratch("ident-target");
+    let probes = probe_dir("ident", &[("I01", "console.log('i');\n")]);
+    let mut cfg = config("ident", probes.clone(), node_target(&targets, ""));
+    let wrapper = run_corpus(&cfg).unwrap();
+    let record = &wrapper.records[0];
+    assert!(record.hosted_target.command.ends_with("target.sh"));
+    assert_eq!(
+        record
+            .hosted_target
+            .program_sha256
+            .as_ref()
+            .map(String::len),
+        Some(64)
+    );
+    assert!(!record.self_check);
+    cfg.out_dir = scratch("ident-out2");
+    cfg.hosted = CommandSpec {
+        program: node(),
+        args: vec!["--experimental-strip-types".to_owned()],
+    };
+    let direct = run_corpus(&cfg).unwrap();
+    assert!(direct.records[0].self_check);
+    cfg.hosted = node_target(&targets, "");
+    cfg.self_check = true;
+    cfg.out_dir = scratch("ident-out3");
+    assert!(run_corpus(&cfg).unwrap().records[0].self_check);
+}
+
+#[test]
+fn the_canary_proves_whether_the_target_applied_the_shim() {
+    let probes = probe_dir("canary", &[("K01", "console.log('k');\n")]);
+    let targets = scratch("canary-target");
+    let applied = run_corpus(&config("canary", probes.clone(), node_target(&targets, ""))).unwrap();
+    assert_eq!(applied.records[0].shim_canary, ShimCanary::Applied);
+    let ignoring = scratch("canary-ignoring");
+    let body = format!(
+        "exec env -u NODE_OPTIONS {} --experimental-strip-types \"$1\"",
+        node().display()
+    );
+    let target =
+        CommandSpec::parse(&write_script(&ignoring, "t.sh", &body).display().to_string()).unwrap();
+    let missed = run_corpus(&config("canary2", probes.clone(), target)).unwrap();
+    assert_eq!(missed.records[0].shim_canary, ShimCanary::NotApplied);
+    let mut legacy = config("canary3", probes, node_target(&targets, ""));
+    legacy.profile = Profile::LegacyTrim;
+    let unchecked = run_corpus(&legacy).unwrap();
+    assert_eq!(unchecked.records[0].shim_canary, ShimCanary::NotChecked);
 }
