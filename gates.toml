@@ -63,6 +63,8 @@ g1_min_rounds = 15
 tyrus_facts = ["tyrus_place", "tyrus_assemble", "tyrus_cli"]
 tyrus_place = ["tyrus_assemble", "tyrus_cli"]
 tyrus_assemble = ["tyrus_cli"]
+# Runtime: nao depende do compilador (teste no_compiler_deps); quem le/escreve o arquivo do fecho.
+tyrus_archive = ["tyrus_assemble", "tyrus_cli", "tyrus_host"]
 
 [claims]
 paths = ["docs", "README.md", "ROADMAP.md"]
