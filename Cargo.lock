@@ -2362,6 +2362,7 @@ dependencies = [
  "jsonschema",
  "serde",
  "serde_json",
+ "sha2",
  "thiserror",
 ]
 
