@@ -69,6 +69,7 @@ A dedicated crate for handling the application's dependency graph.
 | `tyrus_common`      | Shared types (`FilePath` newtype), config, filesystem utilities.       |
 | `tyrus_test_utils`  | Test helpers including `assert_rust_compiles()`.                      |
 | `tyrus_oracle`      | Oracle root of trust: `oracle/oracle.lock` tuple pins, node probe, closed verdict algebra (`Verdict`, `Shares`). Stable codes `TYRUS-E5xxx`. |
+| `tyrus_archive`     | Runtime closure archive: deterministic `ArchiveWriter`/`ArchiveReader` (zstd per entry, sha256 per entry and set), `tyrus-archive inspect --json`. Stable codes `TYRUS-E81xx`. Depends on no compiler crate. |
 
 ---
 

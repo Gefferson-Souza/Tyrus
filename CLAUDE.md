@@ -103,6 +103,7 @@ cargo run -p tyrus_oracle --bin tyrus-oracle -- lock verify --role all
 | `tyrus_common` | ~70 | `FilePath`, `to_snake_case()`, config |
 | `tyrus_test_utils` | ~195 | `assert_rust_compiles()`, `compile_and_run_rust()`, `run_node()` |
 | `tyrus_oracle` | ~970 | Oracle root of trust: pinned Node tuples (`oracle/oracle.lock`), closed `Verdict` algebra with `Shares`, `tyrus-oracle lock verify`. Errors `TYRUS-E5xxx`. Depends on no legacy crate. |
+| `tyrus_archive` | ~550 | Runtime closure archive: sorted entries, zstd level 3 per entry, sha256 per entry and for the set; `tyrus-archive inspect --json` (`schemas/closure-archive.schema.json`). Errors `TYRUS-E81xx`. Depends on no compiler crate. |
 
 ### Codegen Module Structure (Current)
 
