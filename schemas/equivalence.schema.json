@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gefferson-Souza/Tyrus/schemas/equivalence.schema.json",
+  "title": "equivalence-record",
+  "description": "Registro por sonda do driver Node x hospedado x promovido. O campo result segue verdict.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "probe", "corpus", "profile", "tuple_role", "tuple", "shim_sha256",
+    "shim_canary", "self_check", "hosted_target", "promoted_target", "reference_stable", "result", "detail", "reference", "hosted", "promoted"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "probe": { "type": "string", "minLength": 1 },
+    "corpus": { "type": "string", "minLength": 1 },
+    "profile": { "enum": ["exact", "legacy_trim"] },
+    "tuple_role": { "enum": ["reference", "seed"] },
+    "tuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "v8", "icu", "unicode", "tz", "cldr"],
+      "properties": {
+        "node": { "type": "string" }, "v8": { "type": "string" }, "icu": { "type": "string" },
+        "unicode": { "type": "string" }, "tz": { "type": "string" }, "cldr": { "type": "string" }
+      }
+    },
+    "shim_sha256": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sha256" }] },
+    "shim_canary": { "enum": ["applied", "not_applied", "not_checked"] },
+    "self_check": { "type": "boolean" },
+    "hosted_target": { "$ref": "#/$defs/target" },
+    "promoted_target": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/target" }] },
+    "reference_stable": { "type": "boolean" },
+    "result": { "type": "object", "required": ["verdict", "shares"] },
+    "detail": { "type": ["string", "null"] },
+    "reference": { "$ref": "#/$defs/side" },
+    "hosted": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/side" }] },
+    "promoted": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["verdict", "detail", "side"],
+          "properties": {
+            "verdict": { "type": "object", "required": ["kind"] },
+            "detail": { "type": ["string", "null"] },
+            "side": { "$ref": "#/$defs/side" }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "program_sha256"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "program_sha256": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sha256" }] }
+      }
+    },
+    "side": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exit_code", "stdout_sha256", "stderr_sha256", "error_first_line", "timed_out"],
+      "properties": {
+        "exit_code": { "type": ["integer", "null"] },
+        "stdout_sha256": { "$ref": "#/$defs/sha256" },
+        "stderr_sha256": { "$ref": "#/$defs/sha256" },
+        "error_first_line": { "type": ["string", "null"] },
+        "timed_out": { "type": "boolean" }
+      }
+    }
+  }
+}

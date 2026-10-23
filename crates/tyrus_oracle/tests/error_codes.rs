@@ -38,6 +38,21 @@ fn one_of_each_variant() -> Vec<OracleError> {
             field: "code",
             reason: "vazio".into(),
         },
+        OracleError::CommandInvalid {
+            reason: "vazio".into(),
+        },
+        OracleError::CorpusUnavailable {
+            path: PathBuf::from("/x"),
+            reason: "ausente".into(),
+        },
+        OracleError::SpawnFailed {
+            program: "x".into(),
+            reason: "ausente".into(),
+        },
+        OracleError::OutputWriteFailed {
+            path: PathBuf::from("/x"),
+            reason: "negado".into(),
+        },
     ]
 }
 

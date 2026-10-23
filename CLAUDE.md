@@ -69,6 +69,7 @@ cargo bench --bench runtime_comparison # Node.js vs Rust runtime comparison
 export TYRUS_NODE_REFERENCE=/abs/path/to/node-v26.11.1/bin/node   # tuple in oracle/oracle.lock
 export TYRUS_NODE_SEED=/abs/path/to/node-v22.21.1/bin/node
 cargo run -p tyrus_oracle --bin tyrus-oracle -- lock verify --role all
+cargo run -p tyrus_oracle --bin tyrus-oracle -- run --corpus seed --reference node --hosted-cmd <cmd>   # driver: one equivalence.json per probe
 
 # Git hooks (run once after cloning)
 ./scripts/setup-hooks.sh               # Install pre-commit (fmt + clippy)
@@ -102,7 +103,7 @@ cargo run -p tyrus_oracle --bin tyrus-oracle -- lock verify --role all
 | `tyrus_diagnostics` | ~69 | `TyrusError` + miette |
 | `tyrus_common` | ~70 | `FilePath`, `to_snake_case()`, config |
 | `tyrus_test_utils` | ~195 | `assert_rust_compiles()`, `compile_and_run_rust()`, `run_node()` |
-| `tyrus_oracle` | ~970 | Oracle root of trust: pinned Node tuples (`oracle/oracle.lock`), closed `Verdict` algebra with `Shares`, `tyrus-oracle lock verify`. Errors `TYRUS-E5xxx`. Depends on no legacy crate. |
+| `tyrus_oracle` | ~970 | Oracle root of trust: pinned Node tuples (`oracle/oracle.lock`), closed `Verdict` algebra with `Shares`, `tyrus-oracle lock verify`, and the `tyrus-oracle run` driver (`exact`/`legacy_trim` profiles, `oracle/shim/fix-env.js`, perturbation classifier). Errors `TYRUS-E5xxx`. Depends on no legacy crate. |
 | `tyrus_archive` | ~550 | Runtime closure archive: sorted entries, zstd level 3 per entry, sha256 per entry and for the set; `tyrus-archive inspect --json` (`schemas/closure-archive.schema.json`). Errors `TYRUS-E81xx`. Depends on no compiler crate. |
 | `tyrus_facts` | ~760 | Front-end facts (ST1): serde types for `facts.json`, `closure.lock`, `partition.lock` (schemas in `schemas/`), canonical JSON, schema-version (`TYRUS-E7102`) and hash (`TYRUS-E7101`) validation. Depends on no legacy or runtime crate. |
 

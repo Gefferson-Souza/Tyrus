@@ -48,3 +48,4 @@ docs/CODEMAPS/
 
 # Python tooling caches (oracle/apps/replica)
 __pycache__/
+oracle/out/
