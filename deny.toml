@@ -23,8 +23,8 @@ yanked = "warn"
 # `unmaintained` is now scoped: "all" | "workspace" | "transitive" | "none".
 # "workspace" only flags unmaintained crates we depend on directly.
 unmaintained = "workspace"
-# Tracked advisories the project has reviewed and accepted; tracked
-# upstream for upgrade in a follow-up issue.
+# Espelho de audit.toml (fonte única das exceções, com reach/owner/expires);
+# scripts/gates/audit_policy.py reprova se as duas listas divergirem.
 ignore = [
     # number_prefix unmaintained — transitive via indicatif (CLI progress bar).
     # Not a vulnerability. Resolves once indicatif drops the dependency.

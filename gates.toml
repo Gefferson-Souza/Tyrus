@@ -91,6 +91,9 @@ state = "ACTIVE"
 [gates.gates-selftest]
 state = "ACTIVE"
 
+[gates.audit-policy]
+state = "ACTIVE"
+
 [gates.replica]
 state = "ACTIVE"
 

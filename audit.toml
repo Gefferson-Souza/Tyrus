@@ -1,0 +1,30 @@
+# Exceções do cargo audit por advisory (D26). Fonte única: scripts/gates.sh audit lê daqui
+# (scripts/gates/audit_policy.py) e deny.toml [advisories].ignore precisa listar os mesmos ids.
+#
+# reach: o caminho do advisory existe no app emitido?
+#   absent     = não existe; só toca ferramenta do desenvolvedor ou código que o app emitido não carrega
+#   build-only = existe só em tempo de build/compilação
+#   present    = existe no app emitido (exige justification do risco aceito)
+# expires: AAAA-MM-DD, no máximo 90 dias a partir de hoje; exceção vencida reprova o gate.
+# Exceções das linhas de plataforma chegam com a unidade host-v8-embed-offline.
+
+[[exception]]
+id = "RUSTSEC-2025-0119"
+reach = "absent"
+owner = "Gefferson-Souza"
+expires = 2027-01-20
+justification = "number_prefix sem manutenção, vem de indicatif (barra de progresso da CLI); não é vulnerabilidade e não entra no app emitido."
+
+[[exception]]
+id = "RUSTSEC-2026-0097"
+reach = "absent"
+owner = "Gefferson-Souza"
+expires = 2027-01-20
+justification = "rand unsound só com rand_core::CryptoRng customizado e um padrão de logger específico, que o projeto não constrói; some com o rand >= 0.9."
+
+[[exception]]
+id = "RUSTSEC-2026-0249"
+reach = "absent"
+owner = "Gefferson-Souza"
+expires = 2027-01-20
+justification = "smartstring sem manutenção, vem do swc_ecma_parser (parser do compilador, #242); não é vulnerabilidade e não entra no app emitido."

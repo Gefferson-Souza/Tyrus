@@ -164,6 +164,8 @@ jobs:
       - run: ./scripts/gates.sh direction
       # Tests of gates.toml, cfg.py and the gates themselves (fixtures; needs cargo-deny and clippy).
       - run: ./scripts/gates.sh gates-selftest
+      # Testes da política de exceções do cargo audit (audit.toml + audit_policy.py).
+      - run: ./scripts/gates.sh audit-policy
 
   # Build + test in single job (shares compilation cache within job)
   build:
