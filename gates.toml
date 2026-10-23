@@ -134,3 +134,42 @@ activates_in = "docs-claims-migration"
 
 [gates.closure]
 state = "ACTIVE"
+
+[gates.rules-lint]
+state = "ACTIVE"
+
+# Regra da Constituição -> mecanismo. 'gates' lista gates existentes em [gates.*];
+# 'planned_in' nomeia a unidade que entrega o mecanismo ainda inexistente (imprime SKIPPED, nunca PASS).
+[constitution_rules]
+R1 = { planned_in = "place-all-hosted" }
+R2 = { planned_in = "m2-rename-metamorphic-gate" }
+R3 = { planned_in = "m2-l1-differential-vectors" }
+R4 = { planned_in = "m2-analyze-guard-proof" }
+R5 = { planned_in = "bench-g1-parity-harness" }
+R6 = { planned_in = "asm-project-emitter" }
+R7 = { planned_in = "asm-determinism-verify" }
+R8 = { gates = ["claims"] }
+R9 = { planned_in = "orc-self-examination" }
+R10 = { gates = ["unsafe"] }
+R11 = { gates = ["rules-lint", "gates-toml"] }
+R12 = { gates = ["rules-lint"] }
+
+[rules_lint]
+constitution = "docs/standards/CONSTITUTION.md"
+adr_dir = "docs/architecture/decisions"
+adr_index = "docs/ARCHITECTURE.md"
+naming_paths = ["docs", "CLAUDE.md", ".claude/rules"]
+# Nomes de padrão (não de iteração do compilador) e versões de esquema de ferramenta.
+naming_allow = ["Power of Ten v2", "schema v2"]
+
+# PROVISORIO: as categorias são decisão do dono (RFC, risco 6, conta todo o oracle/).
+# Aqui 'tooling' é o ferramental de governança e medição; 'oracle' (crate, baterias, corpus,
+# réplica) é reportado na razão larga, sem teto.
+[loc_budget]
+tooling_max_ratio = 0.25
+exclude = ["vendor/"]
+extensions = [".rs", ".py", ".sh", ".ts", ".js", ".mjs", ".yml", ".yaml"]
+
+[loc_budget.categories]
+tooling = ["scripts/", ".github/", ".claude/hooks/", ".claude/workflows/", "oracle/harness/", "benchmarks/"]
+oracle = ["crates/tyrus_oracle/", "oracle/"]

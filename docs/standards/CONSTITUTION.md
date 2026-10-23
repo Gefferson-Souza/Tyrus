@@ -50,7 +50,7 @@ Activation phases follow the program RFC (section 7): **F-1** spikes, **F0** ora
 
 ## Vocabulary
 
-No iteration is named by a version-style number. What exists today is "the prototypes" (two exploratory iterations) and "Tyrus" (the third iteration, this foundation). Tool versions (`v8`, `v22`, `v26`, `v147`, `deno_core 0.4xx`) are an allowlisted exception. `rules-lint` (unit `gov-rules-lint`) enforces the closed list; until it ships the rule is a review item.
+No iteration is named by a version-style number. What exists today is "the prototypes" (two exploratory iterations) and "Tyrus" (the third iteration, this foundation). Tool versions (`v8`, `v22`, `v26`, `v147`, `deno_core 0.4xx`) are an allowlisted exception. `rules-lint` (unit `gov-rules-lint`) enforces the closed list (gate `rules-lint`); the "new lane" ADR trigger of R12 stays a review item.
 
 ## Power of Ten rules for new crates
 

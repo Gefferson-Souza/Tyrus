@@ -31,6 +31,7 @@
 #   ./scripts/gates.sh gates-selftest  # testes de gates.toml/cfg.py e das portas (scripts/gates/test_cfg.sh)
 #   ./scripts/gates.sh claims      # SKIPPED(docs-claims-migration) até a migração dos docs
 #   ./scripts/gates.sh corpus-immutable  # oracle/corpus/seed bate com corpus.lock (sha256), sem sobra nem falta
+#   ./scripts/gates.sh rules-lint  # Constituição x gates.toml, nomes de iteração, ADR, orçamento de LOC; gatilho de ADR só com TYRUS_RULES_LINT_BASE (CI)
 #   ./scripts/gates.sh closure     # tyrus_closure (closure.lock, rastro) e o gancho de rastro do oráculo (sem Docker)
 #
 # Limiares e estado (ACTIVE | SKIPPED) vêm de gates.toml (scripts/gates/cfg.py). Gate SKIPPED
@@ -383,6 +384,16 @@ gate_corpus_immutable() {
     python3 -B -I "$script_dir/gates/corpus_check.py" --root "${TYRUS_CORPUS_ROOT:-$script_dir/..}"
 }
 
+gate_rules_lint() {
+    echo "=== gate: rules-lint ==="
+    python3 -B -I -m unittest discover -s "$script_dir/gates" -p 'test_rules_lint.py'
+    python3 -B -I "$script_dir/gates/rules_lint.py" static --root "$PWD"
+    # O gatilho de ADR olha o diff do PR; sem base (execução local) não há diff a avaliar.
+    if [ -n "${TYRUS_RULES_LINT_BASE:-}" ]; then
+        python3 -B -I "$script_dir/gates/rules_lint.py" adr-trigger --root "$PWD" --base "$TYRUS_RULES_LINT_BASE"
+    fi
+}
+
 gate_closure() {
     echo "=== gate: closure ==="
     guard_disk
@@ -396,18 +407,18 @@ gate_closure() {
 
 cmd="${1:-all}"
 case "$cmd" in
-    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|audit-policy|claims|corpus-immutable|closure)
+    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|audit-policy|claims|corpus-immutable|closure|rules-lint)
         run_gate "$cmd" ;;
     all)
         guard_disk "$(cfg get thresholds.disk_min_gb_all)"
-        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit audit-policy machete claims corpus-immutable closure; do
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit audit-policy machete claims corpus-immutable closure rules-lint; do
             run_gate "$name"
         done
         echo ""
         echo "=== ALL ACTIVE GATES PASSED (SKIPPED gates printed above) ==="
         ;;
     -h|--help|help)
-        sed -n '2,35p' "$0"
+        sed -n '2,36p' "$0"
         exit 0
         ;;
     *)

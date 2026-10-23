@@ -29,7 +29,7 @@ We will map TS Generics to Rust Generics with default Trait Bounds.
     - _Rationale:_ The Rust compiler rejects unused generic parameters.
 
 4.  **Generics Inheritance:**
-    - We will not support complex TS constraints (`T extends keyof U`) in v1. They will be treated as plain `T`.
+    - We will not support complex TS constraints (`T extends keyof U`) in the first release. They will be treated as plain `T`.
 
 ## Consequences
 

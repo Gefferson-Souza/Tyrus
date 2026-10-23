@@ -195,6 +195,21 @@ jobs:
       # Testes da política de exceções do cargo audit (audit.toml + audit_policy.py).
       - run: ./scripts/gates.sh audit-policy
 
+  # Governance lint (docs x gates.toml, iteration names, ADR status/index, LOC budget).
+  # The ADR trigger runs on the PR diff only, so the checkout needs full history.
+  rules-lint:
+    name: Rules lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Rules lint (gates.sh)
+        env:
+          TYRUS_RULES_LINT_BASE: ${{ github.event.pull_request.base.sha }}
+          TYRUS_RULES_LINT_PR_BODY: ${{ github.event.pull_request.body }}
+        run: ./scripts/gates.sh rules-lint
+
   # Build + test in single job (shares compilation cache within job)
   build:
     name: Build & Test
