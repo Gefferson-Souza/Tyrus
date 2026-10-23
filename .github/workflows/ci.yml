@@ -39,8 +39,13 @@ jobs:
       # Rule 4 file ceiling — same gate the pre-commit hook runs (Rule 9:
       # every gates.sh gate has a 1:1 CI step; this one was hook-only, #213).
       - run: ./scripts/gates.sh filesize
-      # Rule 13: every crate root declares #![forbid(unsafe_code)] (#214).
+      # Rule 13 (amended by ADR 0016): crate roots declare their unsafe_code level (#214).
       - run: ./scripts/gates.sh unsafe
+      # gates.toml is the single source of thresholds and gate state; it must stay
+      # valid and in parity with gates.sh and this workflow.
+      - run: ./scripts/gates.sh gates-toml
+      # Prints SKIPPED(<phase>) until the docs migration activates it; never a silent pass.
+      - run: ./scripts/gates.sh claims
 
   # Replica gate (oracle/apps/replica): parity with Gate 0, request set, tooling tests.
   # The Docker end-to-end run is the replica-e2e job below (change detection inside the job).
@@ -122,6 +127,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-deny and cargo-audit
         uses: taiki-e/install-action@v2.87.0
@@ -129,6 +136,11 @@ jobs:
           tool: cargo-deny,cargo-audit
       - run: ./scripts/gates.sh deny
       - run: ./scripts/gates.sh audit
+      # Dependency direction (front -> facts -> place -> assemble; legacy stays closed),
+      # generated from gates.toml and enforced by cargo-deny bans.wrappers.
+      - run: ./scripts/gates.sh direction
+      # Tests of gates.toml, cfg.py and the gates themselves (fixtures; needs cargo-deny and clippy).
+      - run: ./scripts/gates.sh gates-selftest
 
   # Build + test in single job (shares compilation cache within job)
   build:

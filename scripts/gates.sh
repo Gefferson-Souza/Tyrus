@@ -23,6 +23,14 @@
 #   ./scripts/gates.sh unsafe      # Rule 13: forbid(unsafe_code) in every crate root
 #   ./scripts/gates.sh replica     # oracle/apps/replica: parity, request set, tooling tests (no Docker)
 #   ./scripts/gates.sh node-pins   # TYRUS_NODE_REFERENCE/TYRUS_NODE_SEED apontam para o Node do oracle.lock
+#   ./scripts/gates.sh direction   # dependências respeitam front -> facts -> place -> assemble e o regime legado
+#   ./scripts/gates.sh gates-toml  # gates.toml válido e em paridade com este script e com o CI
+#   ./scripts/gates.sh gates-selftest  # testes de gates.toml/cfg.py e das portas (scripts/gates/test_cfg.sh)
+#   ./scripts/gates.sh claims      # SKIPPED(docs-claims-migration) até a migração dos docs
+#
+# Limiares e estado (ACTIVE | SKIPPED) vêm de gates.toml (scripts/gates/cfg.py). Gate SKIPPED
+# imprime SKIPPED(<fase>), nunca PASS. TYRUS_GATES_TOML e TYRUS_GATES_ROOT apontam para uma
+# cópia do gates.toml e para outra raiz de árvore (usados pelos testes com fixtures).
 #
 # Environment variables:
 #   TYRUS_SKIP_DENY=1      Skip cargo deny check (use only when tool unavailable).
@@ -31,12 +39,45 @@
 #   TYRUS_SKIP_COVERAGE=1  Skip cargo llvm-cov coverage check (e.g. fast pre-commit path).
 #   TYRUS_SKIP_FILESIZE=1  Skip the Rule 4 file ceiling check.
 #   TYRUS_COVERAGE_MIN     Override the minimum line-coverage %
-#                          (default: 73 — the 2026-05-03 baseline floor;
+#                          (default: thresholds.coverage_min in gates.toml;
 #                           ramp-up to 80 tracked in issue #163).
+#   TYRUS_SKIP_DISK_GUARD=1  Skip scripts/gates/disk_guard.sh (use only on a known-large disk).
 #
 # Exit code: 0 on all gates pass, non-zero on first failure.
 
 set -e
+
+script_dir=$(cd "$(dirname "$0")" && pwd)
+cfg_py="$script_dir/gates/cfg.py"
+export TYRUS_GATES_TOML="${TYRUS_GATES_TOML:-$script_dir/../gates.toml}"
+if [ -n "${TYRUS_GATES_ROOT:-}" ]; then
+    cd "$TYRUS_GATES_ROOT"
+fi
+
+cfg() { python3 -B -I "$cfg_py" "$@"; }
+
+# Guarda de disco antes de gates que compilam; 3 = BLOCKED(disk).
+guard_disk() {
+    [ "${TYRUS_SKIP_DISK_GUARD:-0}" = "1" ] && return 0
+    min_gb="${1:-$(cfg get thresholds.disk_min_gb_step)}"
+    rc=0
+    DISK_GUARD_MIN_GB="$min_gb" sh "$script_dir/gates/disk_guard.sh" || rc=$?
+    if [ "$rc" -ne 0 ]; then
+        echo "BLOCKED(disk): gate não executado (disk_guard saiu $rc)"
+        exit "$rc"
+    fi
+}
+
+# Gate SKIPPED vence qualquer outra coisa: imprime a fase e sai 0 sem rodar o sujeito.
+run_gate() {
+    state=$(cfg get "gates.$1.state")
+    if [ "$state" = "SKIPPED" ]; then
+        echo "=== gate: $1 ==="
+        echo "SKIPPED($(cfg get "gates.$1.activates_in"))"
+        return 0
+    fi
+    "gate_$(echo "$1" | tr '-' '_')"
+}
 
 # --- Gate definitions --------------------------------------------------------
 #
@@ -51,6 +92,7 @@ gate_fmt() {
 
 gate_clippy() {
     echo "=== gate: clippy ==="
+    guard_disk
     # --all-targets is critical: it lints test code too. Without this flag,
     # `#[cfg(test)] mod` blocks bypass the strict lint rules entirely.
     # --locked: builds resolve exactly the committed Cargo.lock (Rule 12).
@@ -77,6 +119,7 @@ gate_node_pins() {
 
 gate_test() {
     echo "=== gate: test ==="
+    guard_disk
     gate_node_pins
     # nextest by default runs lib tests, integration tests, and doctests.
     # We deliberately do NOT pass --all-targets here: it would try to run
@@ -93,6 +136,7 @@ gate_coverage() {
         return 0
     fi
     echo "=== gate: coverage ==="
+    guard_disk
     gate_node_pins
     if ! command -v cargo-llvm-cov >/dev/null 2>&1; then
         echo "ERROR: cargo-llvm-cov is not installed."
@@ -120,7 +164,7 @@ gate_coverage() {
     # (3) `--no-report nextest --workspace` for tests, and
     # (4) a final `report` for threshold enforcement
     # keeps both worlds consistent.
-    threshold="${TYRUS_COVERAGE_MIN:-73}"
+    threshold="${TYRUS_COVERAGE_MIN:-$(cfg get thresholds.coverage_min)}"
     # `--profraw-only` is incompatible with `--workspace` (cargo-llvm-cov
     # warns and ignores the latter). Cleaning at the workspace target
     # is implicit, so `--profraw-only` alone is correct.
@@ -147,12 +191,13 @@ gate_filesize() {
     # soft-cap violations are allowlisted (tracked in issue #153 — refactor);
     # they still fail if they cross the hard cap. New files must respect
     # the soft cap.
-    soft_cap=400
-    hard_cap=800
+    soft_cap=$(cfg get thresholds.file_soft_cap)
+    hard_cap=$(cfg get thresholds.file_hard_cap)
 
     # Allowlisted soft-cap violators (tracked in #153). Files in this
     # set may exceed the 400-line soft cap but never the 800-line hard cap.
-    allowlist_pattern='/convert/class/constructor\.rs$|/convert/interface\.rs$'
+    allowlist_pattern=$(cfg get thresholds.filesize_soft_allowlist | paste -sd'|' -)
+    allowlist_pattern="${allowlist_pattern:-\$^}"
 
     # "<lines> <path>" for every .rs file under crates/, descending.
     all=$(find crates -type f -name '*.rs' -print0 \
@@ -195,23 +240,40 @@ gate_filesize() {
 
 gate_unsafe() {
     echo "=== gate: unsafe ==="
-    # Rule 13 (POWER_OF_TEN.md, ADR 0013): every crate root must declare
-    # #![forbid(unsafe_code)]. `forbid` cannot be overridden by inner
-    # allows, so the compiler is the real enforcement — this gate only
-    # guarantees the attribute never silently disappears (or is missing
-    # from a newly added crate).
-    fail=0
-    for root in crates/*/src/lib.rs crates/*/src/main.rs tests/src/lib.rs; do
-        [ -f "$root" ] || continue
-        if ! grep -q '^#!\[forbid(unsafe_code)\]' "$root"; then
-            echo "FAIL: missing #![forbid(unsafe_code)] in $root"
-            fail=1
-        fi
-    done
-    if [ "$fail" -eq 0 ]; then
-        echo "All crate roots forbid unsafe_code."
+    sh "$script_dir/gates/unsafe_check.sh"
+}
+
+gate_direction() {
+    echo "=== gate: direction ==="
+    # Direção de dependência vinda de gates.toml via cargo-deny bans.wrappers.
+    if ! command -v cargo-deny >/dev/null 2>&1; then
+        echo "ERROR: cargo-deny is not installed (cargo install cargo-deny --locked)."
+        return 1
     fi
-    return "$fail"
+    deny_cfg=$(mktemp)
+    cfg deny-config >"$deny_cfg"
+    rc=0
+    cargo deny --manifest-path Cargo.toml --config "$deny_cfg" --offline check bans || rc=$?
+    rm -f "$deny_cfg"
+    return "$rc"
+}
+
+gate_gates_toml() {
+    echo "=== gate: gates-toml ==="
+    cfg validate
+    cfg parity
+}
+
+gate_gates_selftest() {
+    echo "=== gate: gates-selftest ==="
+    sh "$script_dir/gates/test_cfg.sh"
+}
+
+gate_claims() {
+    # Só é chamado se o estado for ACTIVE; o sujeito (campo Ledger:) chega em orc-claims-check.
+    echo "=== gate: claims ==="
+    echo "ERROR: gate claims ACTIVE sem implementação (unidade orc-claims-check)"
+    return 1
 }
 
 gate_machete() {
@@ -280,33 +342,18 @@ gate_replica() {
 
 cmd="${1:-all}"
 case "$cmd" in
-    fmt)      gate_fmt ;;
-    clippy)   gate_clippy ;;
-    test)     gate_test ;;
-    coverage) gate_coverage ;;
-    filesize) gate_filesize ;;
-    deny)     gate_deny ;;
-    audit)    gate_audit ;;
-    machete)  gate_machete ;;
-    unsafe)   gate_unsafe ;;
-    replica)  gate_replica ;;
-    node-pins) gate_node_pins ;;
+    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|node-pins|direction|gates-toml|gates-selftest|claims)
+        run_gate "$cmd" ;;
     all)
-        gate_fmt
-        gate_clippy
-        gate_filesize
-        gate_unsafe
-        gate_replica
-        gate_test
-        gate_coverage
-        gate_deny
-        gate_audit
-        gate_machete
+        guard_disk "$(cfg get thresholds.disk_min_gb_all)"
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica test coverage deny audit machete claims; do
+            run_gate "$name"
+        done
         echo ""
-        echo "=== ALL GATES PASSED ==="
+        echo "=== ALL ACTIVE GATES PASSED (SKIPPED gates printed above) ==="
         ;;
     -h|--help|help)
-        sed -n '2,25p' "$0"
+        sed -n '2,35p' "$0"
         exit 0
         ;;
     *)
