@@ -1,0 +1,15 @@
+[
+  {
+    "engine": "bun-1.2.22",
+    "normalizer": "W-BUN-LONE-SURROGATE-LEN",
+    "reason": "Bun 1.2.22 reports Buffer.byteLength('a\\ud800b') = 4 although the UTF-8 encoding (the lone surrogate becomes U+FFFD) takes 5 bytes. node-pg uses that length to declare the Bind parameter, so Bun sends 61 ef bf bd (4 bytes) and Postgres stores 'a\\ufffd': the trailing 'b' is lost. Node sends 61 ef bf bd 62. The HTTP response of bun-express is still byte-identical (save() echoes the in-memory entity, only id/active/created_at/updated_at come back from RETURNING).",
+    "evidence": "wire bytes captured with tools/pgproxy.py (Node: declared length 5, 61 ef bf bd 62; Bun: declared length 4, 61 ef bf bd); reproduction: PROBE_URL=postgres://postgres:ceiling@127.0.0.1:<proxy>/postgres bun tools/probe-lone-surrogate.js (and the same with node) prints Buffer.byteLength and the stored bytes",
+    "failures": {
+      "wire": [
+        "52-post-valid-lone-surrogate trip 2: parameters differ: expected ['TST-0009', 'a�b', '3', '1', '4'] observed ['TST-0009', 'a�', '3', '1', '4']",
+        "52-post-valid-lone-surrogate trip 2: client bytes differ"
+      ],
+      "state": []
+    }
+  }
+]
