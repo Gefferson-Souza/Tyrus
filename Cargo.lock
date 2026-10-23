@@ -395,6 +395,7 @@ checksum = "d64e8af5551369d19cf50138de61f1c42074ab970f74e99be916646777f8fc87"
 dependencies = [
  "encode_unicode",
  "libc",
+ "unicode-width 0.2.2",
  "windows-sys 0.61.2",
 ]
 
@@ -2141,7 +2142,7 @@ dependencies = [
 name = "tyrus_analyzer"
 version = "0.1.0"
 dependencies = [
- "console 0.15.11",
+ "console 0.16.3",
  "miette",
  "serde",
  "serde_json",
@@ -2168,7 +2169,7 @@ name = "tyrus_cli"
 version = "0.1.0"
 dependencies = [
  "clap",
- "console 0.15.11",
+ "console 0.16.3",
  "indicatif",
  "miette",
  "tokio",

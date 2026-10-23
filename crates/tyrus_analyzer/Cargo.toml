@@ -17,7 +17,7 @@ swc_common = { version = "26.0.0", features = ["tty-emitter"] }
 miette = { version = "7.6.0", features = ["fancy"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-console = "0.15"
+console = "0.16"
 
 [dev-dependencies]
 swc_ecma_parser = "45.1.1"
