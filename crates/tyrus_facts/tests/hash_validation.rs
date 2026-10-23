@@ -4,8 +4,8 @@ mod support;
 use std::fs;
 
 use tyrus_facts::{
-    ClosureFile, ClosureLock, Facts, FactsError, FileFact, FileMode, PartitionLock, PartitionUnit,
-    Placement,
+    sha256_hex, ClosureFile, ClosureLock, Facts, FactsError, FileFact, FileMode, PartitionLock,
+    PartitionUnit, Placement,
 };
 
 fn facts_for(tree: &support::TempTree) -> Facts {
@@ -118,4 +118,34 @@ fn partition_lock_detecta_byte_alterado() {
         lock.verify(tree.path()).unwrap_err().stable_code(),
         "TYRUS-E7101"
     );
+}
+
+#[test]
+fn caminho_ilegivel_da_e7104_e_nao_e_tratado_como_ausente() {
+    let tree = support::TempTree::new("ilegivel");
+    let mut facts = facts_for(&tree);
+    fs::create_dir_all(tree.path().join("src/main.ts.d")).unwrap();
+    facts.sources = vec![FileFact::new("src/main.ts.d", sha256_hex(b"x")).unwrap()];
+    let error = facts
+        .verify(tree.path(), &tree.path().join("out"))
+        .unwrap_err();
+    assert_eq!(error.stable_code(), "TYRUS-E7104");
+    assert!(matches!(error, FactsError::Io { .. }), "{error}");
+}
+
+#[cfg(unix)]
+#[test]
+fn arquivo_sem_permissao_de_leitura_da_e7104() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let tree = support::TempTree::new("sem-permissao");
+    let facts = facts_for(&tree);
+    let source = tree.path().join("src/main.ts");
+    fs::set_permissions(&source, fs::Permissions::from_mode(0o000)).unwrap();
+    let unreadable = fs::File::open(&source).is_err();
+    let result = facts.verify(tree.path(), &tree.path().join("out"));
+    fs::set_permissions(&source, fs::Permissions::from_mode(0o644)).unwrap();
+    if unreadable {
+        assert_eq!(result.unwrap_err().stable_code(), "TYRUS-E7104");
+    }
 }

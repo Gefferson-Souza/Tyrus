@@ -1,6 +1,6 @@
 //! JSON canônico: chaves ordenadas por bytes em todos os níveis, forma compacta e
 //! `\n` final. A ordenação é feita aqui, sem depender de `preserve_order` do `serde_json`
-//! (que outro crate do workspace pode ligar por unificação de features).
+//! (se algum crate ligar o recurso por unificação de features, o contrato continua valendo).
 use std::collections::BTreeMap;
 
 use serde::Serialize;
