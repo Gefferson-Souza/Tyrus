@@ -1,0 +1,7 @@
+{
+  "id": "C01_08_concat_assoc",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3x\nx12\nx3\n",
+  "stderr": ""
+}

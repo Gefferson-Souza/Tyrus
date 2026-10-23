@@ -67,6 +67,9 @@ where
     F: Fn(&str) -> Option<OsString>,
 {
     if let [command, rest @ ..] = args {
+        if command == "record" {
+            return crate::record::run_record(rest, get_env, out, err);
+        }
         if command == "run" {
             return crate::cli_run::run_command(rest, get_env, out, err);
         }

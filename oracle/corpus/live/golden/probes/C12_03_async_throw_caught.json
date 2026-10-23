@@ -1,0 +1,7 @@
+{
+  "id": "C12_03_async_throw_caught",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "caught\n",
+  "stderr": ""
+}

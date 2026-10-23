@@ -1,0 +1,7 @@
+{
+  "id": "C11_07_nullish",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "7\n0\n",
+  "stderr": ""
+}

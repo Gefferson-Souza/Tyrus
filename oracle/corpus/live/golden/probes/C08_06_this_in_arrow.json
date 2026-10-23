@@ -1,0 +1,7 @@
+{
+  "id": "C08_06_this_in_arrow",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "6\n",
+  "stderr": ""
+}

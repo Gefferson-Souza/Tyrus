@@ -1,0 +1,7 @@
+{
+  "id": "C08_09_inherited_method",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "hi Rex\n",
+  "stderr": ""
+}

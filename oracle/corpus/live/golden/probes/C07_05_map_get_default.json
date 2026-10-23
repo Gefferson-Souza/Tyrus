@@ -1,0 +1,7 @@
+{
+  "id": "C07_05_map_get_default",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n-1\n",
+  "stderr": ""
+}

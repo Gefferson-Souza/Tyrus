@@ -1,0 +1,7 @@
+{
+  "id": "C03_13_for_of_emoji",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "a\n😀\nç\n3\n",
+  "stderr": ""
+}

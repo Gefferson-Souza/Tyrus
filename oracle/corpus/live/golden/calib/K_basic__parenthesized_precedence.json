@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__parenthesized_precedence",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "20\n14\n2\n",
+  "stderr": ""
+}

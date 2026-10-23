@@ -1,0 +1,7 @@
+{
+  "id": "C02_05_int_div_mod",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3.5\n-3\n-1\n1.5\n-0\n",
+  "stderr": ""
+}

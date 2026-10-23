@@ -1,0 +1,7 @@
+{
+  "id": "C12_02_then_order",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "sync\nmicro\n",
+  "stderr": ""
+}

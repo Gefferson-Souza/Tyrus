@@ -1,0 +1,7 @@
+{
+  "id": "C02_10_bitwise_compound_overflow",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "-2147483648\n10\n",
+  "stderr": ""
+}

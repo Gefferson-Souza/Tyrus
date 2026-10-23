@@ -1,0 +1,7 @@
+{
+  "id": "C08_03_polymorphism_array",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "4\n3\n",
+  "stderr": ""
+}

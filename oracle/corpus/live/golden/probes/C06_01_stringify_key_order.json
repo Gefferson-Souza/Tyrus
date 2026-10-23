@@ -1,0 +1,7 @@
+{
+  "id": "C06_01_stringify_key_order",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{\"b\":1,\"a\":\"x\"}\n",
+  "stderr": ""
+}

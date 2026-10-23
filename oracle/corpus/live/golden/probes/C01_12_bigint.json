@@ -1,0 +1,7 @@
+{
+  "id": "C01_12_bigint",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "18446744073709551616n\n",
+  "stderr": ""
+}

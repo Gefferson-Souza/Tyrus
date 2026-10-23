@@ -1,0 +1,7 @@
+{
+  "id": "C09_07_optional_param",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "none\nb=2\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C09_10_identifier_case_collision",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n2\n",
+  "stderr": ""
+}

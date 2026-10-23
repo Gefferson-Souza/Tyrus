@@ -1,0 +1,7 @@
+{
+  "id": "C05_01_array_numbers",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "[ 1, 2, 3 ]\n",
+  "stderr": ""
+}

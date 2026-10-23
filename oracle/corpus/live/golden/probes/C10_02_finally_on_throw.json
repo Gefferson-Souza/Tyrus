@@ -1,0 +1,7 @@
+{
+  "id": "C10_02_finally_on_throw",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "caught\nfin\n",
+  "stderr": ""
+}

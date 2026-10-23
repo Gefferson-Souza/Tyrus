@@ -1,0 +1,7 @@
+{
+  "id": "C09_12_generic_function",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "7\n",
+  "stderr": ""
+}

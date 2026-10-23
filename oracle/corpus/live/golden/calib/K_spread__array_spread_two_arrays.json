@@ -1,0 +1,7 @@
+{
+  "id": "K_spread__array_spread_two_arrays",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "a, b, c, d, e, f\n",
+  "stderr": ""
+}

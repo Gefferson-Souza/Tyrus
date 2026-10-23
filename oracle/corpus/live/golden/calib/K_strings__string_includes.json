@@ -1,0 +1,7 @@
+{
+  "id": "K_strings__string_includes",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "true\nfalse\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C09_11_rust_keyword_identifiers",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "11\n",
+  "stderr": ""
+}

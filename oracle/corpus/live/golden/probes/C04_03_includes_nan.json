@@ -1,0 +1,7 @@
+{
+  "id": "C04_03_includes_nan",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "true\n-1\n",
+  "stderr": ""
+}

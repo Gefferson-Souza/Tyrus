@@ -1,0 +1,7 @@
+{
+  "id": "K_error_handling__try_catch_no_throw",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "42\n",
+  "stderr": ""
+}

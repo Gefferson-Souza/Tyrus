@@ -9,6 +9,7 @@ pub mod driver;
 pub mod error;
 pub mod lock;
 pub mod probe;
+pub mod record;
 pub mod registry;
 pub mod shares;
 pub mod tuple;

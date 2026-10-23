@@ -1,0 +1,7 @@
+{
+  "id": "C06_02_stringify_array_undefined",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "[1,null,null]\n",
+  "stderr": ""
+}

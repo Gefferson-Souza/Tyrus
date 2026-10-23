@@ -1,0 +1,7 @@
+{
+  "id": "C09_14_nested_function_decl",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "11\n",
+  "stderr": ""
+}

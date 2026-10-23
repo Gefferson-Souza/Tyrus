@@ -1,0 +1,7 @@
+{
+  "id": "C03_11_replaceAll",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "a+b-c-d\na+b+c+d\n",
+  "stderr": ""
+}

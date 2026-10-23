@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__string_concatenation",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "Hello World\n",
+  "stderr": ""
+}

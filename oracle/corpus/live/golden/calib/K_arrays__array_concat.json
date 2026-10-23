@@ -1,0 +1,7 @@
+{
+  "id": "K_arrays__array_concat",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "1\n2\n3\n4\n",
+  "stderr": ""
+}

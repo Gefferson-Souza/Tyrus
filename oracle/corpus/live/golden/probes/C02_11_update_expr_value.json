@@ -1,0 +1,7 @@
+{
+  "id": "C02_11_update_expr_value",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "5 7 7\n",
+  "stderr": ""
+}

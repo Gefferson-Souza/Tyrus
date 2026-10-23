@@ -1,0 +1,7 @@
+{
+  "id": "C11_05_for_multi_vars",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "0 10\n3 7\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C04_11_join_union_mixed",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1-a-2.5\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C04_05_splice",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "2\n2\n",
+  "stderr": ""
+}

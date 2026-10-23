@@ -1,0 +1,7 @@
+{
+  "id": "K_console__console_log_string",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "hello world\n",
+  "stderr": ""
+}

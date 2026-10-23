@@ -1,0 +1,7 @@
+{
+  "id": "K_math__math_sign",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "1\n-1\n0\n",
+  "stderr": ""
+}

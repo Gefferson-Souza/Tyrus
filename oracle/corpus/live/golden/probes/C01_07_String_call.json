@@ -1,0 +1,7 @@
+{
+  "id": "C01_07_String_call",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1.5\ntrue\n",
+  "stderr": ""
+}

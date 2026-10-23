@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__if_else",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "positive\nnegative\nzero\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C07_02_map_for_of_destructure",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "b 2\na 1\n",
+  "stderr": ""
+}

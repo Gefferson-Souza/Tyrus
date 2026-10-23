@@ -1,0 +1,7 @@
+{
+  "id": "C03_14_concat_assign",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "ab1\n",
+  "stderr": ""
+}

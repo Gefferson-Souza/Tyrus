@@ -1,0 +1,7 @@
+{
+  "id": "C11_13_truthiness_condition",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "truthy\nempty\n",
+  "stderr": ""
+}

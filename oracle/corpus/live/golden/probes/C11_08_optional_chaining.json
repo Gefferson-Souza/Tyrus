@@ -1,0 +1,7 @@
+{
+  "id": "C11_08_optional_chaining",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "-1\n5\n",
+  "stderr": ""
+}

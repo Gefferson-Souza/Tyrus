@@ -1,0 +1,7 @@
+{
+  "id": "C11_03_labeled_continue",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "0 0\n1 0\n2 0\n",
+  "stderr": ""
+}

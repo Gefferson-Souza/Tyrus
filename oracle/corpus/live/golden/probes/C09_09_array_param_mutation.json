@@ -1,0 +1,7 @@
+{
+  "id": "C09_09_array_param_mutation",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n",
+  "stderr": ""
+}

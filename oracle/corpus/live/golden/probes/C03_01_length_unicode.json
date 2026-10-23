@@ -1,0 +1,7 @@
+{
+  "id": "C03_01_length_unicode",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "4\n2\n1\n",
+  "stderr": ""
+}

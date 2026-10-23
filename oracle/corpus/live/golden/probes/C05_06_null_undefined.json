@@ -1,0 +1,7 @@
+{
+  "id": "C05_06_null_undefined",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "null\nundefined\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C03_12_trim_unicode_spaces",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "[hi]\n[hi]\n",
+  "stderr": ""
+}

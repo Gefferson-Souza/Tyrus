@@ -1,0 +1,7 @@
+{
+  "id": "K_arrays__array_reverse",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "5\n4\n3\n2\n1\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_math__math_trunc",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "4\n-4\n",
+  "stderr": ""
+}

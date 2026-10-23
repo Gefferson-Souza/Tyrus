@@ -1,0 +1,7 @@
+{
+  "id": "C01_04_exp_small",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1e-7\n1e-8\n",
+  "stderr": ""
+}

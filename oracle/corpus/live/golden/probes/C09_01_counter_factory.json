@@ -1,0 +1,7 @@
+{
+  "id": "C09_01_counter_factory",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n2\n",
+  "stderr": ""
+}

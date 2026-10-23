@@ -1,0 +1,7 @@
+{
+  "id": "K_console__console_log_boolean",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "true\nfalse\n",
+  "stderr": ""
+}

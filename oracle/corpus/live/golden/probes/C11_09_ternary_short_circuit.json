@@ -1,0 +1,7 @@
+{
+  "id": "C11_09_ternary_short_circuit",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "neg zero pos\nf\nt\nfalse true\n",
+  "stderr": ""
+}

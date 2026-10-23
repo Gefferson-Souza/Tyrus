@@ -1,0 +1,7 @@
+{
+  "id": "C06_09_object_property_read",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\nx\n",
+  "stderr": ""
+}

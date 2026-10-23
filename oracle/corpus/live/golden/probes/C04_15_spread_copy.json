@@ -1,0 +1,7 @@
+{
+  "id": "C04_15_spread_copy",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3\n4\n",
+  "stderr": ""
+}

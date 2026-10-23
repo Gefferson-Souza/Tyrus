@@ -1,0 +1,7 @@
+{
+  "id": "C05_03_interface_object",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{ name: 'Ana', age: 30 }\n",
+  "stderr": ""
+}

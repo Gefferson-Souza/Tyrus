@@ -1,0 +1,7 @@
+{
+  "id": "K_nestjs_logic__app_service_health",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "{\"status\":\"ok\"}\n",
+  "stderr": ""
+}

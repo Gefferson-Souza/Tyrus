@@ -1,0 +1,7 @@
+{
+  "id": "K_math__math_floor_ceil_round",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "4\n5\n5\n",
+  "stderr": ""
+}

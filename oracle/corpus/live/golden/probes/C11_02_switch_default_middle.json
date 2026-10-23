@@ -1,0 +1,7 @@
+{
+  "id": "C11_02_switch_default_middle",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "b\ndb\n",
+  "stderr": ""
+}
