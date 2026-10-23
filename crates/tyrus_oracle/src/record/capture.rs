@@ -39,7 +39,7 @@ pub fn capture_source(
 
 /// Linha de base: o `.ts` da semente executado no Node semente com remoção de tipos.
 /// Roda numa cópia sem `package.json` ancestral: o `"type": "commonjs"` do corpus desligaria a
-/// detecção de módulo do Node 22 e mudaria o veredito de `await` de topo (C12_04).
+/// detecção de módulo do Node 22 e mudaria o veredito de `await` de topo (`C12_04`).
 pub fn baseline_run(seed: &Path, source: &Source) -> Result<RunOutcome, RecordError> {
     let flag = if source.id.starts_with(TRANSFORM_PREFIX) {
         TRANSFORM_TYPES
