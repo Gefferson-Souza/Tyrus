@@ -70,6 +70,8 @@ enum Commands {
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
+    /// Build the production closure (--build) or validate it against an oracle load trace (--validate)
+    Closure(commands::closure::ClosureArgs),
 }
 
 #[tokio::main]
@@ -91,5 +93,6 @@ async fn main() -> Result<()> {
             release,
         } => commands::compile::execute(&path, output, release),
         Commands::Run { path, output } => commands::run::execute(&path, output),
+        Commands::Closure(args) => commands::closure::execute(&args),
     }
 }

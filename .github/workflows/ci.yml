@@ -113,6 +113,30 @@ jobs:
         run: echo "TYRUS_NODE_REFERENCE=$(command -v node)" >> "$GITHUB_ENV"
       - run: ./scripts/gates.sh front
 
+  # Fecho de produção (tyrus_closure): testes do crate e do gancho de rastro, e a verificação
+  # ponta a ponta (npm ci duas vezes, réplica executando do fecho, closure --validate).
+  closure:
+    name: Closure (lock and load trace)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Read the reference Node from oracle.lock
+        id: lock
+        run: echo "node=$(python3 -I -c 'import json; print(json.load(open("oracle/oracle.lock"))["reference"]["node"])')" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ steps.lock.outputs.node }}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: closure
+      - run: ./scripts/gates.sh closure
+      - run: cargo build --locked -p tyrus_cli
+      - run: oracle/apps/replica/tools/verify_closure.sh
+        env:
+          TYRUS_BIN: ${{ github.workspace }}/target/debug/tyrus
+
   # MSRV — the workspace must keep compiling on the declared minimum
   # supported Rust version ([workspace.package] rust-version).
   msrv:

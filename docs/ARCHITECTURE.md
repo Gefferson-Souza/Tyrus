@@ -70,6 +70,7 @@ A dedicated crate for handling the application's dependency graph.
 | `tyrus_test_utils`  | Test helpers including `assert_rust_compiles()`.                      |
 | `tyrus_oracle`      | Oracle root of trust: `oracle/oracle.lock` tuple pins, node probe, closed verdict algebra (`Verdict`, `Shares`). Stable codes `TYRUS-E5xxx`. |
 | `tyrus_facts`      | Front-end facts (ST1): types for `facts.json`, `closure.lock`, `partition.lock`, canonical JSON, version and sha256 validation. Stable codes `TYRUS-E71xx`. |
+| `tyrus_closure`    | Production closure: tree assembly (`npm ci --omit=dev` + app emit), `closure.lock` via `tyrus_facts`, validation against the oracle's module-load trace. Stable codes `TYRUS-E72xx`. |
 
 ---
 

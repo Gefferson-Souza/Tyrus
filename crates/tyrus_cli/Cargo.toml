@@ -19,6 +19,8 @@ tyrus_orchestrator = { path = "../tyrus_orchestrator" }
 tyrus_common = { path = "../tyrus_common" }
 tyrus_analyzer = { path = "../tyrus_analyzer" }
 tyrus_diagnostics = { path = "../tyrus_diagnostics" }
+tyrus_closure = { path = "../tyrus_closure" }
+tyrus_facts = { path = "../tyrus_facts" }
 console = "0.15"
 indicatif = "0.17"
 
