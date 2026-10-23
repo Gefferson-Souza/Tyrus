@@ -91,6 +91,9 @@ state = "ACTIVE"
 [gates.gates-selftest]
 state = "ACTIVE"
 
+[gates.audit-policy]
+state = "ACTIVE"
+
 [gates.replica]
 state = "ACTIVE"
 
@@ -118,6 +121,9 @@ state = "ACTIVE"
 [gates.node-pins]
 state = "ACTIVE"
 ci_exempt = "chamado por test e coverage, que sao passos de CI"
+
+[gates.corpus-immutable]
+state = "ACTIVE"
 
 [gates.claims]
 state = "SKIPPED"
