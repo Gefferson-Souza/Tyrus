@@ -1,5 +1,7 @@
 """Gate corpus-immutable: oracle/corpus/seed/ bate com corpus.lock, sem sobra nem falta.
 
+Reprova divergência entre seed/ e corpus.lock; regerar o lock (--write) é decisão do dono,
+e o gate sozinho não detecta um lock regerado na mesma PR.
 Uso: corpus_check.py [--root DIR] [--write]
 O lock usa o formato do `sha256sum -c`, com caminhos relativos à raiz do repositório.
 """
