@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__boolean_logic",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "false\ntrue\nfalse\ntrue\ntrue\n",
+  "stderr": ""
+}

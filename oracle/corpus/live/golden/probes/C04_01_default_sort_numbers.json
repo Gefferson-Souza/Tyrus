@@ -1,0 +1,7 @@
+{
+  "id": "C04_01_default_sort_numbers",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n10\n100\n9\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_arrays__array_shift",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "10\n20\n30\n",
+  "stderr": ""
+}

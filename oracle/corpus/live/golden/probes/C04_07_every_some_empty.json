@@ -1,0 +1,7 @@
+{
+  "id": "C04_07_every_some_empty",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "true\nfalse\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C06_12_object_reference_equality",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "false\n",
+  "stderr": ""
+}

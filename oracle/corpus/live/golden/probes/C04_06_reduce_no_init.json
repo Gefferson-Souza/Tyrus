@@ -1,0 +1,7 @@
+{
+  "id": "C04_06_reduce_no_init",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "10\n",
+  "stderr": ""
+}

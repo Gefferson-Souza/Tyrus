@@ -1,0 +1,7 @@
+{
+  "id": "K_sprint1__set_add_has",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "true\nfalse\n2\n",
+  "stderr": ""
+}

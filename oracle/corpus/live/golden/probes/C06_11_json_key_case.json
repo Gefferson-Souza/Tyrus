@@ -1,0 +1,7 @@
+{
+  "id": "C06_11_json_key_case",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{\"user_name\":\"a\",\"firstName\":\"b\"}\n",
+  "stderr": ""
+}

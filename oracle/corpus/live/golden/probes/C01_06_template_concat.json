@@ -1,0 +1,7 @@
+{
+  "id": "C01_06_template_concat",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1 and 2.5\nn=1 m=2.5\n0.3333333333333333 0 5\n",
+  "stderr": ""
+}

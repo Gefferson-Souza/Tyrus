@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__simple_addition",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "5\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_spread__array_spread_single",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "x, y, z\n",
+  "stderr": ""
+}

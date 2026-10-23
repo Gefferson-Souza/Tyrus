@@ -1,0 +1,7 @@
+{
+  "id": "C11_01_switch_fallthrough",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "one two \ntwo \nother \n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C06_08_object_literal_props_dropped",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{\"2\":\"x\",\"my-key\":1,\"plain\":3,\"z\":9}\n",
+  "stderr": ""
+}

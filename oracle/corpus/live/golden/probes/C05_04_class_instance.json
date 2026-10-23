@@ -1,0 +1,7 @@
+{
+  "id": "C05_04_class_instance",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "Pt { x: 1, y: 2 }\n",
+  "stderr": ""
+}

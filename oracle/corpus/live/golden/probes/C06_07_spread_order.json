@@ -1,0 +1,7 @@
+{
+  "id": "C06_07_spread_order",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n",
+  "stderr": ""
+}

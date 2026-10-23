@@ -1,0 +1,7 @@
+{
+  "id": "C11_12_while_true_break",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3\n",
+  "stderr": ""
+}

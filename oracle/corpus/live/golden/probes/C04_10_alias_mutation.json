@@ -1,0 +1,7 @@
+{
+  "id": "C04_10_alias_mutation",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "4\n4\n",
+  "stderr": ""
+}

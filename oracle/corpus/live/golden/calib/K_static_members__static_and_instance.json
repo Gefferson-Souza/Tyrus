@@ -1,0 +1,7 @@
+{
+  "id": "K_static_members__static_and_instance",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "1\n2\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C12_01_await_interleave",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "a1\nmain\na2 4\n",
+  "stderr": ""
+}

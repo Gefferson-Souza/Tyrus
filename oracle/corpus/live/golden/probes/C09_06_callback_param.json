@@ -1,0 +1,7 @@
+{
+  "id": "C09_06_callback_param",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "42\n",
+  "stderr": ""
+}

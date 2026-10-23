@@ -1,0 +1,7 @@
+{
+  "id": "C02_06_round_floor_ceil_negative",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "-2\n3\n-0\n-2\n-0\n-0\n",
+  "stderr": ""
+}

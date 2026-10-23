@@ -1,0 +1,7 @@
+{
+  "id": "K_error_handling__nested_try_catch",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "caught inner\n",
+  "stderr": ""
+}

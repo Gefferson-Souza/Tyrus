@@ -1,0 +1,7 @@
+{
+  "id": "C03_08_upper_sharp_s",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "STRASSE\nção\n",
+  "stderr": ""
+}

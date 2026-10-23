@@ -1,0 +1,11 @@
+{
+  "name": "tyrus-oracle-corpus-live",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Corpus regravado do oráculo: emit por arquivo do tsc fixado, executado no Node de referência",
+  "engines": { "node": "26.11.1" },
+  "devDependencies": {
+    "typescript": "5.1.6"
+  }
+}

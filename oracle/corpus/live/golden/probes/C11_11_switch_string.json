@@ -1,0 +1,7 @@
+{
+  "id": "C11_11_switch_string",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n2\n0\n",
+  "stderr": ""
+}

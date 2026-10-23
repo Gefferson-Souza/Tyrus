@@ -1,0 +1,7 @@
+{
+  "id": "C04_14_destructure_swap",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "2\n1\n",
+  "stderr": ""
+}

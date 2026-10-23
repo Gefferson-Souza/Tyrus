@@ -1,0 +1,7 @@
+{
+  "id": "K_math__math_pow",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "1024\n27\n",
+  "stderr": ""
+}

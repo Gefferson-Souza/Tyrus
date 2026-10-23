@@ -1,0 +1,7 @@
+{
+  "id": "C03_06_slice_negative",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "world\nhello worl\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C06_03_stringify_numbers",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "{\"big\":1e+21,\"small\":0.1,\"whole\":2}\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C04_02_sort_comparator",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3\n2\n1\n",
+  "stderr": ""
+}

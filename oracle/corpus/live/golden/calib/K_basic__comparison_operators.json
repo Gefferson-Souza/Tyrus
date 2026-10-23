@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__comparison_operators",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "true\nfalse\ntrue\ntrue\n",
+  "stderr": ""
+}

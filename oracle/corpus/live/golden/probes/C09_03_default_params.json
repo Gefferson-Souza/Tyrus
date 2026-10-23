@@ -1,0 +1,7 @@
+{
+  "id": "C09_03_default_params",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "Hello, Ana\nOi, Bia\n",
+  "stderr": ""
+}

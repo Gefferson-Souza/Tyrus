@@ -1,0 +1,7 @@
+{
+  "id": "K_arrays__array_join",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "hello world\nhello,world\n",
+  "stderr": ""
+}

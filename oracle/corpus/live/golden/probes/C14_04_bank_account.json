@@ -1,0 +1,7 @@
+{
+  "id": "C14_04_bank_account",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "true\nfalse\nBalance: 120\n",
+  "stderr": ""
+}

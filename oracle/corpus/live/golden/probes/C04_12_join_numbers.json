@@ -1,0 +1,7 @@
+{
+  "id": "C04_12_join_numbers",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1-2.5-3\n",
+  "stderr": ""
+}

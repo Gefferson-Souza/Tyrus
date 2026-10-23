@@ -1,0 +1,7 @@
+{
+  "id": "C01_02_negzero",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "-0\n-0\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "C14_03_inventory_pipeline",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "PEN, BOOK\nTotal: 65\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_top_level__top_level_uat_quick_scenario",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "Alice\nisAdult(20): true\n",
+  "stderr": ""
+}

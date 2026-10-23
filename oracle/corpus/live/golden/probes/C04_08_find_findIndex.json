@@ -1,0 +1,7 @@
+{
+  "id": "C04_08_find_findIndex",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n8\n",
+  "stderr": ""
+}

@@ -1,0 +1,7 @@
+{
+  "id": "K_spread__object_spread_override",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "localhost\n3100\nfalse\n",
+  "stderr": ""
+}

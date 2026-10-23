@@ -1,0 +1,7 @@
+{
+  "id": "K_strings__string_index_of",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "6\n-1\n",
+  "stderr": ""
+}

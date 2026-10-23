@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__arithmetic_operations",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "5\n6\n21\n3.75\n",
+  "stderr": ""
+}

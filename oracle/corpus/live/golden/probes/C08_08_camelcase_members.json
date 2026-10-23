@@ -1,0 +1,7 @@
+{
+  "id": "C08_08_camelcase_members",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "3\n",
+  "stderr": ""
+}

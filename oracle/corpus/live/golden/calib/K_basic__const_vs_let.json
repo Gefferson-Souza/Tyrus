@@ -1,0 +1,7 @@
+{
+  "id": "K_basic__const_vs_let",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "10\n20\n",
+  "stderr": ""
+}

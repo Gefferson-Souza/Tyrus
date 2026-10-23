@@ -1,0 +1,7 @@
+{
+  "id": "C04_16_for_of_then_reuse",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "6\n3\n",
+  "stderr": ""
+}

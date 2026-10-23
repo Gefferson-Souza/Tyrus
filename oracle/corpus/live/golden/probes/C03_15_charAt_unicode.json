@@ -1,0 +1,7 @@
+{
+  "id": "C03_15_charAt_unicode",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "ç\nfalse\nb\n",
+  "stderr": ""
+}

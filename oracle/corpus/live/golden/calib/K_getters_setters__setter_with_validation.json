@@ -1,0 +1,7 @@
+{
+  "id": "K_getters_setters__setter_with_validation",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "50\n100\n0\n",
+  "stderr": ""
+}

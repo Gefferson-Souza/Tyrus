@@ -1,0 +1,7 @@
+{
+  "id": "C07_04_set_foreach_order",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "c\na\nb\nz\nm\nq\nk\nx\nd\np\n",
+  "stderr": ""
+}

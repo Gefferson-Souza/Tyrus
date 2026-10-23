@@ -1,0 +1,7 @@
+{
+  "id": "C01_01_int_float",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "1\n1\n2.5\n2\n",
+  "stderr": ""
+}

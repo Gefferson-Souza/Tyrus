@@ -1,0 +1,7 @@
+{
+  "id": "K_spread__object_spread_copy",
+  "set": "calib",
+  "exit_code": 0,
+  "stdout": "10\n20\n",
+  "stderr": ""
+}

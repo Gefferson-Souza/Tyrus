@@ -1,0 +1,7 @@
+{
+  "id": "C10_01_finally_on_return",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "try\nfinally\nret\n",
+  "stderr": ""
+}

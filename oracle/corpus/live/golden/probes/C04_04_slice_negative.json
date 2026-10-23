@@ -1,0 +1,7 @@
+{
+  "id": "C04_04_slice_negative",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "4\n5\n",
+  "stderr": ""
+}

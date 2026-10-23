@@ -1,0 +1,7 @@
+{
+  "id": "C02_04_math_nan",
+  "set": "probes",
+  "exit_code": 0,
+  "stdout": "NaN\nNaN\n",
+  "stderr": ""
+}
