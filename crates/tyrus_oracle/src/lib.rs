@@ -3,7 +3,9 @@
 #![forbid(unsafe_code)]
 
 pub mod cli;
+pub mod cli_run;
 pub mod codes;
+pub mod driver;
 pub mod error;
 pub mod lock;
 pub mod probe;

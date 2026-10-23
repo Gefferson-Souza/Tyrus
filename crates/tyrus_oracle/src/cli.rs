@@ -14,7 +14,7 @@ pub const EXIT_USAGE: u8 = 64;
 pub const EXIT_IO: u8 = 74;
 
 const DEFAULT_LOCK_PATH: &str = "oracle/oracle.lock";
-const USAGE: &str = "uso: tyrus-oracle lock verify [--lock <caminho>] [--role reference|seed|all]";
+const USAGE: &str = "uso: tyrus-oracle lock verify [--lock <caminho>] [--role reference|seed|all]\n     tyrus-oracle run --corpus <seed|live> --reference node --hosted-cmd <cmd> (ver `run` sem opções)";
 
 struct VerifyOptions {
     lock: PathBuf,
@@ -69,6 +69,9 @@ where
     if let [command, rest @ ..] = args {
         if command == "record" {
             return crate::record::run_record(rest, get_env, out, err);
+        }
+        if command == "run" {
+            return crate::cli_run::run_command(rest, get_env, out, err);
         }
     }
     let parsed = match args {
