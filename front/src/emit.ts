@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+
 import type { ProjectConfig } from './config.ts';
 import type { TsApi, TsDiagnostic, TsOptions, TsSourceFile, TsWriteFile } from './ts-api.ts';
 
@@ -8,9 +10,10 @@ export interface EmitResult {
   readonly diagnostics: readonly TsDiagnostic[];
 }
 
-// Só o `outDir` muda: qualquer outra opção do projeto vai intacta para o emit.
+// Além do `outDir`, só as opções que apontam para um caminho de escrita são reancoradas sob ele:
+// o sidecar nunca escreve fora de --out. `mapRoot`/`sourceRoot` são texto embutido, não caminhos escritos.
 export function emitProject(ts: TsApi, config: ProjectConfig, outDir: string): EmitResult {
-  const options: TsOptions = { ...config.parsed.options, outDir };
+  const options: TsOptions = { ...config.parsed.options, ...anchoredWriteTargets(config.parsed.options, outDir), outDir };
   const host = ts.createCompilerHost(options);
   const program = ts.createProgram({
     rootNames: config.parsed.fileNames,
@@ -48,4 +51,11 @@ function emittableSources(program: ReturnType<TsApi['createProgram']>): TsSource
         !program.isSourceFileFromExternalLibrary(file) &&
         !program.isSourceFileDefaultLibrary(file),
     );
+}
+
+function anchoredWriteTargets(options: TsOptions, outDir: string): TsOptions {
+  return {
+    ...(options.declarationDir === undefined ? {} : { declarationDir: join(outDir, '__declarations') }),
+    ...(options.tsBuildInfoFile === undefined ? {} : { tsBuildInfoFile: join(outDir, '__buildinfo', 'tsconfig.tsbuildinfo') }),
+  };
 }

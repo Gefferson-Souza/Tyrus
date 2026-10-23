@@ -48,8 +48,8 @@ function portable(base: string, file: string): string {
   return relative(base, file).split('\\').join('/') || '.';
 }
 
-// Caminhos absolutos dependem da máquina; `outDir` é do sidecar e `configFilePath` já está em `tsconfig`.
-const MACHINE_BOUND_OPTIONS = new Set(['outDir', 'configFilePath', 'pathsBasePath']);
+// Caminhos absolutos dependem da máquina; outDir, declarationDir e tsBuildInfoFile são reancorados pelo sidecar e configFilePath já está em tsconfig.
+const MACHINE_BOUND_OPTIONS = new Set(['outDir', 'configFilePath', 'pathsBasePath', 'declarationDir', 'tsBuildInfoFile']);
 
 function portableOptions(root: string, options: TsOptions): TsOptions {
   const entries = Object.entries(options)

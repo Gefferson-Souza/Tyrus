@@ -279,8 +279,10 @@ gate_replica() {
 
 gate_front() {
     echo "=== gate: front ==="
-    node_bin="${TYRUS_NODE_REFERENCE:-node}"
-    "$node_bin" --test front/test/
+    gate_node_pins
+    # Instala 3 TypeScript e a réplica (~270 MB) na primeira execução.
+    sh scripts/gates/disk_guard.sh
+    "$TYRUS_NODE_REFERENCE" --test front/test/
     lines=$(find front -name '*.ts' -not -path '*/node_modules/*' -exec cat {} + | wc -l)
     if [ "$lines" -gt 1500 ]; then
         echo "FAIL: front/ tem $lines linhas de TypeScript (teto 1500)"

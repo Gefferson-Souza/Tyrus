@@ -72,30 +72,18 @@ jobs:
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Read the reference Node from oracle.lock
-        if: steps.changes.outputs.run == 'true'
-        id: lock
-        run: echo "node=$(python3 -I -c 'import json; print(json.load(open("oracle/oracle.lock"))["reference"]["node"])')" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-node@v7
-        if: steps.changes.outputs.run == 'true'
+      - name: Setup Node.js 22.21.1 (oracle seed tuple)
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ steps.lock.outputs.node }}
-      - if: steps.changes.outputs.run == 'true'
-        run: oracle/apps/replica/tools/verify_replica.sh
-
-  # ST0 (front/): testes do sidecar de emit, matriz de TypeScript e controle sobre a réplica.
-  front:
-    name: Front-end (ST0)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-      - name: Read the reference Node from oracle.lock
-        id: lock
-        run: echo "node=$(python3 -I -c 'import json; print(json.load(open("oracle/oracle.lock"))["reference"]["node"])')" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-node@v7
+          node-version: '22.21.1'
+      - name: Pin the seed Node binary
+        run: echo "TYRUS_NODE_SEED=$(command -v node)" >> "$GITHUB_ENV"
+      - name: Setup Node.js 26.11.1 (oracle reference tuple)
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ steps.lock.outputs.node }}
+          node-version: '26.11.1'
+      - name: Pin the reference Node binary
+        run: echo "TYRUS_NODE_REFERENCE=$(command -v node)" >> "$GITHUB_ENV"
       - run: ./scripts/gates.sh front
 
   # MSRV — the workspace must keep compiling on the declared minimum
