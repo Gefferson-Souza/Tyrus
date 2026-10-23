@@ -72,6 +72,8 @@ fn c12_04_is_a_known_bad_probe() {
         .unwrap()
         .as_str()
         .contains("SyntaxError"));
+    assert_eq!(entry.baseline_stdout.as_deref(), Some("7\n"));
+    assert_eq!(entry.baseline_exit_code, Some(0));
 }
 
 #[test]

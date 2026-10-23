@@ -48,37 +48,44 @@ fn write(path: &Path, text: &str) {
     fs::write(path, text).unwrap();
 }
 
+type Probe = (&'static str, &'static str, &'static str, &'static str);
+
+const DEFAULT_PROBES: [Probe; 4] = [
+    (
+        "probes",
+        "A01_stable",
+        "console.log(1);\n",
+        "console.log(1);\n",
+    ),
+    (
+        "probes",
+        "A02_flaky",
+        "console.log(1);\n",
+        "console.log(Math.random());\n",
+    ),
+    (
+        "probes",
+        "A03_throws",
+        "console.log(1);\n",
+        "throw new RangeError('boom');\n",
+    ),
+    (
+        "calib",
+        "K_changed",
+        "console.log(1);\n",
+        "console.log(2);\n",
+    ),
+];
+
 /// Corpus mínimo: fontes `.ts`, JS "emitido" à mão e um `typescript` de mentira.
-fn fixture(name: &str) -> (PathBuf, PathBuf) {
+fn fixture_with(name: &str, probes: &[Probe]) -> (PathBuf, PathBuf) {
     let root = workdir(name);
     let corpus = root.join("corpus");
     let emit = root.join("out/emit");
-    for (set, id, ts, js) in [
-        (
-            "probes",
-            "A01_stable",
-            "console.log(1);\n",
-            "console.log(1);\n",
-        ),
-        (
-            "probes",
-            "A02_flaky",
-            "console.log(1);\n",
-            "console.log(Math.random());\n",
-        ),
-        (
-            "probes",
-            "A03_throws",
-            "console.log(1);\n",
-            "throw new RangeError('boom');\n",
-        ),
-        (
-            "calib",
-            "K_changed",
-            "console.log(1);\n",
-            "console.log(2);\n",
-        ),
-    ] {
+    for set in ["probes", "calib"] {
+        fs::create_dir_all(corpus.join(set)).unwrap();
+    }
+    for (set, id, ts, js) in probes {
         write(&corpus.join(set).join(format!("{id}.ts")), ts);
         write(&emit.join(set).join(format!("{id}.js")), js);
     }
@@ -87,6 +94,10 @@ fn fixture(name: &str) -> (PathBuf, PathBuf) {
         "{\"version\": \"5.1.6\"}\n",
     );
     (corpus, root.join("out"))
+}
+
+fn fixture(name: &str) -> (PathBuf, PathBuf) {
+    fixture_with(name, &DEFAULT_PROBES)
 }
 
 fn base_args<'a>(corpus: &'a str, out: &'a str, lock: &'a str) -> Vec<&'a str> {
@@ -213,4 +224,233 @@ fn pathdiff(path: &Path, base: &Path) -> String {
     }
     relative.push(path.strip_prefix("/").unwrap());
     relative.display().to_string()
+}
+
+fn strings(corpus: &Path, out: &Path) -> (String, String, String) {
+    (
+        corpus.display().to_string(),
+        out.display().to_string(),
+        lock_arg(),
+    )
+}
+
+fn diff_entry(corpus: &Path, id: &str) -> Value {
+    json(&corpus.join("rerecord-diff.json"))["probes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|p| p["id"] == id)
+        .unwrap()
+        .clone()
+}
+
+fn node_script(dir: &Path, name: &str, body: &str) -> OsString {
+    let path = dir.join(name);
+    write(&path, &format!("#!/bin/sh\n{body}\n"));
+    fs::set_permissions(&path, fs::Permissions::from_mode(0o755)).unwrap();
+    path.into_os_string()
+}
+
+#[test]
+fn reference_killed_by_signal_is_a_bad_probe_not_a_golden() {
+    let (corpus, out) = fixture_with(
+        "signal",
+        &[(
+            "probes",
+            "P1_sigkill",
+            "console.log(1);\n",
+            "console.log('partial'); process.kill(process.pid, 'SIGKILL');\n",
+        )],
+    );
+    let (c, o, l) = strings(&corpus, &out);
+    let run = record(&base_args(&c, &o, &l), process_env);
+    assert_eq!(run.code, 0, "{}", run.stderr);
+    assert!(run.stdout.contains("bad_probe=1"), "{}", run.stdout);
+    assert!(!corpus.join("golden/probes/P1_sigkill.json").exists());
+    assert_eq!(
+        diff_entry(&corpus, "P1_sigkill")["reason"],
+        "reference_killed_by_signal"
+    );
+}
+
+#[test]
+fn bad_probe_records_what_the_seed_baseline_prints() {
+    let (corpus, out) = fixture_with(
+        "bad-baseline",
+        &[(
+            "probes",
+            "T01_top_level_await",
+            "console.log(await Promise.resolve(7));\n",
+            "throw new SyntaxError('await is only valid in async functions');\n",
+        )],
+    );
+    write(&corpus.join("package.json"), "{\"type\": \"commonjs\"}\n");
+    let (c, o, l) = strings(&corpus, &out);
+    assert_eq!(record(&base_args(&c, &o, &l), process_env).code, 0);
+    let entry = diff_entry(&corpus, "T01_top_level_await");
+    assert_eq!(entry["status"], "BAD_PROBE");
+    assert_eq!(entry["baseline_stdout"], "7\n");
+    assert_eq!(entry["baseline_exit_code"], 0);
+}
+
+#[test]
+fn baseline_flag_follows_the_c13_prefix() {
+    let enum_ts = "enum E { A = 1 }\nconsole.log(E.A);\n";
+    let (corpus, out) = fixture_with(
+        "transform-prefix",
+        &[
+            ("probes", "C13_enum", enum_ts, "console.log(1);\n"),
+            ("probes", "C01_enum", enum_ts, "console.log(1);\n"),
+        ],
+    );
+    let (c, o, l) = strings(&corpus, &out);
+    assert_eq!(record(&base_args(&c, &o, &l), process_env).code, 0);
+    assert_eq!(diff_entry(&corpus, "C13_enum")["status"], "SAME");
+    let plain = diff_entry(&corpus, "C01_enum");
+    assert_eq!(plain["status"], "CHANGED");
+    assert_eq!(plain["change"], "baseline_exit_nonzero");
+}
+
+#[test]
+fn seed_results_directory_feeds_the_seed_verdict() {
+    let (corpus, out) = fixture("seed-results");
+    let results = corpus.parent().unwrap().join("results");
+    write(
+        &results.join("A01_stable.json"),
+        "{\"verdict\": \"RUST_DOES_NOT_COMPILE\"}\n",
+    );
+    let (c, o, l) = strings(&corpus, &out);
+    let r = results.display().to_string();
+    let mut args = base_args(&c, &o, &l);
+    args.extend(["--seed-results", &r]);
+    assert_eq!(record(&args, process_env).code, 0);
+    assert_eq!(
+        diff_entry(&corpus, "A01_stable")["seed_verdict"],
+        "RUST_DOES_NOT_COMPILE"
+    );
+}
+
+#[test]
+fn wrong_seed_tuple_aborts_with_exit_2_and_writes_nothing() {
+    let (corpus, out) = fixture("wrong-seed");
+    let fake = node_script(
+        corpus.parent().unwrap(),
+        "fake-seed",
+        "echo '{\"node\":\"22.0.0\",\"v8\":\"1.0.0.0-node.1\",\"icu\":\"1\",\"unicode\":\"1\",\"tz\":\"1\",\"cldr\":\"1\"}'",
+    );
+    let (c, o, l) = strings(&corpus, &out);
+    let run = record(&base_args(&c, &o, &l), |name| {
+        if name == "TYRUS_NODE_SEED" {
+            Some(fake.clone())
+        } else {
+            process_env(name)
+        }
+    });
+    assert_eq!(run.code, 2, "{}", run.stderr);
+    assert!(run.stderr.contains("TYRUS-E5001"), "{}", run.stderr);
+    assert!(!corpus.join("golden").exists());
+}
+
+#[test]
+fn check_fails_when_the_stored_stderr_was_tampered_with() {
+    let (corpus, out) = fixture("tamper-stderr");
+    let (c, o, l) = strings(&corpus, &out);
+    assert_eq!(record(&base_args(&c, &o, &l), process_env).code, 0);
+    let golden = corpus.join("golden/probes/A01_stable.json");
+    let mut value = json(&golden);
+    value["stderr"] = Value::from("ruído\n");
+    write(&golden, &serde_json::to_string(&value).unwrap());
+    let mut args = base_args(&c, &o, &l);
+    args.push("--check");
+    let check = record(&args, process_env);
+    assert_eq!(check.code, 1, "{}", check.stderr);
+    assert!(check.stderr.contains("golden diverge"), "{}", check.stderr);
+}
+
+#[test]
+fn check_fails_when_a_bad_probe_changes_kind() {
+    let (corpus, out) = fixture("bad-kind");
+    let (c, o, l) = strings(&corpus, &out);
+    assert_eq!(record(&base_args(&c, &o, &l), process_env).code, 0);
+    let diff_file = corpus.join("rerecord-diff.json");
+    let text = fs::read_to_string(&diff_file).unwrap();
+    let swapped = text.replace("reference_exit_nonzero(1)", "reference_timeout");
+    assert_ne!(text, swapped);
+    write(&diff_file, &swapped);
+    let mut args = base_args(&c, &o, &l);
+    args.push("--check");
+    let check = record(&args, process_env);
+    assert_eq!(check.code, 1, "{}", check.stderr);
+    assert!(
+        check.stderr.contains("A03_throws: agora é BAD_PROBE"),
+        "{}",
+        check.stderr
+    );
+}
+
+#[test]
+fn missing_typescript_install_is_an_io_error_with_exit_74() {
+    let (corpus, out) = fixture("no-typescript");
+    fs::remove_dir_all(corpus.join("node_modules")).unwrap();
+    let (c, o, l) = strings(&corpus, &out);
+    let run = record(&base_args(&c, &o, &l), process_env);
+    assert_eq!(run.code, 74, "{}", run.stderr);
+    assert!(run.stderr.contains("TYRUS-E5052"), "{}", run.stderr);
+}
+
+fn emit_script(dir: &Path, exit_code: i32) -> PathBuf {
+    let path = dir.join(format!("fake-front-{exit_code}.js"));
+    write(
+        &path,
+        &format!(
+            "const fs = require('fs');\nconst out = process.argv[process.argv.indexOf('--out') + 1];\n\
+             fs.mkdirSync(out + '/emit/probes', {{ recursive: true }});\n\
+             fs.writeFileSync(out + '/emit/probes/A01_stable.js', 'console.log(1);\\n');\n\
+             process.exit({exit_code});\n"
+        ),
+    );
+    path
+}
+
+fn run_with_sidecar_exit(name: &str, exit_code: i32) -> (Run, PathBuf) {
+    let (corpus, out) = fixture_with(
+        name,
+        &[(
+            "probes",
+            "A01_stable",
+            "console.log(1);\n",
+            "console.log(1);\n",
+        )],
+    );
+    let front = emit_script(corpus.parent().unwrap(), exit_code);
+    let (c, o, l) = strings(&corpus, &out);
+    let f = front.display().to_string();
+    let args = [
+        "--corpus",
+        &c,
+        "--emit-dir",
+        &o,
+        "--front",
+        &f,
+        "--lock",
+        &l,
+    ];
+    (record(&args, process_env), corpus)
+}
+
+#[test]
+fn sidecar_exit_codes_0_and_1_are_accepted() {
+    for code in [0, 1] {
+        let (run, corpus) = run_with_sidecar_exit(&format!("sidecar-{code}"), code);
+        assert_eq!(run.code, 0, "código {code}: {}", run.stderr);
+        assert!(corpus.join("golden/probes/A01_stable.json").is_file());
+    }
+}
+
+#[test]
+fn sidecar_exit_code_3_refuses_with_the_emit_error() {
+    let (run, corpus) = run_with_sidecar_exit("sidecar-3", 3);
+    assert_eq!(run.code, 2, "{}", run.stderr);
+    assert!(run.stderr.contains("TYRUS-E5050"), "{}", run.stderr);
+    assert!(!corpus.join("golden").exists());
 }

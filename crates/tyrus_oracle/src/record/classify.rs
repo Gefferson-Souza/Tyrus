@@ -6,6 +6,7 @@ use crate::codes::BadProbeReason;
 use crate::error::OracleError;
 
 pub const NONDETERMINISTIC_PREFIX: &str = "NONDETERMINISTIC_REFERENCE";
+pub const KILLED_BY_SIGNAL: &str = "reference_killed_by_signal";
 const EMIT_MASK: &str = "<emit>";
 const REASON_LIMIT: usize = 180;
 
@@ -72,7 +73,9 @@ fn describe_failure(run: &RunOutcome) -> Option<String> {
     if run.timed_out {
         return Some("reference_timeout".to_owned());
     }
-    let code = run.exit_code?;
+    let Some(code) = run.exit_code else {
+        return Some(KILLED_BY_SIGNAL.to_owned());
+    };
     if code == 0 {
         return None;
     }

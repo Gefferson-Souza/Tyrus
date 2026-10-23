@@ -14,7 +14,8 @@ um lock regerado na mesma PR, então a proteção contra isso é a revisão (COD
 e `package-lock.json` próprios (`typescript` 5.1.6, a faixa da réplica) e `tsconfig.json` (CommonJS, ES2022,
 `strict`, `moduleDetection: force`). Os goldens vêm do emit por arquivo do `tsc` fixado
 (sidecar `front/src/cli.ts`), executado no Node de referência de `oracle.lock`; nunca de
-`--experimental-strip-types`, que diverge em `C12_04` e em campos de classe.
+`--experimental-strip-types`, que diverge em `C12_04` (`await` de topo: imprime 7 no Node semente,
+`SyntaxError` no emit CommonJS; o diff grava os dois lados).
 
 ```sh
 (cd oracle/corpus/live && npm ci --ignore-scripts)          # typescript fixado pelo lockfile

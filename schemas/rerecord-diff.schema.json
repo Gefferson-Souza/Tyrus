@@ -48,7 +48,9 @@
         "status": { "enum": ["SAME", "CHANGED", "BAD_PROBE"] },
         "reason": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[^\\u0000-\\u001f\\u007f]+$" },
         "change": { "enum": ["baseline_exit_nonzero", "stdout_differs", "stdout_differs_only_in_trailing_whitespace"] },
-        "seed_verdict": { "type": "string", "minLength": 1 }
+        "seed_verdict": { "type": "string", "minLength": 1 },
+        "baseline_exit_code": { "type": "integer" },
+        "baseline_stdout": { "type": "string" }
       },
       "additionalProperties": false,
       "allOf": [
@@ -58,11 +60,11 @@
         },
         {
           "if": { "properties": { "status": { "const": "CHANGED" } } },
-          "then": { "required": ["change"], "not": { "required": ["reason"] } }
+          "then": { "required": ["change"], "not": { "anyOf": [{ "required": ["reason"] }, { "required": ["baseline_stdout"] }, { "required": ["baseline_exit_code"] }] } }
         },
         {
           "if": { "properties": { "status": { "const": "SAME" } } },
-          "then": { "not": { "anyOf": [{ "required": ["reason"] }, { "required": ["change"] }] } }
+          "then": { "not": { "anyOf": [{ "required": ["reason"] }, { "required": ["change"] }, { "required": ["baseline_stdout"] }, { "required": ["baseline_exit_code"] }] } }
         }
       ]
     }

@@ -51,6 +51,12 @@ pub struct DiffEntry {
     pub change: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub seed_verdict: Option<String>,
+    /// Só em `BAD_PROBE`: código de saída da linha de base (Node semente) para a mesma fonte.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_exit_code: Option<i32>,
+    /// Só em `BAD_PROBE`: stdout da linha de base, para provar o que a referência recusa.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_stdout: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

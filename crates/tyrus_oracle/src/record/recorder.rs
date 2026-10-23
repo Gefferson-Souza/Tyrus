@@ -39,6 +39,8 @@ fn entry(source: &Source, status: Status) -> DiffEntry {
         reason: None,
         change: None,
         seed_verdict: None,
+        baseline_exit_code: None,
+        baseline_stdout: None,
     }
 }
 
@@ -49,6 +51,9 @@ fn record_one(inputs: &RecordInputs<'_>, source: &Source) -> Result<DiffEntry, R
         Capture::Bad(reason) => {
             diff.status = Status::BadProbe;
             diff.reason = Some(reason);
+            let baseline = baseline_run(inputs.seed, source)?;
+            diff.baseline_exit_code = baseline.exit_code;
+            diff.baseline_stdout = Some(String::from_utf8_lossy(&baseline.stdout).into_owned());
         }
         Capture::Golden { stdout, stderr } => {
             let golden = Golden {

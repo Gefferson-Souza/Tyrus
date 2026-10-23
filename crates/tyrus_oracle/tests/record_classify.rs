@@ -73,6 +73,20 @@ fn timeout_is_a_bad_probe() {
 }
 
 #[test]
+fn process_killed_by_signal_is_a_bad_probe() {
+    let mut run = ok("partial\n");
+    run.exit_code = None;
+    assert_eq!(
+        reason_of(&capture_reference(&run, &ok("partial\n"), Path::new("/e")).unwrap()),
+        "reference_killed_by_signal"
+    );
+    assert_eq!(
+        reason_of(&capture_reference(&ok("partial\n"), &run, Path::new("/e")).unwrap()),
+        "reference_killed_by_signal"
+    );
+}
+
+#[test]
 fn non_utf8_stdout_is_a_bad_probe() {
     let mut run = ok("");
     run.stdout = vec![0xff, 0xfe];

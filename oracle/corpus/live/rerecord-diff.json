@@ -1339,7 +1339,9 @@
       "set": "probes",
       "status": "BAD_PROBE",
       "reason": "reference_exit_nonzero(1): SyntaxError: await is only valid in async functions and the top level bodies of modules",
-      "seed_verdict": "RUST_DOES_NOT_COMPILE"
+      "seed_verdict": "RUST_DOES_NOT_COMPILE",
+      "baseline_exit_code": 0,
+      "baseline_stdout": "7\n"
     },
     {
       "id": "C13_01_numeric_enum_reverse",
