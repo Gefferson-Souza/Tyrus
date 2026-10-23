@@ -39,6 +39,18 @@ pub enum OracleError {
 
     #[error("campo `{field}` do veredito inválido: {reason}")]
     InvalidVerdictField { field: &'static str, reason: String },
+
+    #[error("comando do alvo inválido: {reason}")]
+    CommandInvalid { reason: String },
+
+    #[error("corpus indisponível em {}: {reason}", .path.display())]
+    CorpusUnavailable { path: PathBuf, reason: String },
+
+    #[error("não foi possível executar `{program}`: {reason}")]
+    SpawnFailed { program: String, reason: String },
+
+    #[error("não foi possível gravar {}: {reason}", .path.display())]
+    OutputWriteFailed { path: PathBuf, reason: String },
 }
 
 impl OracleError {
@@ -55,6 +67,10 @@ impl OracleError {
             Self::UnknownAssumption { .. } => "TYRUS-E5007",
             Self::InvalidShare { .. } => "TYRUS-E5008",
             Self::InvalidVerdictField { .. } => "TYRUS-E5009",
+            Self::CommandInvalid { .. } => "TYRUS-E5010",
+            Self::CorpusUnavailable { .. } => "TYRUS-E5011",
+            Self::SpawnFailed { .. } => "TYRUS-E5012",
+            Self::OutputWriteFailed { .. } => "TYRUS-E5013",
         }
     }
 }
