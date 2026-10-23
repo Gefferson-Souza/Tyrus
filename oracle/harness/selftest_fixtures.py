@@ -36,11 +36,17 @@ def entry(rid: str, status: int, body: bytes, trips: list[dict[str, Any]]) -> di
     return {"http": http(rid, status, body), "trips": trips}
 
 
+def created_body(row_id: int, sku: str, category_id: int) -> bytes:
+    return json.dumps({"sku": sku, "price": 12.5, "stock": 1, "categoryId": category_id, "id": row_id,
+                       "active": True}, separators=(",", ":")).encode()
+
+
 def base_state() -> dict[str, Any]:
     new_row = {"id": 10001, "sku": "TST-1", "name": "n", "description": None, "price": "12.50", "stock": 1,
                "active": True, "category_id": 2, "timestamps_coherent": True}
+    second_row = dict(new_row, id=10002, sku="TST-0009", category_id=4)
     return {"dump_sha256": "a" * 64, "dump_bytes": 1000, "seed_products_md5": "b" * 32,
-            "new_products": [new_row], "row_counts": {"product": 10001, "order_item": 50000}}
+            "new_products": [new_row, second_row], "row_counts": {"product": 10001, "order_item": 50000}}
 
 
 def base_trace(engine: str = "node-26.11.1") -> dict[str, Any]:
@@ -53,13 +59,13 @@ def base_trace(engine: str = "node-26.11.1") -> dict[str, Any]:
                               [trip("extended", select, ("1",)), trip("extended", select, ("1",))]),
         "03-list-defaults": entry("03-list-defaults", 200, b'{"items":[]}',
                                   [trip("simple", "SELECT 1"), trip("simple", "SELECT 2")]),
-        "04-post": entry("04-post", 201, b'{"id":10001}',
+        "04-post": entry("04-post", 201, created_body(10001, "TST-1", 2),
                          [trip("simple", "START TRANSACTION"), trip("extended", insert, ("TST-1",)),
                           trip("simple", "COMMIT")]),
         "05-post-fk": entry("05-post-fk", 500, b'{"statusCode":500}',
                             [trip("simple", "START TRANSACTION"),
                              trip("extended", insert, ("TST-2",), errors=("23503",)), trip("simple", "ROLLBACK")]),
-        LONE_SURROGATE_ID: entry(LONE_SURROGATE_ID, 201, b'{"id":10002}',
+        LONE_SURROGATE_ID: entry(LONE_SURROGATE_ID, 201, created_body(10002, "TST-0009", 4),
                                  [trip("simple", "START TRANSACTION"),
                                   trip("extended", insert, ("TST-0009", "a�b", "3", "1", "4")),
                                   trip("simple", "COMMIT")]),

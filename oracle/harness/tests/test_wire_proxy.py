@@ -4,6 +4,7 @@ import socket
 import struct
 import sys
 import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -71,12 +72,21 @@ def query_message(sql: str) -> bytes:
     return b"Q" + struct.pack("!i", len(payload) + 4) + payload
 
 
-def send_through(proxy: pgproxy.WireProxy, messages: list[bytes]) -> None:
+def wait_until(condition, timeout_s: float = 5.0) -> None:
+    deadline = time.monotonic() + timeout_s
+    while not condition():
+        if time.monotonic() > deadline:
+            raise AssertionError("condição não atendida no prazo")
+        time.sleep(0.01)
+
+
+def send_through(proxy: pgproxy.WireProxy, upstream: FakeUpstream, messages: list[bytes]) -> None:
+    """Só retorna quando o upstream recebeu todos os bytes: o primeiro `Z` responde ao startup, não ao `Q`."""
+    expected_len = sum(len(message) for message in messages)
     with socket.create_connection(("127.0.0.1", proxy.listen_port), timeout=5) as client:
         for message in messages:
             client.sendall(message)
-        client.settimeout(2)
-        client.recv(64)
+        wait_until(lambda: len(upstream.received) >= expected_len)
 
 
 class WireProxyTest(unittest.TestCase):
@@ -94,14 +104,14 @@ class WireProxyTest(unittest.TestCase):
     def test_frontend_message_carries_the_sha256_of_its_exact_bytes(self):
         proxy = self.run_proxy()
         message = query_message("SELECT 1")
-        send_through(proxy, [startup_packet(), message])
+        send_through(proxy, self.upstream, [startup_packet(), message])
         events = [e for e in proxy.events if e["dir"] == "F" and e["type"] == "Q"]
         self.assertEqual(events[0]["wire_sha256"], hashlib.sha256(message).hexdigest())
         self.assertEqual(trips_of(proxy.events)[0]["sql"], "SELECT 1")
 
     def test_rewrite_hook_changes_what_is_recorded_and_forwarded(self):
         proxy = self.run_proxy(rewrite=lambda kind, payload: payload.replace(b"SELECT", b"select"))
-        send_through(proxy, [startup_packet(), query_message("SELECT 1")])
+        send_through(proxy, self.upstream, [startup_packet(), query_message("SELECT 1")])
         recorded = [e for e in proxy.events if e["dir"] == "F" and e["type"] == "Q"][0]
         self.assertEqual(recorded["sql"], "select 1")
         self.assertIn(b"select 1", bytes(self.upstream.received))
@@ -109,13 +119,13 @@ class WireProxyTest(unittest.TestCase):
 
     def test_without_rewrite_the_bytes_are_forwarded_untouched(self):
         proxy = self.run_proxy()
-        send_through(proxy, [startup_packet(), query_message("SELECT 1")])
+        send_through(proxy, self.upstream, [startup_packet(), query_message("SELECT 1")])
         self.assertIn(query_message("SELECT 1"), bytes(self.upstream.received))
 
     def test_password_messages_are_not_recorded_nor_hashed(self):
         proxy = self.run_proxy()
         password = b"p" + struct.pack("!i", 9) + b"abcd\x00"
-        send_through(proxy, [startup_packet(), password])
+        send_through(proxy, self.upstream, [startup_packet(), password])
         events = [e for e in proxy.events if e["type"] == "p"]
         self.assertEqual(events[0].get("note"), "password/SASL message not recorded")
         self.assertNotIn("wire_sha256", events[0])

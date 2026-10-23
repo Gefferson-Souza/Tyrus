@@ -38,6 +38,11 @@ def _psql(container: str, sql: str) -> str:
     return _docker(container, ["psql", "-U", "postgres", "-d", DATABASE, "-At", "-X", "-c", sql]).decode().strip()
 
 
+def execute(container: str, sql: str) -> None:
+    """Escrita direta no banco (controle negativo do estado: uma mudança que nenhuma requisição causou)."""
+    _psql(container, sql)
+
+
 def stable_dump(dump: bytes) -> bytes:
     """O pg_dump 17.11 imprime `\\restrict <token aleatório>` e `\\unrestrict`; fora isso o dump é determinístico."""
     return b"\n".join(line for line in dump.split(b"\n") if not line.startswith((b"\\restrict ", b"\\unrestrict ")))

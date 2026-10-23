@@ -86,7 +86,7 @@ Dispatch **tyrus-reviewer** (xhigh, read-only) on the diff — written to a scra
 
 ### P6 — EQUIVALENCE LIVE + GATES — *enforces F4, F6, R9, R12 — RULE ZERO's gate*
 
-1. `/gates` — all ten (fmt · clippy · filesize · unsafe · test · coverage · deny · audit · machete · replica), staged is fine, **every gate on the exact tree being pushed**. Never read pass/fail through a pipe.
+1. `/gates` — all eleven (fmt · clippy · filesize · unsafe · test · coverage · deny · audit · machete · replica · wire), staged is fine, **every gate on the exact tree being pushed**. Never read pass/fail through a pipe.
 2. The equivalence suite IS the E2E: `cargo nextest run --workspace` includes every equivalence test running real Node vs real compiled Rust. NestJS-tier changes additionally show `test_http_equivalence_rust_server` green.
 3. **Proof-of-delivery package** (goes verbatim into the PR body, F6): the RED failure output, the GREEN pass output, mutation-check note, gates verdict line, and — for bugs — the reproduced BEFORE symptom vs the AFTER on the same input. "The code looks correct" is never an acceptance statement.
 4. **Docs same PR** (F7): if counts/trees/commands/rules changed → `/doc-sync` (dispatch **tyrus-docs**) inside this branch. `CHANGELOG.md` untouched.

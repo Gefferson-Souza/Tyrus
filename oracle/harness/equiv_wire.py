@@ -39,6 +39,8 @@ def add_trace_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--expect-node", default=None)
     parser.add_argument("--inject-mutation", choices=["lowercase-select"], default=None,
                         help="controle negativo: o proxy reescreve um SELECT antes de gravar e encaminhar")
+    parser.add_argument("--inject-state-mutation", choices=["bump-order-item"], default=None,
+                        help="controle negativo: escrita direta no banco entre o tráfego e a coleta do estado")
 
 
 def add_compare_args(parser: argparse.ArgumentParser) -> None:

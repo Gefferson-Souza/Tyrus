@@ -60,5 +60,23 @@ class CompareCommandTest(unittest.TestCase):
         self.assertIn("mensagens do cliente", done.stdout)
 
 
+class TraceOptionsTest(unittest.TestCase):
+    def record(self, *extra: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", "-B", str(CLI), "record", "--target-cmd", "true", "--out", "/dev/null",
+                               *extra], capture_output=True, text=True, check=False)
+
+    def test_a_container_outside_the_tyrus_prefix_exits_two_before_touching_docker(self):
+        done = self.record("--container", "docker-database-cloud-1")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("tyrus-", done.stderr)
+
+    def test_an_owner_port_exits_two(self):
+        for flag in ("--port", "--proxy-port", "--upstream-port"):
+            with self.subTest(flag=flag):
+                done = self.record(flag, "3001")
+                self.assertEqual(done.returncode, 2)
+                self.assertIn("3000 a 3002", done.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

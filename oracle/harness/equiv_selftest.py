@@ -125,6 +125,27 @@ def state_controls() -> list[Control]:
     ]
 
 
+def consistency_controls() -> list[Control]:
+    """A resposta 201 precisa casar com a linha gravada: o equivalente de CP1 e CN1 a CN3 do Gate 0."""
+    def fails(mutate: Callable[[dict], None]) -> list[str]:
+        return wire_compare.response_state_consistency(fx.mutated(fx.base_trace(), mutate))
+
+    def body_of(trace: dict, **fields: Any) -> None:
+        current = json.loads(req(trace, "04-post")["http"]["body"])
+        set_body(trace, "04-post", json.dumps(dict(current, **fields), separators=(",", ":")).encode())
+
+    inconsistent = fx.mutated(fx.base_trace(), lambda t: body_of(t, stock=7))
+    return [
+        ("CP1 response and stored row agree", fails(lambda t: None) == [], ""),
+        ("CN1 the response id has no stored row", bool(fails(lambda t: body_of(t, id=99999))), ""),
+        ("CN2 the response stock differs from the stored stock", bool(fails(lambda t: body_of(t, stock=7))), ""),
+        ("CN3 the response price differs from the stored price", bool(fails(lambda t: body_of(t, price=12.51))), ""),
+        ("CN4 the response category differs from the stored one", bool(fails(lambda t: body_of(t, categoryId=3))), ""),
+        ("CN5 two equal traces that are both inconsistent still fail the state layer",
+         not verdict(inconsistent, inconsistent)["green"], ""),
+    ]
+
+
 def lone_surrogate_pair() -> tuple[dict, dict]:
     base = fx.base_trace()
     actual = fx.mutated(base, lambda t: req(t, fx.LONE_SURROGATE_ID)["trips"][1].update(
@@ -176,7 +197,7 @@ def sweep_controls(trace: dict[str, Any]) -> list[Control]:
 
 
 def run_all(trace_path: str | None) -> list[Control]:
-    controls = http_controls() + wire_controls() + state_controls() + divergence_controls()
+    controls = http_controls() + wire_controls() + state_controls() + consistency_controls() + divergence_controls()
     if trace_path:
         controls += sweep_controls(json.loads(Path(trace_path).read_text(encoding="utf-8")))
     return controls

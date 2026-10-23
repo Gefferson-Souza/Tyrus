@@ -47,6 +47,19 @@ if wire != "DIFFERENT" or http != "IDENTICAL":
     sys.exit("verify_wire: camadas inesperadas no controle negativo: wire=" + wire + " http=" + http)
 ' "$work/mutated.json"
 
+echo "== controle negativo: escrita direta no banco entre o tráfego e a coleta =="
+if WIRE check --golden "$work/golden.json" --inject-state-mutation bump-order-item --out "$work/state-mutated.json" >/dev/null; then
+    echo "verify_wire: a escrita extra no banco passou como equivalente" >&2
+    exit 1
+fi
+python3 -I -c '
+import json, sys
+layers = json.load(open(sys.argv[1]))["layers"]
+got = {name: layers[name]["status"] for name in ("http", "wire", "state")}
+if got != {"http": "IDENTICAL", "wire": "IDENTICAL", "state": "DIFFERENT"}:
+    sys.exit("verify_wire: camadas inesperadas no controle de estado: " + repr(got))
+' "$work/state-mutated.json"
+
 echo "== autoteste sobre o traço real e fatos de SQL =="
 python3 -I -B "$HARNESS/equiv_selftest.py" --trace "$work/golden.json"
 python3 -I -B "$HARNESS/capture_sql.py" --target-cmd "$TARGET" --expect-node "$EXPECT_NODE" --out-dir "$work/capture"

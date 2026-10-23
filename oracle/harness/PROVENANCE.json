@@ -48,7 +48,7 @@
       "origin": "harness/sql_equiv.py",
       "origin_sha256": "bfd0edff33225992bb8e5bc88afa312b825c2e016e66ac111fcf299e8cf6dea7",
       "mode": "adapted",
-      "sha256": "d5a39c1ef17c358fa485a1e13dca881817eb42e1ab8b35d9c1e75ad066c3479b",
+      "sha256": "1e47cda298272f9624c6c06ccf620dc11006443e4ddb7e993a41baa06cdae01a",
       "note": "`compare`/`apply_known` do Gate 0; HTTP vem de `replica_core.diff_runs`; nível `bytes` novo; estado novo"
     },
     {
@@ -56,7 +56,7 @@
       "origin": "harness/sql_equiv.py",
       "origin_sha256": "bfd0edff33225992bb8e5bc88afa312b825c2e016e66ac111fcf299e8cf6dea7",
       "mode": "adapted",
-      "sha256": "2bd131f623f17ef3246a224d53597c712747e4e74ee5669808f5d3e0881228bd",
+      "sha256": "f0597e8420011ce2b1459f20bbd9136c4fa101c318ff4a92847a1d1714539e32",
       "note": "`collect` do Gate 0 sem `common.Server`/`Recorder`: executa o alvo genérico com o executor da réplica"
     },
     {
@@ -64,7 +64,7 @@
       "origin": "harness/equiv_selftest.py",
       "origin_sha256": "fd12970f115472941121f462d2bdacdb31cda7a37da0dc5edd5be405eb7e6ae4",
       "mode": "adapted",
-      "sha256": "b9f9a95d6ed6841c7bd42b62ff9b9416d598c9dba8b1bb88725d91dfe726022a",
+      "sha256": "71f78b05903ab57048396a46bdffdeedb293396a9a9b69b3f3b8d6405affa4f5",
       "note": "controles reescritos sobre o comparador de fio, HTTP e estado (o `equiv_core.py` do Gate 0 não é importado)"
     }
   ],

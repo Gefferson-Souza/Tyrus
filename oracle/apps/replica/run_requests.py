@@ -21,7 +21,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any, Callable, Iterator
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "harness"))
@@ -89,10 +89,15 @@ def request_body(request: dict[str, Any]) -> bytes | None:
     return None
 
 
-def send_all(port: int, requests: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def send_all(port: int, requests: list[dict[str, Any]],
+             before: Callable[[dict[str, Any]], None] | None = None,
+             after: Callable[[dict[str, Any], dict[str, Any]], None] | None = None) -> list[dict[str, Any]]:
+    """`before(request)` e `after(request, record)` deixam outro harness observar cada requisição sem reimplementar o envio."""
     connection = http.client.HTTPConnection("127.0.0.1", port, timeout=REQUEST_TIMEOUT_S)
     records = []
     for request in requests:
+        if before:
+            before(request)
         payload = request_body(request)
         headers = dict(request.get("headers", {}))
         if payload is not None:
@@ -100,7 +105,10 @@ def send_all(port: int, requests: list[dict[str, Any]]) -> list[dict[str, Any]]:
         connection.request(request["method"], request["path"], body=payload, headers=headers)
         response = connection.getresponse()
         raw = response.read()
-        records.append(replica_core.build_record(request, response.status, response.getheaders(), raw))
+        record = replica_core.build_record(request, response.status, response.getheaders(), raw)
+        records.append(record)
+        if after:
+            after(request, record)
     connection.close()
     return records
 

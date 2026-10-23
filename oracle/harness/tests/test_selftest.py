@@ -14,8 +14,9 @@ class SelftestTest(unittest.TestCase):
         failed = [name for name, ok, _ in equiv_selftest.run_all(None) if not ok]
         self.assertEqual(failed, [])
 
-    def test_the_selftest_has_at_least_thirty_controls(self):
-        self.assertGreaterEqual(len(equiv_selftest.run_all(None)), 30)
+    def test_the_control_inventory_never_shrinks(self):
+        """Piso = inventário atual (38 controles sem traço real). O 96 do Gate 0 vem de equiv_core, que o RFC proíbe importar."""
+        self.assertGreaterEqual(len(equiv_selftest.run_all(None)), 38)
 
     def test_client_byte_hash_is_the_only_difference_caught_at_bytes_level(self):
         base = fx.base_trace()

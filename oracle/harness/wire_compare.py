@@ -6,7 +6,9 @@ diferenças aceitas de drivers que não são o node-pg); `state` compara o estad
 """
 from __future__ import annotations
 
+import json
 import sys
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -87,6 +89,46 @@ def compare_state(golden: dict[str, Any], actual: dict[str, Any]) -> list[str]:
     return fails
 
 
+def response_state_consistency(trace: dict[str, Any]) -> list[str]:
+    """Cada 201 com `id` precisa ter a linha correspondente no banco com os mesmos sku, stock, active, categoryId e price.
+
+    `name` e `description` ficam de fora: um surrogate solitário vira U+FFFD no banco e `\\ud800` na resposta.
+    """
+    rows = {row["id"]: row for row in trace["state"]["new_products"]}
+    fails = []
+    for rid, entry in trace["requests"].items():
+        http = entry["http"]
+        body = _json_object(http["body"]) if http and http["status"] == 201 else None
+        if body is None or not isinstance(body.get("id"), int):
+            continue
+        row = rows.get(body["id"])
+        if row is None:
+            fails.append(f"{rid}: resposta 201 com id {body['id']} sem linha correspondente no banco")
+            continue
+        fails += [f"{rid}: `{field}` da resposta ({body.get(field)!r}) difere da linha ({stored!r})"
+                  for field, stored in _stored_fields(row).items() if not _same_field(field, body.get(field), stored)]
+    return fails
+
+
+def _json_object(text: str) -> dict[str, Any] | None:
+    try:
+        value = json.loads(text)
+    except ValueError:
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def _stored_fields(row: dict[str, Any]) -> dict[str, Any]:
+    return {"sku": row["sku"], "stock": row["stock"], "active": row["active"],
+            "categoryId": row["category_id"], "price": row["price"]}
+
+
+def _same_field(field: str, observed: Any, stored: Any) -> bool:
+    if field == "price":
+        return isinstance(observed, (int, float)) and Decimal(str(observed)) == Decimal(stored)
+    return observed == stored
+
+
 def _short(value: Any) -> str:
     text = repr(value)
     return text if len(text) <= 160 else text[:157] + "..."
@@ -110,7 +152,8 @@ def compare_traces(golden: dict, actual: dict, known: list[dict], options: dict[
     layers = {
         "http": layer_verdict(compare_http(golden, actual), known, engine, "http"),
         "wire": layer_verdict(wire["fails"], known, engine, "wire"),
-        "state": layer_verdict(compare_state(golden["state"], actual["state"]), known, engine, "state"),
+        "state": layer_verdict(compare_state(golden["state"], actual["state"])
+                                + response_state_consistency(actual), known, engine, "state"),
     }
     green = all(v["status"] in (IDENTICAL, NORMALIZED) for v in layers.values())
     return {"green": green, "wire_level": level, "engine": engine, "requests": wire["requests"],

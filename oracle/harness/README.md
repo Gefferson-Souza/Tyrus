@@ -39,4 +39,21 @@ importado; `wire.py` é cópia idêntica, os demais são adaptações descritas 
 ## O que este harness não faz
 
 Não grava golden de fio no repositório (o golden é o oráculo e a gravação é decisão do dono), não fala AMQP e não
-executa o Tyrus. Contêineres devem começar com `tyrus-`; as portas 3000 a 3002 são recusadas.
+executa o Tyrus. Contêineres devem começar com `tyrus-`; as portas 3000 a 3002 são recusadas. A CLI (`record`, `check`, `twice`) valida
+`--container`, `--port`, `--proxy-port` e `--upstream-port` antes de qualquer coisa (saída 2), e o reset do banco usa o
+mesmo contêiner e a mesma porta do proxy e do `pg_dump`.
+
+## Autoteste e contagem de controles
+
+`equiv_selftest.py` roda 38 controles sem traço real (mais os de varredura com `--trace`). O aceite do RFC pedia a
+contagem do Gate 0 (96), mas ela vem de `equiv_core.py`, que o RFC proíbe importar; a dispensa fica registrada aqui:
+o que vale é que todos passem e o piso nunca desça (`test_selftest.py`). O equivalente de CP1/CN1 a CN3 do Gate 0 é
+`wire_compare.response_state_consistency` (cada 201 precisa casar com a linha gravada), com os controles CP1, CN1 a CN5.
+Não portados: formato de `createdAt` e `stock` pós-escrita no corpo, porque a réplica mascara os instantes.
+
+## Registro de normalizadores (provisório)
+
+`normalizers.py` é um registro Python provisório e paralelo ao `tyrus_oracle` (Rust: `registry.rs` e `verdict.rs`).
+Aqui `NORMALIZED` é verde; no crate, divergência de motor ainda não tem veredito próprio. A unificação (fonte única
+lida pelos dois lados) e a decisão de a divergência de motor ser verde ou premissa ficam para antes de
+`orc-driver-triple` e `orc-ledger-ci`. A exceção é indexada por `--engine-id`, informado pelo chamador.
