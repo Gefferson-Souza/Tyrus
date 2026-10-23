@@ -2333,6 +2333,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tyrus_facts"
+version = "0.1.0"
+dependencies = [
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "tyrus_oracle"
 version = "0.1.0"
 dependencies = [

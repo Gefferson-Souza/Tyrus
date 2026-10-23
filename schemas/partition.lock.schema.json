@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gefferson-Souza/Tyrus/schemas/partition.lock.schema.json",
+  "title": "partition.lock",
+  "description": "Partição por unidade: onde roda (hosted ou native) e o motivo em MAIÚSCULAS_COM_SUBLINHADO (no M1 todo arquivo do fecho é hosted/FLOOR). Ordem estrita por bytes do caminho. Tipos Rust em crates/tyrus_facts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "units"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256",
+          "placement",
+          "reason"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "placement": {
+            "enum": [
+              "hosted",
+              "native"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "pattern": "^(\\.|[^/\\\\\\u0000]+(/[^/\\\\\\u0000]+)*)$",
+      "not": {
+        "pattern": "(^|/)\\.\\.?(/|$)"
+      }
+    }
+  }
+}

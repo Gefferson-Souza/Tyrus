@@ -46,6 +46,8 @@ jobs:
       - run: ./scripts/gates.sh gates-toml
       # Prints SKIPPED(<phase>) until the docs migration activates it; never a silent pass.
       - run: ./scripts/gates.sh claims
+      # The seed corpus under oracle/corpus/seed is immutable (corpus.lock, sha256).
+      - run: ./scripts/gates.sh corpus-immutable
 
   # Replica gate (oracle/apps/replica): parity with Gate 0, request set, tooling tests.
   # The Docker end-to-end run is the replica-e2e job below (change detection inside the job).
@@ -164,6 +166,8 @@ jobs:
       - run: ./scripts/gates.sh direction
       # Tests of gates.toml, cfg.py and the gates themselves (fixtures; needs cargo-deny and clippy).
       - run: ./scripts/gates.sh gates-selftest
+      # Testes da política de exceções do cargo audit (audit.toml + audit_policy.py).
+      - run: ./scripts/gates.sh audit-policy
 
   # Build + test in single job (shares compilation cache within job)
   build:

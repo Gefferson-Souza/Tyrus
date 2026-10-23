@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-**Tyrus** (TypeRust) is an academic TypeScript-to-Rust transpiler. It converts a strict subset of TypeScript ("Oxidizable Standard") into memory-safe Rust code. No `any`, `var`, or `eval` allowed. Cargo workspace with 12 crates under `crates/` plus the `tests` member.
+**Tyrus** (TypeRust) is an academic TypeScript-to-Rust transpiler. It converts a strict subset of TypeScript ("Oxidizable Standard") into memory-safe Rust code. No `any`, `var`, or `eval` allowed. Cargo workspace with 13 crates under `crates/` plus the `tests` member.
 
 ## STRICT RULES (NEVER VIOLATE)
 
@@ -104,6 +104,7 @@ cargo run -p tyrus_oracle --bin tyrus-oracle -- lock verify --role all
 | `tyrus_test_utils` | ~195 | `assert_rust_compiles()`, `compile_and_run_rust()`, `run_node()` |
 | `tyrus_oracle` | ~970 | Oracle root of trust: pinned Node tuples (`oracle/oracle.lock`), closed `Verdict` algebra with `Shares`, `tyrus-oracle lock verify`. Errors `TYRUS-E5xxx`. Depends on no legacy crate. |
 | `tyrus_archive` | ~550 | Runtime closure archive: sorted entries, zstd level 3 per entry, sha256 per entry and for the set; `tyrus-archive inspect --json` (`schemas/closure-archive.schema.json`). Errors `TYRUS-E81xx`. Depends on no compiler crate. |
+| `tyrus_facts` | ~760 | Front-end facts (ST1): serde types for `facts.json`, `closure.lock`, `partition.lock` (schemas in `schemas/`), canonical JSON, schema-version (`TYRUS-E7102`) and hash (`TYRUS-E7101`) validation. Depends on no legacy or runtime crate. |
 
 ### Codegen Module Structure (Current)
 
