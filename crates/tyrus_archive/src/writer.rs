@@ -46,7 +46,7 @@ impl ArchiveWriter {
             reason: reason.to_owned(),
         };
         validate_path(path).map_err(invalid)?;
-        if u64::try_from(content.len()).map_or(true, |len| len > MAX_ENTRY_SIZE) {
+        if exceeds_entry_limit(content.len()) {
             return Err(invalid("conteúdo acima do limite por entrada"));
         }
         if self.entries.contains_key(path) {
@@ -114,4 +114,61 @@ fn compress(content: &[u8]) -> Result<Vec<u8>, ArchiveError> {
         return Ok(Vec::new());
     }
     Ok(zstd::bulk::compress(content, COMPRESSION_LEVEL)?)
+}
+
+fn exceeds_entry_limit(len: usize) -> bool {
+    exceeds_limit(len, MAX_ENTRY_SIZE)
+}
+
+fn exceeds_limit(len: usize, limit: u64) -> bool {
+    u64::try_from(len).map_or(true, |len| len > limit)
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    // Calculado por script Python independente (struct + hashlib).
+    const SET_DIGEST_VECTOR: &str =
+        "3b452c6ea58b6abb97dbabdf9474691960127cf0ad0acfdaf493312e4436ba6b";
+
+    #[test]
+    fn limit_is_inclusive_and_rejects_one_byte_over() {
+        assert!(!exceeds_limit(10, 10));
+        assert!(exceeds_limit(11, 10));
+    }
+
+    #[test]
+    fn real_limit_is_one_gibibyte() {
+        assert!(!exceeds_entry_limit(1 << 30));
+        assert!(exceeds_entry_limit((1 << 30) + 1));
+    }
+
+    #[test]
+    fn set_digest_of_a_fixed_listing_matches_the_independent_vector() {
+        let entry = TableEntry {
+            path: "a".to_owned(),
+            mode: MODE_FILE,
+            size: 1,
+            offset: 999,
+            compressed_size: 999,
+            sha256: [7; 32],
+        };
+        let hex = crate::digest::to_hex(&set_digest(&[entry]));
+        assert_eq!(hex, SET_DIGEST_VECTOR);
+    }
+
+    #[test]
+    fn write_to_emits_exactly_the_finished_bytes() {
+        let build = || {
+            let mut writer = ArchiveWriter::new();
+            writer.add("x/y", b"conteudo", false).unwrap();
+            writer
+        };
+        let mut sink = Vec::new();
+        build().write_to(&mut sink).unwrap();
+        assert_eq!(sink, build().finish().unwrap());
+        assert_eq!(format!("{:?}", build()), "ArchiveWriter { entries: 1 }");
+    }
 }
