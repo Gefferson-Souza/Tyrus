@@ -1,0 +1,11 @@
+const a: number = 5;
+const b: number = 3;
+const c: number = -16;
+const big: number = 2147483648;
+console.log(a & b);
+console.log(a | b);
+console.log(a ^ b);
+console.log(c << 2);
+console.log(c >> 2);
+console.log(c >>> 28);
+console.log(big | 0);
