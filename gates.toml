@@ -1,0 +1,119 @@
+# Fonte única de limiares e do estado de cada gate (unidade gov-gates-toml).
+# Leitura: scripts/gates/cfg.py (get | validate | parity | deny-config). Consumo: scripts/gates.sh.
+# Raiz de confiança: alteração aqui exige revisão do dono.
+
+[meta]
+schema_version = 1
+semantics_source = "docs/standards/CONSTITUTION.md"
+
+# Crates legados (regime do Power of Ten). A lista só encolhe.
+[legacy]
+crates = [
+    "tyrus_analyzer",
+    "tyrus_ast",
+    "tyrus_cli",
+    "tyrus_codegen",
+    "tyrus_common",
+    "tyrus_decorator_kinds",
+    "tyrus_di",
+    "tyrus_diagnostics",
+    "tyrus_orchestrator",
+    "tyrus_parser",
+    "tyrus_test_utils",
+    "integration_tests",
+]
+
+# Allowlist fechada de unsafe (ADR 0016). Acrescentar crate exige ADR.
+[unsafe_allowlist]
+crates = ["tyrus_host", "tyrus_platform", "tyrus_heap"]
+
+# Módulos (caminho relativo a src/) que podem carregar #[allow(unsafe_code)].
+[unsafe_allowlist.modules]
+tyrus_host = []
+tyrus_platform = []
+tyrus_heap = []
+
+[thresholds]
+file_soft_cap = 400
+file_hard_cap = 800
+# Violadores antigos do teto suave (issue #153); nunca passam do teto duro.
+filesize_soft_allowlist = ['/convert/class/constructor\.rs$', '/convert/interface\.rs$']
+fn_max_lines = 50
+fn_max_params = 5
+nesting_max = 4
+coverage_min = 73
+disk_min_gb_all = 15
+disk_min_gb_step = 3
+# PROVISORIO (ADR 0018 Proposto): imutavel depois da primeira medicao do hospedado.
+g1_margin = 1.05
+g1b_upper = 1.0
+g2_promote_max = 0.9
+g2_demote_min = 1.0
+g2_demote_nights = 2
+# Piso 1.0 ate o dono fixar os numeros definitivos (Q-D).
+m2_rss_ratio_max = 1.0
+m2_startup_ratio_max = 1.0
+ci_level = 0.95
+g1_min_rounds = 15
+
+# Quem pode depender de cada crate guardado. Crates legados so aceitam legados
+# como dependentes (gerado de [legacy]); os demais sao a direcao
+# facts -> place -> assemble, e o runtime nunca depende do compilador.
+[direction.allowed_dependents]
+tyrus_facts = ["tyrus_place", "tyrus_assemble", "tyrus_cli"]
+tyrus_place = ["tyrus_assemble", "tyrus_cli"]
+tyrus_assemble = ["tyrus_cli"]
+
+[claims]
+paths = ["docs", "README.md", "ROADMAP.md"]
+
+# state = ACTIVE | SKIPPED. SKIPPED exige activates_in (fase) e imprime SKIPPED(<fase>).
+# ci_exempt = motivo de nao ter passo proprio no CI.
+
+[gates.fmt]
+state = "ACTIVE"
+
+[gates.clippy]
+state = "ACTIVE"
+
+[gates.filesize]
+state = "ACTIVE"
+
+[gates.unsafe]
+state = "ACTIVE"
+
+[gates.direction]
+state = "ACTIVE"
+
+[gates.gates-toml]
+state = "ACTIVE"
+
+[gates.gates-selftest]
+state = "ACTIVE"
+
+[gates.replica]
+state = "ACTIVE"
+
+[gates.test]
+state = "ACTIVE"
+
+[gates.coverage]
+state = "ACTIVE"
+
+[gates.deny]
+state = "ACTIVE"
+
+[gates.audit]
+state = "ACTIVE"
+
+[gates.machete]
+state = "ACTIVE"
+
+[gates.node-pins]
+state = "ACTIVE"
+ci_exempt = "chamado por test e coverage, que sao passos de CI"
+
+[gates.claims]
+state = "SKIPPED"
+activates_in = "docs-claims-migration"
+ci_exempt = "SKIPPED ate a migracao dos docs"

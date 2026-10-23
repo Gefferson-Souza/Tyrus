@@ -24,7 +24,9 @@ lto = true
 # `cargo clippy`/`cargo build`.
 [workspace.lints.rust]
 warnings = "deny"
-unsafe_code = "forbid"
+# deny, not forbid: forbid at workspace level would block #[allow(unsafe_code)] in the
+# allowlisted crates (ADR 0016); every other crate keeps #![forbid(unsafe_code)] at its root.
+unsafe_code = "deny"
 unreachable_pub = "warn"
 missing_debug_implementations = "warn"
 
@@ -46,6 +48,9 @@ unwrap_in_result = "warn"
 needless_pass_by_value = "warn"
 redundant_closure_for_method_calls = "warn"
 implicit_clone = "warn"
+
+# Allowlisted crates only (ADR 0016): every unsafe block needs a // SAFETY: comment.
+undocumented_unsafe_blocks = "deny"
 
 # Debug/process hygiene (restriction cherry-picks, ADR 0013).
 dbg_macro = "warn"

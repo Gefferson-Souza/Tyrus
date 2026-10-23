@@ -138,8 +138,12 @@ The mandated gate set (as named in `gates.sh`):
 ```bash
 fmt       # cargo fmt --all -- --check
 clippy    # cargo clippy --workspace --all-targets --locked -- -D warnings
-filesize  # Rule 4 line caps: soft 400 / hard 800 per .rs under crates/
-unsafe    # Rule 13: #![forbid(unsafe_code)] present in every crate root
+filesize  # Rule 4 line caps per .rs under crates/ (thresholds.file_soft_cap / file_hard_cap in gates.toml: 400 / 800)
+unsafe    # Rule 13: #![forbid(unsafe_code)] in every crate root outside gates.toml [unsafe_allowlist]
+direction # dependency direction and closed legacy regime (cargo-deny bans.wrappers generated from gates.toml)
+gates-toml     # gates.toml valid and in parity with gates.sh and ci.yml (scripts/gates/cfg.py)
+gates-selftest # scripts/gates/test_cfg.sh: fixtures for the gates above
+claims    # SKIPPED(docs-claims-migration): a SKIPPED gate prints SKIPPED(<phase>), never PASS
 test      # cargo nextest run --workspace --locked
 coverage  # cargo llvm-cov, --fail-under-lines at the enforced threshold
 deny      # cargo deny check
@@ -208,7 +212,7 @@ When the monolithic `gates.sh all` run is impractical on a dev machine (resource
 
 **Why.** With zero `unsafe` in the workspace, whole classes of tooling (Miri, sanitizers) become unnecessary rather than merely passing — the strongest possible safety argument is structural absence, not audited presence. This also makes the safety posture legible to outside reviewers in one grep.
 
-**Enforce.** `#![forbid(unsafe_code)]` attribute in every crate root (all 12 members, #214); the `unsafe` gate in `scripts/gates.sh` (with its 1:1 CI step) fails if any crate root lacks the attribute.
+**Enforce.** `#![forbid(unsafe_code)]` attribute in every crate root (all 12 members, #214); the `unsafe` gate in `scripts/gates.sh` (with its 1:1 CI step) fails if any crate root lacks the attribute. The workspace lint `unsafe_code` is `deny` (not `forbid`) since `gov-gates-toml`, so the allowlist of ADR 0016 can use `#[allow(unsafe_code)]`; the per-crate `forbid` carries the guarantee, and `undocumented_unsafe_blocks` is `deny`.
 
 **Severity.** CRITICAL.
 
