@@ -1,7 +1,7 @@
 # 7. Decorator Registry
 
 Date: 2026-05-02
-Status: Accepted. Superseded for new work by [ADR 0016](0016-ppr-foundation-and-constitution.md) (contradicts foundation decision D5), effective when ADR 0016 is accepted; legacy-scoped until the code is deleted.
+Status: Accepted. To be replaced for new work by [ADR 0016](0016-ppr-foundation-and-constitution.md) (contradicts foundation decision D5) once ADR 0016 is accepted; legacy-scoped until the code is deleted.
 
 ## Context
 
