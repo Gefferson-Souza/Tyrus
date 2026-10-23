@@ -60,7 +60,8 @@ g1_min_rounds = 15
 # como dependentes (gerado de [legacy]); os demais sao a direcao
 # facts -> place -> assemble, e o runtime nunca depende do compilador.
 [direction.allowed_dependents]
-tyrus_facts = ["tyrus_place", "tyrus_assemble", "tyrus_cli"]
+tyrus_facts = ["tyrus_place", "tyrus_assemble", "tyrus_closure", "tyrus_cli"]
+tyrus_closure = ["tyrus_cli"]
 tyrus_place = ["tyrus_assemble", "tyrus_cli"]
 tyrus_assemble = ["tyrus_cli"]
 # Runtime: nao depende do compilador (teste no_compiler_deps); quem le/escreve o arquivo do fecho.
@@ -130,6 +131,9 @@ state = "ACTIVE"
 [gates.claims]
 state = "SKIPPED"
 activates_in = "docs-claims-migration"
+
+[gates.closure]
+state = "ACTIVE"
 
 [gates.rules-lint]
 state = "ACTIVE"

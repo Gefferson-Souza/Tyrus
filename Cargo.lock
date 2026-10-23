@@ -2285,9 +2285,21 @@ dependencies = [
  "miette",
  "tokio",
  "tyrus_analyzer",
+ "tyrus_closure",
  "tyrus_common",
  "tyrus_diagnostics",
+ "tyrus_facts",
  "tyrus_orchestrator",
+]
+
+[[package]]
+name = "tyrus_closure"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tyrus_facts",
 ]
 
 [[package]]
@@ -2350,6 +2362,7 @@ dependencies = [
  "jsonschema",
  "serde",
  "serde_json",
+ "sha2",
  "thiserror",
 ]
 

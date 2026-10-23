@@ -32,6 +32,7 @@
 #   ./scripts/gates.sh claims      # SKIPPED(docs-claims-migration) até a migração dos docs
 #   ./scripts/gates.sh corpus-immutable  # oracle/corpus/seed bate com corpus.lock (sha256), sem sobra nem falta
 #   ./scripts/gates.sh rules-lint  # Constituição x gates.toml, nomes de iteração, ADR, orçamento de LOC; gatilho de ADR só com TYRUS_RULES_LINT_BASE (CI)
+#   ./scripts/gates.sh closure     # tyrus_closure (closure.lock, rastro) e o gancho de rastro do oráculo (sem Docker)
 #
 # Limiares e estado (ACTIVE | SKIPPED) vêm de gates.toml (scripts/gates/cfg.py). Gate SKIPPED
 # imprime SKIPPED(<fase>), nunca PASS. TYRUS_GATES_TOML e TYRUS_GATES_ROOT apontam para uma
@@ -393,15 +394,24 @@ gate_rules_lint() {
     fi
 }
 
+gate_closure() {
+    echo "=== gate: closure ==="
+    guard_disk
+    # nextest roda um processo por teste: os testes de build escrevem e executam um npm falso,
+    # e threads do libtest concorrentes causam ETXTBSY (fork com o arquivo ainda aberto).
+    cargo nextest run --locked -p tyrus_closure
+    python3 -B -I -m unittest discover -s oracle/harness/tests -t oracle/harness -p 'test_closure_trace_hook.py'
+}
+
 # --- Dispatcher --------------------------------------------------------------
 
 cmd="${1:-all}"
 case "$cmd" in
-    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|audit-policy|claims|corpus-immutable|rules-lint)
+    fmt|clippy|test|coverage|filesize|deny|audit|machete|unsafe|replica|wire|front|node-pins|direction|gates-toml|gates-selftest|audit-policy|claims|corpus-immutable|closure|rules-lint)
         run_gate "$cmd" ;;
     all)
         guard_disk "$(cfg get thresholds.disk_min_gb_all)"
-        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit audit-policy machete claims corpus-immutable rules-lint; do
+        for name in gates-toml fmt clippy filesize unsafe direction gates-selftest replica wire front test coverage deny audit audit-policy machete claims corpus-immutable closure rules-lint; do
             run_gate "$name"
         done
         echo ""
