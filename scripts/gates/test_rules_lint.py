@@ -1,9 +1,11 @@
 """Testes do rules_lint.py com árvores de fixture em diretório temporário."""
 
+import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -199,7 +201,24 @@ class LocBudgetTest(TempRoot):
 
 def git(root, *args):
     subprocess.run(["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@t", *args],
-                   check=True, capture_output=True)
+                   check=True, capture_output=True, env=rules_lint.clean_git_env())
+
+
+    def test_excluded_vendor_does_not_count_in_the_total(self):
+        self.lines("scripts/a.py", 30)
+        self.lines("crates/p/src/lib.rs", 70)
+        self.lines("vendor/dep/lib.rs", 5000)
+        data = {**BASE_DATA, "loc_budget": {**BASE_DATA["loc_budget"], "exclude": ["vendor/"]}}
+        stats = rules_lint.loc_stats(self.root, data)
+        self.assertEqual(stats["total"], 100)
+
+    def test_wide_ratio_over_limit_warns_without_failing(self):
+        self.lines("scripts/a.py", 10)
+        self.lines("oracle/o.py", 60)
+        self.lines("crates/p/src/lib.rs", 30)
+        errors, notes = rules_lint.check_loc(self.root, BASE_DATA)
+        self.assertEqual(errors, [])
+        self.assertTrue(any("K8" in n for n in notes))
 
 
 class AdrTriggerTest(TempRoot):
@@ -262,6 +281,36 @@ class AdrTriggerTest(TempRoot):
         write(self.root, "crates/a/src/t.rs", "trait Handler {}\n")
         self.commit()
         self.assertEqual(self.trigger(), [])
+
+
+class HookEnvironmentTest(TempRoot):
+    def test_inherited_git_env_does_not_touch_another_repo(self):
+        decoy = self.root / "decoy"
+        decoy.mkdir()
+        git(decoy, "init", "-q", "-b", "main")
+        write(decoy, "keep.txt", "x\n")
+        git(decoy, "add", "-A")
+        git(decoy, "commit", "-q", "-m", "keep")
+        head = subprocess.run(["git", "-C", str(decoy), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout
+        inherited = {"GIT_DIR": str(decoy / ".git"), "GIT_INDEX_FILE": str(decoy / ".git" / "index")}
+        with mock.patch.dict(os.environ, inherited):
+            work = self.root / "work"
+            work.mkdir()
+            git(work, "init", "-q", "-b", "main")
+            for name in "abcd":
+                write(work, f"crates/{name}/src/lib.rs", "pub fn f() {}\n")
+            git(work, "add", "-A")
+            git(work, "commit", "-q", "-m", "base")
+            git(work, "checkout", "-q", "-b", "pr")
+            for name in "abc":
+                write(work, f"crates/{name}/src/x.rs", "pub fn g() {}\n")
+            git(work, "add", "-A")
+            git(work, "commit", "-q", "-m", "change")
+            errors = rules_lint.check_adr_trigger(work, "main", "HEAD", "")
+        after = subprocess.run(["git", "-C", str(decoy), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout
+        self.assertEqual(after, head)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue((work / ".git").is_dir())
 
 
 class RealTreeTest(unittest.TestCase):

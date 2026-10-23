@@ -29,6 +29,11 @@ SKIP_DIRS = {".git", "target", "node_modules", "vendor", "dist", "__pycache__"}
 MIN_CRATES_FOR_ADR = 3
 
 
+def clean_git_env():
+    """Ambiente sem GIT_*: o hook pre-commit de um worktree exporta GIT_DIR/GIT_INDEX_FILE absolutos."""
+    return {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+
+
 def load_config(path):
     with open(path, "rb") as handle:
         return tomllib.load(handle)
@@ -38,7 +43,7 @@ def walk_files(root):
     """Arquivos versionados (git) ou, fora de um repositório, todos exceto diretórios de build."""
     root = Path(root)
     if (root / ".git").exists():
-        out = subprocess.run(["git", "-C", str(root), "ls-files", "-z"], capture_output=True, check=True)
+        out = subprocess.run(["git", "-C", str(root), "ls-files", "-z"], capture_output=True, check=True, env=clean_git_env())
         return [root / rel for rel in out.stdout.decode().split("\0") if rel and (root / rel).is_file()]
     found = []
     for base, dirs, names in os.walk(root):
@@ -181,10 +186,11 @@ def category_of(relative, categories):
 def loc_stats(root, data):
     budget = data["loc_budget"]
     extensions = tuple(budget["extensions"])
+    excluded = tuple(budget.get("exclude", []))
     counts = {name: 0 for name in budget["categories"]}
     total = 0
     for path in walk_files(root):
-        if not path.name.endswith(extensions):
+        if not path.name.endswith(extensions) or rel(root, path).startswith(excluded):
             continue
         lines = count_lines(path)
         total += lines
@@ -202,15 +208,19 @@ def check_loc(root, data):
     stats = loc_stats(root, data)
     note = (f"ferramental {stats['tooling']}/{stats['total']} LOC = {stats['ratio']:.1%} (teto {limit:.0%}); "
             f"larga com oracle (informativo, não imposto): {stats['wide_ratio']:.1%}")
+    notes = [note]
+    if stats["wide_ratio"] > limit:
+        notes.append(f"AVISO: a leitura larga ({stats['wide_ratio']:.1%}) passa de {limit:.0%}; "
+                     "o K8 do RFC pode estar disparado (ADR antes de continuar) - decisão do dono")
     if stats["ratio"] > limit:
-        return [f"orçamento de LOC: ferramental em {stats['ratio']:.1%}, acima de {limit:.0%}"], [note]
-    return [], [note]
+        return [f"orçamento de LOC: ferramental em {stats['ratio']:.1%}, acima de {limit:.0%}"], notes
+    return [], notes
 
 
 # --- (d) gatilho de ADR sobre o diff (só CI) ---------------------------------
 
 def run_git(root, *args):
-    out = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, check=True)
+    out = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, check=True, env=clean_git_env())
     return out.stdout
 
 

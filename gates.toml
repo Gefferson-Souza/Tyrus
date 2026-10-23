@@ -161,6 +161,7 @@ naming_allow = ["Power of Ten v2", "schema v2"]
 # réplica) é reportado na razão larga, sem teto.
 [loc_budget]
 tooling_max_ratio = 0.25
+exclude = ["vendor/"]
 extensions = [".rs", ".py", ".sh", ".ts", ".js", ".mjs", ".yml", ".yaml"]
 
 [loc_budget.categories]
