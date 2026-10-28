@@ -2,7 +2,7 @@
 
 # Tyrus: Um Compilador TypeScript-para-Rust de Alta Fidelidade
 
-_Projeto Acadêmico em Teoria de Compiladores e Preservação Semântica_
+_Projeto experimental em teoria de compiladores e preservação semântica_
 
 [![CI Status](https://github.com/Gefferson-Souza/Tyrus/actions/workflows/ci.yml/badge.svg)](https://github.com/Gefferson-Souza/Tyrus/actions/workflows/ci.yml)
 ![Rust Version](https://img.shields.io/badge/rust-1.75%2B-orange)
@@ -27,7 +27,7 @@ Tyrus não depende de um runtime oculto ou emulação de garbage collection. Cad
 
 ### 📐 Preservação Semântica
 
-O objetivo principal é a equivalência formal. Se um projeto TypeScript for "Oxidizável", o código Rust gerado é garantido para manter a integridade semântica da lógica original, ao mesmo tempo em que melhora o desempenho e a segurança.
+O objetivo principal é a equivalência formal. Se um projeto TypeScript for "Oxidizável", o código Rust gerado deve manter o comportamento da lógica original. Isso ainda não é garantido: os padrões listados abaixo são os verificados até agora.
 
 ### 🚫 O Padrão Oxidizável
 
@@ -45,19 +45,19 @@ Aderindo aos princípios estritos de "Transpilação Segura":
 
 ## 🚀 Camadas de Funcionalidades
 
-### Camada 1: Linguagem Base (Pronto para Produção)
+### Camada 1: Linguagem Base (Experimental)
 
 - Primitivos (`string`, `number`, `boolean`)
 - Fluxo de Controle (`if/else`, `while`, `for`)
 - Tratamento de Erros (`Result`, `Option`)
 
-### Camada 2: Sistema de Tipos Avançado (Pronto para Produção)
+### Camada 2: Sistema de Tipos Avançado (Experimental)
 
 - Interfaces e Type Aliases para Structs/Enums
 - Generics e Polimorfismo
 - Mapeamento Abrangente de Coleções (`Array<T>` -> `Vec<T>`)
 
-### Camada 3: Ecossistema e Assincronia (Pronto para Produção)
+### Camada 3: Ecossistema e Assincronia (Experimental)
 
 - `Async/Await` para concorrência baseada em Future
 - Serialização/Desserialização JSON (via `serde`)
