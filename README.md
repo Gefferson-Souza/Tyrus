@@ -2,7 +2,7 @@
 
 # Tyrus: A High-Fidelity TypeScript-to-Rust Compiler
 
-_Academic Project in Compiler Theory & Semantic Preservation_
+_Experimental project in compiler theory and semantic preservation_
 
 [![CI Status](https://github.com/Gefferson-Souza/Tyrus/actions/workflows/ci.yml/badge.svg)](https://github.com/Gefferson-Souza/Tyrus/actions/workflows/ci.yml)
 ![Rust Version](https://img.shields.io/badge/rust-1.75%2B-orange)
@@ -27,7 +27,7 @@ Tyrus does not rely on a hidden runtime or garbage collection emulation. Every T
 
 ### 📐 Semantic Preservation
 
-The primary goal is formal equivalence. If a TypeScript project is "Oxidizable," the generated Rust code is guaranteed to maintain the original logic's semantic integrity while improving performance and security.
+The primary goal is formal equivalence. If a TypeScript project is "Oxidizable," the generated Rust code should keep the original logic's behavior. This is not yet guaranteed: the patterns listed below are the ones verified so far.
 
 ### 🚫 The Oxidizable Standard
 
@@ -45,19 +45,19 @@ Adhering to strict "Safe Transpilation" principles:
 
 ## 🚀 Feature Tiers
 
-### Tier 1: Core Language (Production Ready)
+### Tier 1: Core Language (Experimental)
 
 - Primitives (`string`, `number`, `boolean`)
 - Control Flow (`if/else`, `while`, `for`)
 - Error Handling (`Result`, `Option`)
 
-### Tier 2: Advanced Type System (Production Ready)
+### Tier 2: Advanced Type System (Experimental)
 
 - Interfaces and Type Aliases to Structs/Enums
 - Generics and Polymorphism
 - Comprehensive Collection Mapping (`Array<T>` -> `Vec<T>`)
 
-### Tier 3: Ecosystem & Asynchony (Production Ready)
+### Tier 3: Ecosystem & Asynchrony (Experimental)
 
 - `Async/Await` to Future-based concurrency
 - JSON Serialization/Deserialization (via `serde`)
